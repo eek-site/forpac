@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FormanPacific | Service Claims Management & Emergency Response Coordination</title>
+  <meta name="description" content="FormanPacific (ForPac) Service Claims - Professional claims intermediary and emergency service coordination platform. Connecting verified service providers with insurance and corporate clients across New Zealand." />
+  <meta name="keywords" content="service claims management, insurance intermediary, emergency response coordination, supplier network, claims processing, ForPac, FormanPacific" />
+  <meta property="og:title" content="FormanPacific - Service Claims Management Platform" />
+  <meta property="og:description" content="Professional service claims intermediary connecting verified suppliers with insurance and corporate clients. Streamlined claims processing and emergency response coordination." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.formanpacific.com" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: #2c3e50;
+    }
+
+    /* Professional Header */
+    .header {
+      background: #ffffff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    .company-name {
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #1e3c72;
+    }
+
+    .tagline {
+      font-size: 0.9em;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #4a5568;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #1e3c72;
+    }
+
+    /* Closed/Notice Banner */
+    .notice-banner {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.05em;
+    }
+
+    .notice-banner a {
+      color: white;
+      text-decoration: underline;
+      margin-left: 10px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: white;
+      padding: 60px 30px;
+      text-align: center;
+      margin: 40px auto;
+      max-width: 1200px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .hero h1 {
+      font-size: 2.8em;
+      color: #1e3c72;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 1.3em;
+      color: #4a5568;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto 40px;
+    }
+
+    /* Login Section */
+    .login-section {
+      background: #f8f9fa;
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 500px;
+      margin: 0 auto 40px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .login-section h2 {
+      color: #1e3c72;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      text-align: center;
+    }
+
+    .ms-login-btn {
+      background: #0078d4;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .ms-login-btn:hover {
+      background: #005a9e;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,120,212,0.3);
+    }
+
+    .ms-logo {
+      width: 20px;
+      height: 20px;
+    }
+
+    .login-divider {
+      text-align: center;
+      margin: 25px 0;
+      color: #718096;
+      position: relative;
+    }
+
+    .login-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .login-divider span {
+      background: #f8f9fa;
+      padding: 0 15px;
+      position: relative;
+    }
+
+    .supplier-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .supplier-link {
+      display: block;
+      padding: 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      color: #4a5568;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .supplier-link:hover {
+      background: #f7fafc;
+      border-color: #cbd5e0;
+      transform: translateX(5px);
+    }
+
+    /* Services Grid */
+    .services-section {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 30px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    .service-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border-top: 4px solid transparent;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .service-card.emergency {
+      border-top-color: #f56565;
+    }
+
+    .service-card.claims {
+      border-top-color: #4299e1;
+    }
+
+    .service-card.network {
+      border-top-color: #48bb78;
+    }
+
+    .service-card.compliance {
+      border-top-color: #9f7aea;
+    }
+
+    .service-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .service-card.emergency .service-icon {
+      background: linear-gradient(135deg, #feb2b2, #fc8181);
+    }
+
+    .service-card.claims .service-icon {
+      background: linear-gradient(135deg, #90cdf4, #63b3ed);
+    }
+
+    .service-card.network .service-icon {
+      background: linear-gradient(135deg, #9ae6b4, #68d391);
+    }
+
+    .service-card.compliance .service-icon {
+      background: linear-gradient(135deg, #d6bcfa, #b794f4);
+    }
+
+    .service-card h3 {
+      color: #2d3748;
+      margin-bottom: 15px;
+      font-size: 1.4em;
+    }
+
+    .service-card p {
+      color: #718096;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .service-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .service-features li {
+      padding: 8px 0;
+      color: #4a5568;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .service-features li::before {
+      content: '✓';
+      color: #48bb78;
+      font-weight: bold;
+    }
+
+    /* Supplier Resources Section */
+    .resources-section {
+      background: white;
+      padding: 60px 30px;
+      margin: 40px auto;
+      max-width: 1200px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .resources-section h2 {
+      text-align: center;
+      color: #1e3c72;
+      font-size: 2.2em;
+      margin-bottom: 40px;
+    }
+
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .resource-card {
+      background: #f7fafc;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .resource-card:hover {
+      background: white;
+      border-color: #4299e1;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .resource-icon {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+    }
+
+    .resource-card h4 {
+      color: #2d3748;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+
+    .resource-card p {
+      color: #718096;
+      font-size: 0.95em;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      padding: 60px 30px;
+      margin: 40px 0;
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      text-align: center;
+    }
+
+    .stat-item h3 {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    .stat-item p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: white;
+      padding: 40px 30px 20px;
+      margin-top: 60px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+
+    .footer-section h4 {
+      margin-bottom: 15px;
+      color: #e2e8f0;
+    }
+
+    .footer-section a {
+      color: #cbd5e0;
+      text-decoration: none;
+      display: block;
+      padding: 5px 0;
+      transition: color 0.3s ease;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #4a5568;
+      padding-top: 20px;
+      text-align: center;
+      color: #a0aec0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .header-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero h1 {
+        font-size: 2em;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .company-name {
+        font-size: 1.4em;
+      }
+    }
+
+    /* Loading State */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #0078d4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Notice Banner -->
+  <div class="notice-banner">
+    📢 Supplier Portal Access: Authentication required for all supplier services
+    <a href="#supplier-login">Login Now →</a>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div>
+          <div class="company-name">FormanPacific</div>
+          <div class="tagline">Service Claims Management Platform</div>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="#services" class="nav-link">Services</a>
+        <a href="#network" class="nav-link">Network</a>
+        <a href="#resources" class="nav-link">Resources</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Professional Service Claims Management</h1>
+    <p>FormanPacific (ForPac) connects verified service providers with insurance companies, corporate clients, and emergency response networks across New Zealand and the Pacific region.</p>
+    
+    <!-- Login Section -->
+    <div class="login-section" id="supplier-login">
+      <h2>Supplier Portal Access</h2>
+      
+      <button class="ms-login-btn" onclick="initiateLogin()">
+        <svg class="ms-logo" viewBox="0 0 21 21">
+          <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+          <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+          <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+          <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+        Sign in with Microsoft
+      </button>
+
+      <div class="login-divider">
+        <span>Supplier Resources</span>
+      </div>
+
+      <div class="supplier-links">
+        <a href="/supplier-registration" class="supplier-link">🤝 Become a Supplier Partner</a>
+        <a href="/supplier-terms" class="supplier-link">📋 Supplier Terms & Conditions</a>
+        <a href="/supplier-compliance" class="supplier-link">✅ Compliance & Certification</a>
+        <a href="/supplier-support" class="supplier-link">💬 Supplier Support</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="services-section" id="services">
+    <div class="services-grid">
+      <div class="service-card emergency">
+        <div class="service-icon">🚨</div>
+        <h3>Emergency Response Coordination</h3>
+        <p>24/7 emergency service dispatch and coordination for critical infrastructure and commercial clients.</p>
+        <ul class="service-features">
+          <li>Vehicle breakdown & mechanical services</li>
+          <li>Commercial refrigeration emergencies</li>
+          <li>Flood response & water damage</li>
+          <li>Tree removal & storm damage</li>
+          <li>30-60 minute response times</li>
+        </ul>
+      </div>
+
+      <div class="service-card claims">
+        <div class="service-icon">📊</div>
+        <h3>Claims Processing & Management</h3>
+        <p>Streamlined claims intermediary services for insurance providers and corporate partners.</p>
+        <ul class="service-features">
+          <li>Automated claim validation</li>
+          <li>Real-time status tracking</li>
+          <li>Compliance documentation</li>
+          <li>Quality assurance protocols</li>
+          <li>Direct billing integration</li>
+        </ul>
+      </div>
+
+      <div class="service-card network">
+        <div class="service-icon">🌐</div>
+        <h3>Supplier Network Management</h3>
+        <p>Comprehensive supplier vetting, onboarding, and performance management system.</p>
+        <ul class="service-features">
+          <li>Verified contractor database</li>
+          <li>Performance metrics tracking</li>
+          <li>Automated dispatch system</li>
+          <li>Geographic coverage mapping</li>
+          <li>Capacity management</li>
+        </ul>
+      </div>
+
+      <div class="service-card compliance">
+        <div class="service-icon">🛡️</div>
+        <h3>Compliance & Quality Assurance</h3>
+        <p>Industry-leading compliance standards and quality control processes.</p>
+        <ul class="service-features">
+          <li>ISO certification support</li>
+          <li>Health & safety compliance</li>
+          <li>Insurance verification</li>
+          <li>Regular audits & assessments</li>
+          <li>Training & certification programs</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stat-item">
+        <h3>500+</h3>
+        <p>Verified Suppliers</p>
+      </div>
+      <div class="stat-item">
+        <h3>24/7</h3>
+        <p>Emergency Response</p>
+      </div>
+      <div class="stat-item">
+        <h3>30-60min</h3>
+        <p>Average Response Time</p>
+      </div>
+      <div class="stat-item">
+        <h3>100%</h3>
+        <p>Coverage NZ-Wide</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supplier Resources -->
+  <section class="resources-section" id="resources">
+    <h2>Supplier Resources & Tools</h2>
+    <div class="resources-grid">
+      <div class="resource-card" onclick="accessPortal('dashboard')">
+        <div class="resource-icon">📱</div>
+        <h4>Supplier Dashboard</h4>
+        <p>Access jobs, invoices, and performance metrics</p>
+      </div>
+      <div class="resource-card" onclick="accessPortal('training')">
+        <div class="resource-icon">🎓</div>
+        <h4>Training Portal</h4>
+        <p>Certification courses and compliance training</p>
+      </div>
+      <div class="resource-card" onclick="accessPortal('documents')">
+        <div class="resource-icon">📄</div>
+        <h4>Documentation</h4>
+        <p>Forms, templates, and procedure guides</p>
+      </div>
+      <div class="resource-card" onclick="accessPortal('payments')">
+        <div class="resource-icon">💳</div>
+        <h4>Payment Portal</h4>
+        <p>Invoice submission and payment tracking</p>
+      </div>
+      <div class="resource-card" onclick="accessPortal('compliance')">
+        <div class="resource-icon">✅</div>
+        <h4>Compliance Center</h4>
+        <p>Upload certifications and insurance documents</p>
+      </div>
+      <div class="resource-card" onclick="accessPortal('support')">
+        <div class="resource-icon">🆘</div>
+        <h4>Support Center</h4>
+        <p>Technical support and escalations</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Supplier Services</h4>
+        <a href="/supplier-portal">Supplier Portal Login</a>
+        <a href="/supplier-registration">Become a Supplier</a>
+        <a href="/supplier-payments">Payment Queries</a>
+        <a href="/supplier-compliance">Compliance Support</a>
+        <a href="/supplier-escalation">Escalations</a>
+      </div>
+      <div class="footer-section">
+        <h4>Legal & Compliance</h4>
+        <a href="/terms">Terms of Service</a>
+        <a href="/supplier-terms">Supplier Agreement</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/compliance">Compliance Standards</a>
+        <a href="/insurance">Insurance Requirements</a>
+      </div>
+      <div class="footer-section">
+        <h4>Corporate</h4>
+        <a href="/about">About FormanPacific</a>
+        <a href="/corporate-services">Corporate Solutions</a>
+        <a href="/insurance-partners">Insurance Partners</a>
+        <a href="/careers">Careers</a>
+        <a href="/contact">Contact Us</a>
+      </div>
+      <div class="footer-section">
+        <h4>Emergency Contacts</h4>
+        <a href="tel:0800FORPAC">0800 FORPAC (Business Hours)</a>
+        <a href="/emergency-escalation">Emergency Escalation</a>
+        <a href="/after-hours">After Hours Support</a>
+        <a href="/critical-response">Critical Response Team</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 FormanPacific Limited. All rights reserved. | Service Claims Management Platform | ABN: 12 345 678 901</p>
+      <p>ForPac Service Claims is a registered trademark of FormanPacific Limited</p>
+    </div>
+  </footer>
+
+  <script>
+    // Microsoft Authentication Configuration
+    const msalConfig = {
+      auth: {
+        clientId: "YOUR_APP_CLIENT_ID", // Replace with your Azure AD app client ID
+        authority: "https://login.microsoftonline.com/YOUR_TENANT_ID", // Replace with your tenant ID
+        redirectUri: "https://www.formanpacific.com/auth/callback",
+      },
+      cache: {
+        cacheLocation: "sessionStorage",
+        storeAuthStateInCookie: false,
+      }
+    };
+
+    // Login request configuration
+    const loginRequest = {
+      scopes: ["openid", "profile", "email", "User.Read"]
+    };
+
+    // Initiate Microsoft login
+    async function initiateLogin() {
+      // Show loading state
+      const button = document.querySelector('.ms-login-btn');
+      const originalContent = button.innerHTML;
+      button.innerHTML = '<span class="loading"></span> Connecting to Microsoft...';
+      button.disabled = true;
+
+      try {
+        // In production, you would use MSAL.js library
+        // For now, simulating the login flow
+        setTimeout(() => {
+          // Simulate redirect to Microsoft login
+          alert('Redirecting to Microsoft login...\n\nIn production, this would redirect to:\nhttps://login.microsoftonline.com/\n\nAfter authentication, suppliers would be redirected to their dashboard.');
+          
+          // Reset button
+          button.innerHTML = originalContent;
+          button.disabled = false;
+          
+          // In production, you would redirect like this:
+          // window.location.href = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?...`;
+        }, 1500);
+      } catch (error) {
+        console.error('Login error:', error);
+        button.innerHTML = originalContent;
+        button.disabled = false;
+        alert('Login service temporarily unavailable. Please try again later.');
+      }
+    }
+
+    // Access portal sections (requires authentication)
+    function accessPortal(section) {
+      // Check if authenticated (would check actual auth state in production)
+      const isAuthenticated = false; // Would check MSAL authentication state
+      
+      if (isAuthenticated) {
+        window.location.href = `/supplier/${section}`;
+      } else {
+        alert(`Authentication required to access the ${section}.\n\nPlease sign in with your Microsoft account to continue.`);
+        document.getElementById('supplier-login').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Add animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '0';
+          entry.target.style.transform = 'translateY(20px)';
+          setTimeout(() => {
+            entry.target.style.transition = 'all 0.6s ease';
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }, 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe service cards and resource cards
+    document.querySelectorAll('.service-card, .resource-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
