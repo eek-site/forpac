@@ -17,7 +17,7 @@
   script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: https:;
-  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com;
+  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
   frame-src 'self';
   font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -399,6 +399,29 @@
   </footer>
 
   <script>
+    // Check system availability status
+    async function checkSystemStatus() {
+      try {
+        // Direct API call to check phone system status - shared backend with Eek
+        const response = await fetch("https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/17b1d2990e6f4082a2b0d9c2f1a29025/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bPyoxJ24kuxJZOyLGAclGaEuH6BHwUTFaGmYOwHofa8", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({}),
+          cache: "no-store"
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.state === 'Active';
+        }
+      } catch (error) {
+        console.error('Error checking system status:', error);
+      }
+      return true; // Default to active (phones visible) if check fails
+    }
+
     // Check if current time is within business hours
     function isWithinBusinessHours() {
       const now = new Date();
@@ -416,17 +439,61 @@
       return false;
     }
 
-    // Update UI based on business hours
-    function updateHoursDisplay() {
+    // Update UI based on system status and business hours
+    async function updateHoursDisplay() {
+      const systemActive = await checkSystemStatus();
       const duringBusinessHours = isWithinBusinessHours();
+      
+      // Update closed banner
       const closedBanner = document.getElementById('closedBanner');
+      const closedTitle = document.getElementById('closedTitle');
+      const afterHoursMessage = document.getElementById('afterHoursMessage');
+      const tempUnavailableMessage = document.getElementById('tempUnavailableMessage');
       
       if (closedBanner) {
-        if (!duringBusinessHours) {
+        if (!systemActive) {
           closedBanner.style.display = 'block';
+          
+          if (duringBusinessHours) {
+            // During business hours but phones off - operational reasons
+            closedTitle.innerHTML = '🚧 PHONE LINES CURRENTLY BUSY';
+            closedBanner.style.background = 'linear-gradient(135deg, #ff8c00, #ff6b00)';
+            afterHoursMessage.style.display = 'none';
+            tempUnavailableMessage.style.display = 'block';
+          } else {
+            // Outside business hours
+            closedTitle.innerHTML = '🕐 OFFICE CURRENTLY CLOSED';
+            closedBanner.style.background = 'linear-gradient(135deg, #666, #888)';
+            afterHoursMessage.style.display = 'block';
+            tempUnavailableMessage.style.display = 'none';
+          }
         } else {
           closedBanner.style.display = 'none';
         }
+      }
+      
+      // Update phone buttons visibility based on system status
+      const phoneButtons = document.querySelectorAll('.phone-button, a[href^="tel:"]');
+      phoneButtons.forEach(btn => {
+        if (!btn.closest('.footer-section')) { // Don't hide footer phone links
+          if (systemActive) {
+            btn.style.display = btn.classList.contains('phone-button') ? 'inline-block' : 'inline-flex';
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+          } else {
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            if (btn.classList.contains('phone-button')) {
+              btn.setAttribute('title', duringBusinessHours ? 'Phone lines busy - please try again shortly' : 'Office closed - please call during business hours');
+            }
+          }
+        }
+      });
+      
+      // Update admin link visibility
+      const adminLink = document.querySelector('.admin-link');
+      if (adminLink && !systemActive && !duringBusinessHours) {
+        adminLink.style.display = 'inline-block';
       }
     }
 
@@ -470,8 +537,8 @@
     // Initialize on page load
     window.addEventListener('load', function() {
       updateHoursDisplay();
-      // Update every minute to ensure accuracy
-      setInterval(updateHoursDisplay, 60 * 1000);
+      // Check status every 5 minutes
+      setInterval(updateHoursDisplay, 5 * 60 * 1000);
     });
   </script>
 </body>
