@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | FormanPacific</title>
+    <meta name="description" content="Secure administrator access portal for FormanPacific service claims management platform">
+    
+    <!-- Microsoft Authentication Library -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #1e3c72;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 30px 0;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .login-button:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .microsoft-logo {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 1px solid #fc8181;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .success-message {
+            background: #f0fff4;
+            border: 1px solid #68d391;
+            color: #22543d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #718096;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .security-notice {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #4a5568;
+            text-align: center;
+        }
+        
+        .security-notice strong {
+            color: #2d3748;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #4299e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo">FP</div>
+            <h1>Admin Portal</h1>
+            <p class="subtitle">Sign in with your Microsoft account</p>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <button class="login-button" onclick="signIn()">
+            <svg class="microsoft-logo" viewBox="0 0 21 21">
+                <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+                <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+                <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+            </svg>
+            Sign in with Microsoft
+        </button>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <div id="loadingIndicator" class="loading">
+            <div class="spinner"></div>
+            <p>Authenticating...</p>
+        </div>
+        
+        <div class="security-notice">
+            <strong>Secure Access</strong><br>
+            Only authorized FormanPacific administrators can access this portal.
+            All login attempts are logged and monitored.
+        </div>
+        
+        <div class="back-link">
+            <a href="/">← Back to main site</a>
+        </div>
+    </div>
+
+    <script>
+        // Microsoft Authentication Configuration
+        const msalConfig = {
+            auth: {
+                clientId: 'YOUR-CLIENT-ID-HERE', // Replace with your Azure AD app client ID
+                authority: 'https://login.microsoftonline.com/YOUR-TENANT-ID', // Replace with your tenant ID
+                redirectUri: 'https://www.formanpacific.com/admin/dashboard' // Where to redirect after login
+            },
+            cache: {
+                cacheLocation: 'sessionStorage', // Session storage for security
+                storeAuthStateInCookie: false
+            }
+        };
+
+        // Create MSAL instance
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+        // Login request configuration
+        const loginRequest = {
+            scopes: ['user.read'] // Basic user profile access
+        };
+
+        // Sign in function
+        async function signIn() {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            const loadingDiv = document.getElementById('loadingIndicator');
+            
+            // Reset messages
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                // Attempt popup login (can also use redirect)
+                const loginResponse = await msalInstance.loginPopup(loginRequest);
+                
+                if (loginResponse) {
+                    // Successfully logged in
+                    successDiv.textContent = 'Authentication successful! Redirecting to dashboard...';
+                    successDiv.style.display = 'block';
+                    loadingDiv.style.display = 'none';
+                    
+                    // Store user info
+                    sessionStorage.setItem('msalAccount', JSON.stringify(loginResponse.account));
+                    
+                    // Redirect to dashboard after short delay
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 1500);
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                
+                if (error.errorCode === 'popup_window_error') {
+                    // Popup blocked, try redirect method
+                    try {
+                        await msalInstance.loginRedirect(loginRequest);
+                    } catch (redirectError) {
+                        errorDiv.textContent = 'Unable to authenticate. Please check your popup blocker settings.';
+                    }
+                } else if (error.errorCode === 'user_cancelled') {
+                    errorDiv.textContent = 'Sign-in cancelled. Please try again.';
+                } else {
+                    errorDiv.textContent = 'Authentication failed. Please try again or contact support.';
+                    console.error('Authentication error:', error);
+                }
+            }
+        }
+
+        // Check if returning from redirect
+        msalInstance.handleRedirectPromise()
+            .then(response => {
+                if (response) {
+                    // User successfully logged in via redirect
+                    sessionStorage.setItem('msalAccount', JSON.stringify(response.account));
+                    window.location.href = '/admin/dashboard';
+                }
+            })
+            .catch(error => {
+                console.error('Redirect error:', error);
+            });
+
+        // Alternative: Direct to Microsoft Forms for now
+        function temporaryFormRedirect() {
+            // While Microsoft auth is being set up, redirect to your form
+            window.location.href = 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u';
+        }
+        
+        // Temporarily use form redirect until Azure AD is configured
+        // Uncomment the line below to bypass MS auth and use the form
+        // document.querySelector('.login-button').onclick = temporaryFormRedirect;
+    </script>
+</body>
+</html>
