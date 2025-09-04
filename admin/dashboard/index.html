@@ -944,7 +944,14 @@
             // Only start updates if authenticated
             const dashboardContainer = document.getElementById('dashboardContainer');
             if (dashboardContainer.classList.contains('authenticated')) {
+                // Check phone system status immediately
+                checkPhoneSystemStatus();
+                
+                // Update stats every 10 seconds
                 setInterval(updateStats, 10000);
+                
+                // Check phone system status every 30 seconds
+                setInterval(checkPhoneSystemStatus, 30000);
             }
         });
 
