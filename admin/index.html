@@ -234,16 +234,16 @@
     <script>
         // Microsoft Authentication Configuration
         const msalConfig = {
-            auth: {
-                clientId: 'YOUR-CLIENT-ID-HERE', // Replace with your Azure AD app client ID
-                authority: 'https://login.microsoftonline.com/YOUR-TENANT-ID', // Replace with your tenant ID
-                redirectUri: 'https://www.formanpacific.com/admin/dashboard' // Where to redirect after login
-            },
-            cache: {
-                cacheLocation: 'sessionStorage', // Session storage for security
-                storeAuthStateInCookie: false
-            }
-        };
+    auth: {
+        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+        redirectUri: 'https://www.formanpacific.com/admin/dashboard'
+    },
+    cache: {
+        cacheLocation: 'sessionStorage',
+        storeAuthStateInCookie: false
+    }
+};
 
         // Create MSAL instance
         const msalInstance = new msal.PublicClientApplication(msalConfig);
