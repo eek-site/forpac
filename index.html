@@ -28,7 +28,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17529704008"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
+    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config','AW-17529704008');
   </script>
@@ -43,8 +43,8 @@
     "telephone": "+6448873337",
     "url": "https://www.formanpacific.com",
     "image": "https://www.formanpacific.com/brand-image.png",
-    "address": { "@type":"PostalAddress", "addressCountry":"NZ" },
-    "areaServed": { "@type":"Country", "name":"New Zealand" },
+    "address": {"@type":"PostalAddress","addressCountry":"NZ"},
+    "areaServed": {"@type":"Country","name":"New Zealand"},
     "openingHours": ["Mo 08:30-17:00","Tu 08:30-17:00","We 08:30-17:00","Th 08:30-17:00","Fr 08:30-17:00"]
   }
   </script>
@@ -56,8 +56,13 @@
     body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;color:#2c3e50;}
 
     /* After Hours Banner */
-    .after-hours-banner{background:linear-gradient(135deg,#f56565,#e53e3e);color:#fff;padding:10px 20px;text-align:center;font-weight:600;display:none;position:sticky;top:0;z-index:1001;}
-    .after-hours-banner.show{display:block;}
+    .after-hours-banner{background:linear-gradient(135deg,#666,#888);color:#fff;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.2);display:none;position:sticky;top:0;z-index:1001;}
+    .after-hours-banner h3{margin:0 0 10px 0;font-size:1.4em;}
+    .after-hours-banner p{margin:5px 0;}
+    .after-hours-banner a{color:#fff;text-decoration:underline;font-weight:700;}
+
+    /* Header */
+    .header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000;}
     .header-content{max-width:1200px;margin:0 auto;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;}
     .logo-section{display:flex;align-items:center;gap:15px;}
     .logo{width:50px;height:50px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;}
@@ -71,7 +76,7 @@
     .admin-link{color:#a0aec0;font-size:.85em;text-decoration:none;margin-left:20px;}
     .admin-link:hover{color:#718096;}
 
-    /* ===== HERO styles ===== */
+    /* Hero */
     .hero{padding:56px 30px 30px;margin:40px auto;max-width:1200px;border-radius:24px;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.08);}
     .hero-inner{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;}
     .hero-left h1{font-size:clamp(2.2rem,3.2vw,3rem);line-height:1.1;color:#1e3c72;font-weight:800;margin:10px 0 14px;}
@@ -111,6 +116,7 @@
     .service-card p{color:#718096;margin-bottom:18px;}
     .service-features{list-style:none;padding:0;}
     .service-features li{padding:7px 0;color:#4a5568;}
+    .service-features li::before{content:"✓ ";color:#48bb78;font-weight:bold;}
     .service-card.emergency{border-top-color:#f56565;}
     .service-card.claims{border-top-color:#4299e1;}
     .service-card.network{border-top-color:#48bb78;}
@@ -137,12 +143,20 @@
     .footer-section a{color:#cbd5e0;text-decoration:none;display:block;padding:5px 0;}
     .footer-section a:hover{color:#fff;}
     .footer-bottom{border-top:1px solid #4a5568;padding-top:20px;text-align:center;color:#a0aec0;}
+    .contact-link{display:flex;align-items:center;gap:8px;}
   </style>
 </head>
 <body>
   <!-- After Hours Banner -->
-  <div id="afterHoursBanner" class="after-hours-banner">
-    🕐 Currently after hours - For emergencies call <a href="tel:048873337" style="color:#fff;font-weight:700;">04 887 3337</a> | Office hours: Mon-Fri 8:30 AM - 5:00 PM
+  <div id="closedBanner" class="after-hours-banner" style="display: none;">
+    <h3 id="closedTitle">🕐 OFFICE CURRENTLY CLOSED</h3>
+    <div id="afterHoursMessage">
+      <p><strong>Business Hours:</strong> Monday - Friday: 8:30 AM - 5:00 PM | Saturday - Sunday: Closed</p>
+      <p>For urgent supplier inquiries, please use our <a href="/supplier-inquiry">Supplier Inquiry Form</a></p>
+    </div>
+    <div id="tempUnavailableMessage" style="display: none;">
+      <p><strong>Our phone lines are currently busy.</strong> Please submit your inquiry online or try calling again shortly.</p>
+    </div>
   </div>
 
   <!-- Header -->
@@ -160,13 +174,13 @@
         <a href="#network" class="nav-link">Network</a>
         <a href="#resources" class="nav-link">Resources</a>
         <a href="#contact" class="nav-link">Contact</a>
-        <a href="tel:048873337" class="phone-button">📞 04 887 3337</a>
-        <a href="#" onclick="adminLogin();return false;" class="admin-link">Sign In</a>
+        <a href="tel:048873337" class="phone-button" onclick="track('header_call')">📞 04 887 3337</a>
+        <a href="/admin" class="admin-link">Sign In</a>
       </nav>
     </div>
   </header>
 
-  <!-- HERO -->
+  <!-- Hero -->
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-left">
@@ -174,7 +188,7 @@
         <h1>Insurance Claims <span class="accent">Reimagined</span></h1>
         <p class="subtitle">Connect with <strong>500+ verified suppliers</strong>, deploy emergency response teams in <strong>30 minutes</strong>, and process claims <strong>70% faster</strong>—all in one platform built for insurers, corporates, and government.</p>
         <div class="cta-row">
-          <a href="https://www.formanpacific.com/new-business" class="btn-primary" onclick="track('hero_get_started')">Get Started
+          <a href="/new-business" class="btn-primary" onclick="track('hero_get_started')">Get Started
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a href="tel:048873337" class="btn-secondary" onclick="track('hero_talk_specialist')">Talk to a Specialist</a>
@@ -192,7 +206,6 @@
 
       <div class="hero-right">
         <div class="media-card" aria-label="Platform highlights">
-          <!-- Inline SVG credibility card (CSP-safe) -->
           <svg viewBox="0 0 560 360" role="img" aria-label="ForPac highlights">
             <defs>
               <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
@@ -294,36 +307,36 @@
     </div>
   </section>
 
-  <!-- Supplier Resources -->
+  <!-- Resources -->
   <section class="resources-section" id="resources">
     <h2>Supplier Resources & Tools</h2>
     <div class="resources-grid">
-      <a href="https://www.formanpacific.com/supplier-registration" class="resource-card">
+      <a href="/supplier-registration" class="resource-card" onclick="track('resource_supplier_registration')">
         <div class="resource-icon">🤝</div>
         <h4>Become a Supplier</h4>
         <p>Join our verified network of service providers</p>
       </a>
-      <a href="https://www.formanpacific.com/supplier-portal" class="resource-card">
+      <a href="/supplier-portal" class="resource-card" onclick="track('resource_supplier_portal')">
         <div class="resource-icon">📱</div>
         <h4>Supplier Portal</h4>
         <p>Access jobs, invoices, and performance metrics</p>
       </a>
-      <a href="https://www.formanpacific.com/training" class="resource-card">
+      <a href="/training" class="resource-card" onclick="track('resource_training')">
         <div class="resource-icon">🎓</div>
         <h4>Training Resources</h4>
         <p>Certification courses and compliance training</p>
       </a>
-      <a href="https://www.formanpacific.com/documentation" class="resource-card">
+      <a href="/documentation" class="resource-card" onclick="track('resource_documentation')">
         <div class="resource-icon">📄</div>
         <h4>Documentation</h4>
         <p>Forms, templates, and procedure guides</p>
       </a>
-      <a href="https://www.formanpacific.com/compliance" class="resource-card">
+      <a href="/compliance" class="resource-card" onclick="track('resource_compliance')">
         <div class="resource-icon">✅</div>
         <h4>Compliance Center</h4>
         <p>Standards, certifications, and requirements</p>
       </a>
-      <a href="https://www.formanpacific.com/support" class="resource-card">
+      <a href="/support" class="resource-card" onclick="track('resource_support')">
         <div class="resource-icon">💬</div>
         <h4>Support Center</h4>
         <p>Technical support and escalations</p>
@@ -336,38 +349,48 @@
     <div class="footer-content">
       <div class="footer-section">
         <h4>Contact Information</h4>
-        <a href="tel:048873337" style="font-size:1.15em;font-weight:700;">📞 04 887 3337</a>
-        <a href="mailto:info@formanpacific.com">info@formanpacific.com</a>
-        <a href="mailto:suppliers@formanpacific.com">suppliers@formanpacific.com</a>
-        <p style="margin-top:10px;color:#cbd5e0;font-size:.9em;">
+        <a href="tel:048873337" class="contact-link" style="font-size:1.15em;font-weight:700;" onclick="track('footer_call')">
+          <span style="color:#f56565;">📞</span> 04 887 3337
+        </a>
+        <a href="/contact-form" class="contact-link">
+          <span style="color:#4299e1;">📝</span> General Inquiries
+        </a>
+        <a href="/supplier-inquiry" class="contact-link">
+          <span style="color:#48bb78;">🤝</span> Supplier Inquiries  
+        </a>
+        <a href="/emergency-service" class="contact-link">
+          <span style="color:#f56565;">🚨</span> Emergency Service
+        </a>
+        <p style="margin-top:15px;color:#cbd5e0;font-size:.9em;">
           <strong>Office Hours:</strong><br>
           Mon–Fri: 8:30 AM – 5:00 PM<br>
-          Sat–Sun: Closed
+          Sat–Sun: Closed<br>
+          <em>24/7 Emergency Dispatch Available</em>
         </p>
       </div>
       <div class="footer-section">
         <h4>Supplier Services</h4>
-        <a href="https://www.formanpacific.com/supplier-portal">Supplier Portal</a>
-        <a href="https://www.formanpacific.com/supplier-registration">Become a Supplier</a>
-        <a href="https://www.formanpacific.com/supplier-payments">Payment Queries</a>
-        <a href="https://www.formanpacific.com/supplier-compliance">Compliance Support</a>
-        <a href="https://www.formanpacific.com/supplier-terms">Terms & Conditions</a>
+        <a href="/supplier-portal">Supplier Portal</a>
+        <a href="/supplier-registration">Become a Supplier</a>
+        <a href="/supplier-payments">Payment Queries</a>
+        <a href="/supplier-compliance">Compliance Support</a>
+        <a href="/supplier-terms">Terms & Conditions</a>
       </div>
       <div class="footer-section">
         <h4>Corporate</h4>
-        <a href="https://www.formanpacific.com/about">About FormanPacific</a>
-        <a href="https://www.formanpacific.com/insurance-partners">Insurance Partners</a>
-        <a href="https://www.formanpacific.com/corporate-services">Corporate Solutions</a>
-        <a href="https://www.formanpacific.com/careers">Careers</a>
-        <a href="https://www.formanpacific.com/news">News & Updates</a>
+        <a href="/about">About FormanPacific</a>
+        <a href="/insurance-partners">Insurance Partners</a>
+        <a href="/corporate-services">Corporate Solutions</a>
+        <a href="/careers">Careers</a>
+        <a href="/news">News & Updates</a>
       </div>
       <div class="footer-section">
         <h4>Legal & Compliance</h4>
-        <a href="https://www.formanpacific.com/terms">Terms of Service</a>
-        <a href="https://www.formanpacific.com/privacy">Privacy Policy</a>
-        <a href="https://www.formanpacific.com/compliance-standards">Compliance Standards</a>
-        <a href="https://www.formanpacific.com/insurance-requirements">Insurance Requirements</a>
-        <a href="https://www.formanpacific.com/emergency-procedures">Emergency Procedures</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/compliance-standards">Compliance Standards</a>
+        <a href="/insurance-requirements">Insurance Requirements</a>
+        <a href="/emergency-procedures">Emergency Procedures</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -407,19 +430,42 @@
       }
     }
 
-    // smooth scroll for hash links
+    // Enhanced tracking function
+    function track(label, value){
+      if(typeof gtag!=='undefined'){ 
+        gtag('event', 'click', { 
+          'event_category': 'engagement',
+          'event_label': label,
+          'value': value || 1
+        });
+        
+        // Fire conversion events for key actions
+        if(label.includes('call')){
+          gtag('event', 'conversion', {
+            'send_to': 'AW-17529704008/phone_click'
+          });
+        }
+      }
+    }
+
+    // Admin login redirect
+    function adminLogin(){ 
+      window.location.href='/admin'; 
+    }
+
+    // Smooth scroll for hash links
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click',e=>{
-        const id=a.getAttribute('href'); if(id.length>1){ e.preventDefault(); const t=document.querySelector(id); if(t){ t.scrollIntoView({behavior:'smooth'}); } }
+        const id=a.getAttribute('href'); 
+        if(id.length>1){ 
+          e.preventDefault(); 
+          const t=document.querySelector(id); 
+          if(t){ 
+            t.scrollIntoView({behavior:'smooth'}); 
+          } 
+        }
       });
     });
-    
-    // optional: basic tracking wrapper
-    function track(label){
-      if(typeof gtag!=='undefined'){ gtag('event', label || 'click', { 'event_category':'engagement' }); }
-    }
-    
-    function adminLogin(){ window.location.href='/admin/login'; }
 
     // Initialize on page load
     window.addEventListener('load', function() {
