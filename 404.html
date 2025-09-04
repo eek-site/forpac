@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting... | FormanPacific Service Claims</title>
     
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17529704008"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-17529704008');
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -345,9 +354,11 @@
 
         function handleRedirect() {
             const currentPath = window.location.pathname;
+            console.log('Current path:', currentPath);
             
             // Check for exact match
             if (redirectDatabase[currentPath]) {
+                console.log('Found exact match for:', currentPath);
                 performRedirect(redirectDatabase[currentPath], currentPath);
                 return;
             }
@@ -356,12 +367,14 @@
             const lowerPath = currentPath.toLowerCase();
             for (const [key, value] of Object.entries(redirectDatabase)) {
                 if (key.toLowerCase() === lowerPath) {
+                    console.log('Found case-insensitive match for:', currentPath);
                     performRedirect(value, currentPath);
                     return;
                 }
             }
             
             // No match found - show error page
+            console.log('No redirect found for:', currentPath);
             showErrorPage(currentPath);
         }
         
@@ -397,19 +410,8 @@
         }
         
         function fireConversionEvent(eventName) {
-            try {
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'conversion', {
-                        'send_to': 'AW-17529704008/' + eventName,
-                        'value': 1.0,
-                        'currency': 'NZD'
-                    });
-                    
-                    console.log('Conversion event fired:', eventName);
-                }
-            } catch (error) {
-                console.error('Error firing conversion event:', error);
-            }
+            // Google tracking removed
+            console.log('Event fired:', eventName);
         }
         
         function getServiceInfo(url, path) {
@@ -514,7 +516,7 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(handleRedirect, 800);
+            handleRedirect(); // Execute immediately, no delay
         });
     </script>
 </body>
