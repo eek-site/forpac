@@ -55,8 +55,9 @@
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;color:#2c3e50;}
 
-    /* Header */
-    .header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000;}
+    /* After Hours Banner */
+    .after-hours-banner{background:linear-gradient(135deg,#f56565,#e53e3e);color:#fff;padding:10px 20px;text-align:center;font-weight:600;display:none;position:sticky;top:0;z-index:1001;}
+    .after-hours-banner.show{display:block;}
     .header-content{max-width:1200px;margin:0 auto;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;}
     .logo-section{display:flex;align-items:center;gap:15px;}
     .logo{width:50px;height:50px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;}
@@ -139,6 +140,11 @@
   </style>
 </head>
 <body>
+  <!-- After Hours Banner -->
+  <div id="afterHoursBanner" class="after-hours-banner">
+    🕐 Currently after hours - For emergencies call <a href="tel:048873337" style="color:#fff;font-weight:700;">04 887 3337</a> | Office hours: Mon-Fri 8:30 AM - 5:00 PM
+  </div>
+
   <!-- Header -->
   <header class="header">
     <div class="header-content">
@@ -370,17 +376,57 @@
   </footer>
 
   <script>
+    // Check if current time is within business hours
+    function isWithinBusinessHours() {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const minutes = now.getMinutes();
+      const time = hour + minutes / 60;
+      
+      // Monday-Friday: 8:30 AM - 5:00 PM (NZ Time)
+      if (day >= 1 && day <= 5) {
+        return time >= 8.5 && time < 17;
+      }
+      
+      // Saturday-Sunday: Closed
+      return false;
+    }
+
+    // Update UI based on business hours
+    function updateHoursDisplay() {
+      const duringBusinessHours = isWithinBusinessHours();
+      const closedBanner = document.getElementById('closedBanner');
+      
+      if (closedBanner) {
+        if (!duringBusinessHours) {
+          closedBanner.style.display = 'block';
+        } else {
+          closedBanner.style.display = 'none';
+        }
+      }
+    }
+
     // smooth scroll for hash links
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click',e=>{
         const id=a.getAttribute('href'); if(id.length>1){ e.preventDefault(); const t=document.querySelector(id); if(t){ t.scrollIntoView({behavior:'smooth'}); } }
       });
     });
+    
     // optional: basic tracking wrapper
     function track(label){
       if(typeof gtag!=='undefined'){ gtag('event', label || 'click', { 'event_category':'engagement' }); }
     }
+    
     function adminLogin(){ window.location.href='/admin/login'; }
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      updateHoursDisplay();
+      // Update every minute to ensure accuracy
+      setInterval(updateHoursDisplay, 60 * 1000);
+    });
   </script>
 </body>
 </html>
