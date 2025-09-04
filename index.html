@@ -10,7 +10,57 @@
   <meta property="og:description" content="Professional service claims intermediary connecting verified suppliers with insurance and corporate clients. Streamlined claims processing and emergency response coordination." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.formanpacific.com" />
-  
+  <meta property="og:image" content="https://www.formanpacific.com/og-image.jpg" />
+
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https:;
+  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
+  frame-src 'self';
+  font-src 'self' data:;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17529704008"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17529704008');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "FormanPacific",
+    "description": "Professional service claims management and emergency response coordination across New Zealand.",
+    "telephone": "+6448873337",
+    "url": "https://www.formanpacific.com",
+    "image": "https://www.formanpacific.com/brand-image.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "NZ"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "New Zealand"
+    },
+    "openingHours": [
+      "Mo 08:30-17:00",
+      "Tu 08:30-17:00", 
+      "We 08:30-17:00",
+      "Th 08:30-17:00",
+      "Fr 08:30-17:00"
+    ]
+  }
+  </script>
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
     * {
       margin: 0;
@@ -25,7 +75,30 @@
       color: #2c3e50;
     }
 
-    /* Professional Header */
+    /* Business Hours Banner */
+    .after-hours-banner {
+      background: linear-gradient(135deg, #666, #888);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .after-hours-banner h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.4em;
+    }
+
+    .after-hours-banner p {
+      margin: 5px 0;
+    }
+
+    .after-hours-banner a {
+      color: white;
+      text-decoration: underline;
+    }
+
+    /* Header */
     .header {
       background: #ffffff;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -91,19 +164,32 @@
       color: #1e3c72;
     }
 
-    /* Closed/Notice Banner */
-    .notice-banner {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+    .phone-button {
+      background: #1e3c72;
       color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 1.05em;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
 
-    .notice-banner a {
-      color: white;
-      text-decoration: underline;
-      margin-left: 10px;
+    .phone-button:hover {
+      background: #2a5298;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(30,60,114,0.3);
+    }
+
+    .admin-link {
+      color: #a0aec0;
+      font-size: 0.85em;
+      text-decoration: none;
+      margin-left: 20px;
+      transition: color 0.3s ease;
+    }
+
+    .admin-link:hover {
+      color: #718096;
     }
 
     /* Hero Section */
@@ -129,98 +215,7 @@
       color: #4a5568;
       line-height: 1.6;
       max-width: 800px;
-      margin: 0 auto 40px;
-    }
-
-    /* Login Section */
-    .login-section {
-      background: #f8f9fa;
-      padding: 40px;
-      border-radius: 15px;
-      max-width: 500px;
-      margin: 0 auto 40px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-
-    .login-section h2 {
-      color: #1e3c72;
-      margin-bottom: 20px;
-      font-size: 1.8em;
-      text-align: center;
-    }
-
-    .ms-login-btn {
-      background: #0078d4;
-      color: white;
-      padding: 15px 30px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-
-    .ms-login-btn:hover {
-      background: #005a9e;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,120,212,0.3);
-    }
-
-    .ms-logo {
-      width: 20px;
-      height: 20px;
-    }
-
-    .login-divider {
-      text-align: center;
-      margin: 25px 0;
-      color: #718096;
-      position: relative;
-    }
-
-    .login-divider::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #e2e8f0;
-    }
-
-    .login-divider span {
-      background: #f8f9fa;
-      padding: 0 15px;
-      position: relative;
-    }
-
-    .supplier-links {
-      display: grid;
-      gap: 10px;
-    }
-
-    .supplier-link {
-      display: block;
-      padding: 12px;
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      color: #4a5568;
-      text-decoration: none;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-
-    .supplier-link:hover {
-      background: #f7fafc;
-      border-color: #cbd5e0;
-      transform: translateX(5px);
+      margin: 0 auto;
     }
 
     /* Services Grid */
@@ -324,7 +319,7 @@
       font-weight: bold;
     }
 
-    /* Supplier Resources Section */
+    /* Resources Section */
     .resources-section {
       background: white;
       padding: 60px 30px;
@@ -355,6 +350,9 @@
       transition: all 0.3s ease;
       cursor: pointer;
       border: 2px solid transparent;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
 
     .resource-card:hover {
@@ -448,7 +446,27 @@
       color: #a0aec0;
     }
 
-    /* Responsive Design */
+    /* Sticky call button */
+    .sticky-call {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background-color: #1e3c72;
+      color: white;
+      font-size: 1.1em;
+      padding: 14px 20px;
+      border-radius: 50px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-decoration: none;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .sticky-call:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
@@ -471,30 +489,26 @@
       .company-name {
         font-size: 1.4em;
       }
-    }
 
-    /* Loading State */
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #0078d4;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      .admin-link {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Notice Banner -->
-  <div class="notice-banner">
-    📢 Supplier Portal Access: Authentication required for all supplier services
-    <a href="#supplier-login">Login Now →</a>
+  <!-- Business Hours Banner (hidden by default) -->
+  <div id="closedBanner" class="after-hours-banner" style="display: none;">
+    <h3 id="closedTitle">🕐 OFFICE CURRENTLY CLOSED</h3>
+    <div id="afterHoursMessage">
+      <p><strong>Business Hours:</strong> Monday - Friday: 8:30 AM - 5:00 PM | Saturday - Sunday: Closed</p>
+      <p>For urgent supplier inquiries, please email: suppliers@formanpacific.com</p>
+    </div>
+    <div id="tempUnavailableMessage" style="display: none;">
+      <p><strong>Our phone lines are currently busy.</strong> Please submit your inquiry online or try calling again shortly.</p>
+    </div>
   </div>
 
   <!-- Header -->
@@ -512,38 +526,81 @@
         <a href="#network" class="nav-link">Network</a>
         <a href="#resources" class="nav-link">Resources</a>
         <a href="#contact" class="nav-link">Contact</a>
+        <a href="tel:048873337" class="phone-button normal-hours-btn" onclick="trackConversion('header_call', 'Contact')">📞 04 887 3337</a>
+        <a href="#" onclick="adminLogin(); return false;" class="admin-link">Sign In</a>
       </nav>
     </div>
   </header>
 
   <!-- Hero Section -->
   <section class="hero">
-    <h1>Professional Service Claims Management</h1>
-    <p>FormanPacific (ForPac) connects verified service providers with insurance companies, corporate clients, and emergency response networks across New Zealand and the Pacific region.</p>
-    
-    <!-- Login Section -->
-    <div class="login-section" id="supplier-login">
-      <h2>Supplier Portal Access</h2>
-      
-      <button class="ms-login-btn" onclick="initiateLogin()">
-        <svg class="ms-logo" viewBox="0 0 21 21">
-          <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
-          <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
-          <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
-          <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
-        </svg>
-        Sign in with Microsoft
-      </button>
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="hero-tag">
+          <span class="tag-dot"></span>
+          <span>Live Platform</span>
+        </div>
+        <h1>
+          Insurance Claims<br>
+          <span class="gradient-text">Simplified</span>
+        </h1>
+        <p class="hero-subtitle">
+          Connect with verified service providers. Dispatch emergency response teams. 
+          Process claims faster. All through one integrated platform.
+        </p>
+        
+        <div class="metrics-row">
+          <div class="metric">
+            <div class="metric-value">30min</div>
+            <div class="metric-label">Response</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">24/7</div>
+            <div class="metric-label">Available</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">2002</div>
+            <div class="metric-label">Established</div>
+          </div>
+        </div>
 
-      <div class="login-divider">
-        <span>Supplier Resources</span>
-      </div>
+        <div class="hero-cta-group">
+          <a href="https://www.formanpacific.com/new-business" class="cta-primary">
+            Start Now <span class="arrow">→</span>
+          </a>
+          <a href="#services" class="cta-secondary">
+            Learn More
+          </a>
+        </div>
 
-      <div class="supplier-links">
-        <a href="/supplier-registration" class="supplier-link">🤝 Become a Supplier Partner</a>
-        <a href="/supplier-terms" class="supplier-link">📋 Supplier Terms & Conditions</a>
-        <a href="/supplier-compliance" class="supplier-link">✅ Compliance & Certification</a>
-        <a href="/supplier-support" class="supplier-link">💬 Supplier Support</a>
+        <div class="trust-section">
+          <div class="trust-label">Trusted by leading insurers</div>
+          <div class="logo-grid">
+            <div class="logo-item">Insurance Partners</div>
+            <div class="logo-item">•</div>
+            <div class="logo-item">Corporate Clients</div>
+            <div class="logo-item">•</div>
+            <div class="logo-item">Emergency Networks</div>
+          </div>
+        </div>
+
+        <div class="bento-grid">
+          <div class="bento-card">
+            <div class="icon">⚡</div>
+            <h3>Instant Dispatch</h3>
+            <p>Deploy verified contractors within minutes, not hours</p>
+          </div>
+          <div class="bento-card">
+            <div class="icon">✓</div>
+            <h3>Pre-Verified Network</h3>
+            <p>Every supplier vetted for compliance and quality</p>
+          </div>
+          <div class="bento-card">
+            <div class="icon">📊</div>
+            <h3>Real-Time Tracking</h3>
+            <p>Monitor claims from dispatch to completion</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -577,7 +634,7 @@
         </ul>
       </div>
 
-      <div class="service-card network">
+      <div class="service-card network" id="network">
         <div class="service-icon">🌐</div>
         <h3>Supplier Network Management</h3>
         <p>Comprehensive supplier vetting, onboarding, and performance management system.</p>
@@ -631,36 +688,36 @@
   <section class="resources-section" id="resources">
     <h2>Supplier Resources & Tools</h2>
     <div class="resources-grid">
-      <div class="resource-card" onclick="accessPortal('dashboard')">
+      <a href="https://www.formanpacific.com/supplier-registration" class="resource-card">
+        <div class="resource-icon">🤝</div>
+        <h4>Become a Supplier</h4>
+        <p>Join our verified network of service providers</p>
+      </a>
+      <a href="https://www.formanpacific.com/supplier-portal" class="resource-card">
         <div class="resource-icon">📱</div>
-        <h4>Supplier Dashboard</h4>
+        <h4>Supplier Portal</h4>
         <p>Access jobs, invoices, and performance metrics</p>
-      </div>
-      <div class="resource-card" onclick="accessPortal('training')">
+      </a>
+      <a href="https://www.formanpacific.com/training" class="resource-card">
         <div class="resource-icon">🎓</div>
-        <h4>Training Portal</h4>
+        <h4>Training Resources</h4>
         <p>Certification courses and compliance training</p>
-      </div>
-      <div class="resource-card" onclick="accessPortal('documents')">
+      </a>
+      <a href="https://www.formanpacific.com/documentation" class="resource-card">
         <div class="resource-icon">📄</div>
         <h4>Documentation</h4>
         <p>Forms, templates, and procedure guides</p>
-      </div>
-      <div class="resource-card" onclick="accessPortal('payments')">
-        <div class="resource-icon">💳</div>
-        <h4>Payment Portal</h4>
-        <p>Invoice submission and payment tracking</p>
-      </div>
-      <div class="resource-card" onclick="accessPortal('compliance')">
+      </a>
+      <a href="https://www.formanpacific.com/compliance" class="resource-card">
         <div class="resource-icon">✅</div>
         <h4>Compliance Center</h4>
-        <p>Upload certifications and insurance documents</p>
-      </div>
-      <div class="resource-card" onclick="accessPortal('support')">
-        <div class="resource-icon">🆘</div>
+        <p>Standards, certifications, and requirements</p>
+      </a>
+      <a href="https://www.formanpacific.com/support" class="resource-card">
+        <div class="resource-icon">💬</div>
         <h4>Support Center</h4>
         <p>Technical support and escalations</p>
-      </div>
+      </a>
     </div>
   </section>
 
@@ -668,140 +725,201 @@
   <footer class="footer" id="contact">
     <div class="footer-content">
       <div class="footer-section">
-        <h4>Supplier Services</h4>
-        <a href="/supplier-portal">Supplier Portal Login</a>
-        <a href="/supplier-registration">Become a Supplier</a>
-        <a href="/supplier-payments">Payment Queries</a>
-        <a href="/supplier-compliance">Compliance Support</a>
-        <a href="/supplier-escalation">Escalations</a>
+        <h4>Contact Information</h4>
+        <a href="tel:048873337" style="font-size: 1.2em; font-weight: bold;">📞 04 887 3337</a>
+        <a href="mailto:info@formanpacific.com">info@formanpacific.com</a>
+        <a href="mailto:suppliers@formanpacific.com">suppliers@formanpacific.com</a>
+        <p style="margin-top: 10px; color: #cbd5e0; font-size: 0.9em;">
+          <strong>Office Hours:</strong><br>
+          Mon-Fri: 8:30 AM - 5:00 PM<br>
+          Sat-Sun: Closed
+        </p>
       </div>
       <div class="footer-section">
-        <h4>Legal & Compliance</h4>
-        <a href="/terms">Terms of Service</a>
-        <a href="/supplier-terms">Supplier Agreement</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/compliance">Compliance Standards</a>
-        <a href="/insurance">Insurance Requirements</a>
+        <h4>Supplier Services</h4>
+        <a href="https://www.formanpacific.com/supplier-portal">Supplier Portal</a>
+        <a href="https://www.formanpacific.com/supplier-registration">Become a Supplier</a>
+        <a href="https://www.formanpacific.com/supplier-payments">Payment Queries</a>
+        <a href="https://www.formanpacific.com/supplier-compliance">Compliance Support</a>
+        <a href="https://www.formanpacific.com/supplier-terms">Terms & Conditions</a>
       </div>
       <div class="footer-section">
         <h4>Corporate</h4>
-        <a href="/about">About FormanPacific</a>
-        <a href="/corporate-services">Corporate Solutions</a>
-        <a href="/insurance-partners">Insurance Partners</a>
-        <a href="/careers">Careers</a>
-        <a href="/contact">Contact Us</a>
+        <a href="https://www.formanpacific.com/about">About FormanPacific</a>
+        <a href="https://www.formanpacific.com/insurance-partners">Insurance Partners</a>
+        <a href="https://www.formanpacific.com/corporate-services">Corporate Solutions</a>
+        <a href="https://www.formanpacific.com/careers">Careers</a>
+        <a href="https://www.formanpacific.com/news">News & Updates</a>
       </div>
       <div class="footer-section">
-        <h4>Emergency Contacts</h4>
-        <a href="tel:0800FORPAC">0800 FORPAC (Business Hours)</a>
-        <a href="/emergency-escalation">Emergency Escalation</a>
-        <a href="/after-hours">After Hours Support</a>
-        <a href="/critical-response">Critical Response Team</a>
+        <h4>Legal & Compliance</h4>
+        <a href="https://www.formanpacific.com/terms">Terms of Service</a>
+        <a href="https://www.formanpacific.com/privacy">Privacy Policy</a>
+        <a href="https://www.formanpacific.com/compliance-standards">Compliance Standards</a>
+        <a href="https://www.formanpacific.com/insurance-requirements">Insurance Requirements</a>
+        <a href="https://www.formanpacific.com/emergency-procedures">Emergency Procedures</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2025 FormanPacific Limited. All rights reserved. | Service Claims Management Platform | ABN: 12 345 678 901</p>
-      <p>ForPac Service Claims is a registered trademark of FormanPacific Limited</p>
+      <p>&copy; 2025 FormanPacific. All rights reserved. | ForPac Service Claims is a registered trademark of FormanPacific</p>
     </div>
   </footer>
 
+  <a class="sticky-call normal-hours-btn" href="tel:048873337" onclick="trackConversion('sticky_call', 'Contact')" id="stickyCallButton">📞 Call ForPac</a>
+  <a class="sticky-call" href="#closedBanner" id="stickyClosedButton" style="display: none; background: #666;">🕐 View Hours</a>
+
   <script>
-    // Microsoft Authentication Configuration
-    const msalConfig = {
-      auth: {
-        clientId: "YOUR_APP_CLIENT_ID", // Replace with your Azure AD app client ID
-        authority: "https://login.microsoftonline.com/YOUR_TENANT_ID", // Replace with your tenant ID
-        redirectUri: "https://www.formanpacific.com/auth/callback",
-      },
-      cache: {
-        cacheLocation: "sessionStorage",
-        storeAuthStateInCookie: false,
-      }
-    };
-
-    // Login request configuration
-    const loginRequest = {
-      scopes: ["openid", "profile", "email", "User.Read"]
-    };
-
-    // Initiate Microsoft login
-    async function initiateLogin() {
-      // Show loading state
-      const button = document.querySelector('.ms-login-btn');
-      const originalContent = button.innerHTML;
-      button.innerHTML = '<span class="loading"></span> Connecting to Microsoft...';
-      button.disabled = true;
-
+    // Check system availability status
+    async function checkSystemStatus() {
       try {
-        // In production, you would use MSAL.js library
-        // For now, simulating the login flow
-        setTimeout(() => {
-          // Simulate redirect to Microsoft login
-          alert('Redirecting to Microsoft login...\n\nIn production, this would redirect to:\nhttps://login.microsoftonline.com/\n\nAfter authentication, suppliers would be redirected to their dashboard.');
-          
-          // Reset button
-          button.innerHTML = originalContent;
-          button.disabled = false;
-          
-          // In production, you would redirect like this:
-          // window.location.href = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?...`;
-        }, 1500);
+        const response = await fetch("https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/17b1d2990e6f4082a2b0d9c2f1a29025/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bPyoxJ24kuxJZOyLGAclGaEuH6BHwUTFaGmYOwHofa8", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({}),
+          cache: "no-store"
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.state === 'Active';
+        }
       } catch (error) {
-        console.error('Login error:', error);
-        button.innerHTML = originalContent;
-        button.disabled = false;
-        alert('Login service temporarily unavailable. Please try again later.');
+        console.error('Error checking system status:', error);
       }
+      return true; // Default to active if check fails
     }
 
-    // Access portal sections (requires authentication)
-    function accessPortal(section) {
-      // Check if authenticated (would check actual auth state in production)
-      const isAuthenticated = false; // Would check MSAL authentication state
+    // Check if current time is within business hours
+    function isWithinBusinessHours() {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const minutes = now.getMinutes();
+      const time = hour + minutes / 60;
       
-      if (isAuthenticated) {
-        window.location.href = `/supplier/${section}`;
-      } else {
-        alert(`Authentication required to access the ${section}.\n\nPlease sign in with your Microsoft account to continue.`);
-        document.getElementById('supplier-login').scrollIntoView({ behavior: 'smooth' });
+      // Monday-Friday: 8:30 AM - 5:00 PM
+      if (day >= 1 && day <= 5) {
+        return time >= 8.5 && time < 17;
+      }
+      
+      // Saturday-Sunday: Closed
+      return false;
+    }
+
+    // Update UI based on system status
+    async function updateHoursDisplay() {
+      const systemActive = await checkSystemStatus();
+      const duringBusinessHours = isWithinBusinessHours();
+      
+      const closedBanner = document.getElementById('closedBanner');
+      const closedTitle = document.getElementById('closedTitle');
+      const afterHoursMessage = document.getElementById('afterHoursMessage');
+      const tempUnavailableMessage = document.getElementById('tempUnavailableMessage');
+      
+      if (closedBanner) {
+        if (!systemActive) {
+          closedBanner.style.display = 'block';
+          
+          if (duringBusinessHours) {
+            closedTitle.innerHTML = '🚧 PHONE LINES BUSY';
+            closedBanner.style.background = 'linear-gradient(135deg, #ff8c00, #ff6b00)';
+            afterHoursMessage.style.display = 'none';
+            tempUnavailableMessage.style.display = 'block';
+          } else {
+            closedTitle.innerHTML = '🕐 OFFICE CURRENTLY CLOSED';
+            closedBanner.style.background = 'linear-gradient(135deg, #666, #888)';
+            afterHoursMessage.style.display = 'block';
+            tempUnavailableMessage.style.display = 'none';
+          }
+        } else {
+          closedBanner.style.display = 'none';
+        }
+      }
+      
+      // Update phone buttons visibility
+      const normalButtons = document.querySelectorAll('.normal-hours-btn');
+      normalButtons.forEach(btn => {
+        btn.style.display = systemActive ? 'inline-block' : 'none';
+      });
+      
+      // Update sticky buttons
+      const stickyCall = document.getElementById('stickyCallButton');
+      const stickyClosed = document.getElementById('stickyClosedButton');
+      
+      if (stickyCall) {
+        stickyCall.style.display = systemActive ? 'block' : 'none';
+      }
+      
+      if (stickyClosed) {
+        stickyClosed.style.display = systemActive ? 'none' : 'block';
+        if (!systemActive && duringBusinessHours) {
+          stickyClosed.innerHTML = '📋 Contact Us';
+          stickyClosed.style.background = '#ff8c00';
+        } else if (!systemActive) {
+          stickyClosed.innerHTML = '🕐 View Hours';
+          stickyClosed.style.background = '#666';
+        }
       }
     }
 
-    // Smooth scroll for navigation links
+    // Admin login function
+    function adminLogin() {
+      window.location.href = 'https://www.formanpacific.com/admin/login';
+    }
+
+    // Tracking function
+    function trackConversion(eventAction, eventCategory) {
+      if (typeof gtag !== 'undefined') {
+        gtag('event', eventAction, {
+          'event_category': eventCategory,
+          'event_label': 'Phone Call Click',
+          'value': 250
+        });
+        
+        gtag('event', 'conversion', {
+          'send_to': 'AW-17529704008/YOUR_CONVERSION_LABEL'
+        });
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      updateHoursDisplay();
+      setInterval(updateHoursDisplay, 5 * 60 * 1000); // Check every 5 minutes
+      
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+          'page_title': document.title,
+          'page_location': window.location.href
+        });
+      }
+    });
+
+    // Track scroll depth
+    let scrollTracked = false;
+    window.addEventListener('scroll', function() {
+      if (!scrollTracked && window.scrollY > document.body.scrollHeight * 0.5) {
+        scrollTracked = true;
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'scroll_50_percent', {
+            'event_category': 'Engagement',
+            'event_label': 'Scrolled 50% of page'
+          });
+        }
+      }
+    });
+
+    // Smooth scroll for navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          target.scrollIntoView({ behavior: 'smooth' });
         }
       });
-    });
-
-    // Add animation on scroll
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '0';
-          entry.target.style.transform = 'translateY(20px)';
-          setTimeout(() => {
-            entry.target.style.transition = 'all 0.6s ease';
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }, 100);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    // Observe service cards and resource cards
-    document.querySelectorAll('.service-card, .resource-card').forEach(el => {
-      observer.observe(el);
     });
   </script>
 </body>
