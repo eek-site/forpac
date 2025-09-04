@@ -24,7 +24,16 @@
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
 
- <script type="application/ld+json">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17529704008"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17529704008');
+  </script>
+
+  <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -526,70 +535,72 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
-      <div class="hero-text">
-        <div class="hero-tag">
-          <span class="tag-dot"></span>
-          <span>Live Platform</span>
-        </div>
-        <h1>
-          Insurance Claims<br>
-          <span class="gradient-text">Simplified</span>
-        </h1>
-        <p class="hero-subtitle">
-          Connect with verified service providers. Dispatch emergency response teams. 
-          Process claims faster. All through one integrated platform.
-        </p>
-        
-        <div class="metrics-row">
-          <div class="metric">
-            <div class="metric-value">30min</div>
-            <div class="metric-label">Response</div>
+      <div class="hero-grid">
+        <div class="hero-left">
+          <div class="hero-badge">
+            <span class="established">Est. 2002</span>
+            <span class="status">
+              <span class="status-dot"></span>
+              <span>Live Platform</span>
+            </span>
           </div>
-          <div class="metric">
-            <div class="metric-value">24/7</div>
-            <div class="metric-label">Available</div>
+          
+          <h1>
+            Insurance Claims
+            <span class="accent-line">Reimagined</span>
+          </h1>
+          
+          <p class="hero-description">
+            Connect with 500+ verified service providers. Deploy emergency response teams in 30 minutes. Process claims 70% faster through our integrated platform.
+          </p>
+
+          <div class="cta-row">
+            <a href="https://www.formanpacific.com/new-business" class="btn-primary">
+              Get Started
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="#services" class="btn-secondary">
+              Watch Demo
+            </a>
           </div>
-          <div class="metric">
-            <div class="metric-value">2002</div>
-            <div class="metric-label">Established</div>
+
+          <div class="trust-logos">
+            <span class="trust-text">Trusted By</span>
+            <div class="logo-list">
+              <span>Leading Insurers</span>
+              <span>•</span>
+              <span>Corporate Clients</span>
+              <span>•</span>
+              <span>Government</span>
+            </div>
           </div>
         </div>
 
-        <div class="hero-cta-group">
-          <a href="https://www.formanpacific.com/new-business" class="cta-primary">
-            Start Now <span class="arrow">→</span>
-          </a>
-          <a href="#services" class="cta-secondary">
-            Learn More
-          </a>
-        </div>
+        <div class="hero-right">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">30min</div>
+              <div class="stat-label">Response Time</div>
+              <div class="stat-detail">Average dispatch to on-site arrival nationwide</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">24/7</div>
+              <div class="stat-label">Always Online</div>
+              <div class="stat-detail">Emergency response team available round the clock</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">100%</div>
+              <div class="stat-label">NZ Coverage</div>
+              <div class="stat-detail">Complete nationwide network from Auckland to Invercargill</div>
+            </div>
+          </div>
 
-        <div class="trust-section">
-          <div class="trust-label">Trusted by leading insurers</div>
-          <div class="logo-grid">
-            <div class="logo-item">Insurance Partners</div>
-            <div class="logo-item">•</div>
-            <div class="logo-item">Corporate Clients</div>
-            <div class="logo-item">•</div>
-            <div class="logo-item">Emergency Networks</div>
-          </div>
-        </div>
-
-        <div class="bento-grid">
-          <div class="bento-card">
-            <div class="icon">⚡</div>
-            <h3>Instant Dispatch</h3>
-            <p>Deploy verified contractors within minutes, not hours</p>
-          </div>
-          <div class="bento-card">
-            <div class="icon">✓</div>
-            <h3>Pre-Verified Network</h3>
-            <p>Every supplier vetted for compliance and quality</p>
-          </div>
-          <div class="bento-card">
-            <div class="icon">📊</div>
-            <h3>Real-Time Tracking</h3>
-            <p>Monitor claims from dispatch to completion</p>
+          <div class="feature-tags">
+            <span class="feature-tag">✓ ISO Compliant</span>
+            <span class="feature-tag">✓ Direct Billing</span>
+            <span class="feature-tag">✓ Real-time Tracking</span>
           </div>
         </div>
       </div>
