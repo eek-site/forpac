@@ -302,55 +302,44 @@
     <script>
         // Redirect database for FormanPacific
         const redirectDatabase = {
-            // Main service forms
-            '/new-business': 'https://forms.office.com/r/ForPacNewBusiness',
-            '/contact-form': 'https://forms.office.com/r/ForPacContact',
-            '/supplier-inquiry': 'https://forms.office.com/r/ForPacSupplierInquiry',
-            '/emergency-service': 'https://forms.office.com/r/ForPacEmergency',
-            '/emergency': 'https://forms.office.com/r/ForPacEmergency',
+            // All service requests go to the unified form
+            '/new-business': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/contact-form': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/contact': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/supplier-inquiry': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/emergency-service': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/emergency': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/supplier-registration': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/supplier-portal': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/supplier-payments': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/supplier-compliance': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/supplier': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/training': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/documentation': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/compliance': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/support': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/about': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/insurance-partners': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/corporate-services': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/careers': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/news': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/admin': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/admin/login': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/dashboard': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/claim': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/insurance-claim': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/claim-status': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/escalation': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/feedback': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+            '/complaint': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
             
-            // Supplier portal and registration
-            '/supplier-registration': 'https://forms.office.com/r/ForPacSupplierReg',
-            '/supplier-portal': 'https://portal.formanpacific.com',
-            '/supplier-payments': 'https://forms.office.com/r/ForPacPayments',
-            '/supplier-compliance': 'https://forms.office.com/r/ForPacCompliance',
-            '/supplier-terms': 'https://formanpacific.sharepoint.com/:b:/s/public/SupplierTerms',
-            '/supplier': 'https://www.formanpacific.com/supplier-hub',
-            
-            // Documentation and resources
-            '/training': 'https://training.formanpacific.com',
-            '/documentation': 'https://docs.formanpacific.com',
-            '/compliance': 'https://compliance.formanpacific.com',
-            '/support': 'https://support.formanpacific.com',
-            
-            // Corporate pages
-            '/about': 'https://www.formanpacific.com/about',
-            '/insurance-partners': 'https://www.formanpacific.com/insurance-partners',
-            '/corporate-services': 'https://www.formanpacific.com/corporate-services',
-            '/careers': 'https://careers.formanpacific.com',
-            '/news': 'https://www.formanpacific.com/news',
-            
-            // Legal documents
+            // Legal documents (still external SharePoint links)
             '/terms': 'https://formanpacific.sharepoint.com/:b:/s/public/TermsOfService',
             '/privacy': 'https://formanpacific.sharepoint.com/:b:/s/public/PrivacyPolicy',
+            '/supplier-terms': 'https://formanpacific.sharepoint.com/:b:/s/public/SupplierTerms',
             '/compliance-standards': 'https://formanpacific.sharepoint.com/:b:/s/public/ComplianceStandards',
             '/insurance-requirements': 'https://formanpacific.sharepoint.com/:b:/s/public/InsuranceReqs',
-            '/emergency-procedures': 'https://formanpacific.sharepoint.com/:b:/s/public/EmergencyProc',
-            
-            // Admin and internal
-            '/admin': 'https://admin.formanpacific.com',
-            '/admin/login': 'https://admin.formanpacific.com/login',
-            '/dashboard': 'https://dashboard.formanpacific.com',
-            
-            // Insurance claim forms
-            '/claim': 'https://forms.office.com/r/ForPacClaimForm',
-            '/insurance-claim': 'https://forms.office.com/r/ForPacInsuranceClaim',
-            '/claim-status': 'https://forms.office.com/r/ForPacClaimStatus',
-            
-            // Escalation and feedback
-            '/escalation': 'https://forms.office.com/r/ForPacEscalation',
-            '/feedback': 'https://forms.office.com/r/ForPacFeedback',
-            '/complaint': 'https://forms.office.com/r/ForPacComplaint',
+            '/emergency-procedures': 'https://formanpacific.sharepoint.com/:b:/s/public/EmergencyProc'
             
             // Case variations (common typos)
             '/New-Business': 'https://forms.office.com/r/ForPacNewBusiness',
