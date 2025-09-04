@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eek & Coolth - Emergency Response Platform</title>
+    <title>Admin Dashboard | FormanPacific Service Claims Management</title>
+    <meta name="description" content="FormanPacific administrator dashboard for service claims management and supplier coordination">
+    
+    <!-- Microsoft Authentication Library -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -12,42 +17,164 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            color: #333;
+            color: #2c3e50;
         }
 
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .loading-screen.authenticated {
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        /* Main Dashboard - Hidden by default */
+        .dashboard-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dashboard-container.authenticated {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .company-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .company-name {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .dashboard-label {
+            font-size: 0.9em;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .user-role {
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .btn-logout {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+        }
+
+        /* Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 1.1em;
-        }
-
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -56,11 +183,11 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -73,7 +200,6 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
@@ -84,32 +210,54 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
-        .stat-card.eek {
-            border-left: 4px solid #667eea;
+        .stat-card.emergency {
+            border-top: 4px solid #f56565;
         }
 
-        .stat-card.coolth {
-            border-left: 4px solid #764ba2;
+        .stat-card.claims {
+            border-top: 4px solid #4299e1;
+        }
+
+        .stat-card.suppliers {
+            border-top: 4px solid #48bb78;
+        }
+
+        .stat-card.compliance {
+            border-top: 4px solid #9f7aea;
         }
 
         .stat-value {
             font-size: 2.5em;
             font-weight: bold;
             margin: 10px 0;
-            color: #333;
+            color: #1e3c72;
         }
 
         .stat-label {
-            color: #666;
+            color: #718096;
             font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .main-content {
+        .stat-change {
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .positive {
+            color: #48bb78;
+        }
+
+        .negative {
+            color: #f56565;
+        }
+
+        /* Main Content Grid */
+        .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
@@ -117,51 +265,52 @@
         }
 
         @media (max-width: 968px) {
-            .main-content {
+            .main-grid {
                 grid-template-columns: 1fr;
             }
         }
 
+        /* Service Panel */
         .service-panel {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
         }
 
-        .service-panel h2 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
+        .panel-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .brand-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.5em;
-            color: white;
-            font-weight: normal;
+        .panel-title {
+            font-size: 1.6em;
+            color: #2d3748;
+            font-weight: 600;
         }
 
-        .eek-badge {
-            background: linear-gradient(135deg, #667eea, #7c3aed);
+        .view-all {
+            color: #4299e1;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95em;
         }
 
-        .coolth-badge {
-            background: linear-gradient(135deg, #764ba2, #8b5cf6);
+        .view-all:hover {
+            text-decoration: underline;
         }
 
+        /* Job List */
         .job-list {
             list-style: none;
             padding: 0;
         }
 
         .job-item {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: #f8fafc;
+            border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
             display: flex;
@@ -169,24 +318,7 @@
             align-items: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .job-item::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: currentColor;
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-        }
-
-        .job-item:hover::after {
-            transform: scaleY(1);
+            border-left: 3px solid transparent;
         }
 
         .job-item:hover {
@@ -197,18 +329,26 @@
 
         .job-item.urgent {
             background: #fff5f5;
-            border: 1px solid #fed7d7;
+            border-left-color: #f56565;
+        }
+
+        .job-item.insurance {
+            border-left-color: #4299e1;
+        }
+
+        .job-item.corporate {
+            border-left-color: #9f7aea;
         }
 
         .job-info h3 {
             margin: 0 0 5px 0;
-            font-size: 1.1em;
-            color: #333;
+            font-size: 1.05em;
+            color: #2d3748;
         }
 
         .job-info p {
             margin: 0;
-            color: #666;
+            color: #718096;
             font-size: 0.9em;
         }
 
@@ -216,6 +356,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            gap: 5px;
         }
 
         .status-badge {
@@ -224,7 +365,6 @@
             font-size: 0.8em;
             font-weight: bold;
             text-transform: uppercase;
-            margin-bottom: 5px;
         }
 
         .status-pending {
@@ -232,12 +372,12 @@
             color: #92400e;
         }
 
-        .status-dispatched {
+        .status-assigned {
             background: #dbeafe;
             color: #1e40af;
         }
 
-        .status-onsite {
+        .status-in-progress {
             background: #d1fae5;
             color: #065f46;
         }
@@ -247,99 +387,36 @@
             color: #6b21a8;
         }
 
-        .eta {
+        .response-time {
             font-size: 0.85em;
-            color: #666;
+            color: #718096;
         }
 
-        .action-panel {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            display: grid;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .tech-grid {
+        /* Supplier Grid */
+        .supplier-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
-            margin-top: 20px;
         }
 
-        .tech-card {
-            background: #f8f9fa;
-            border-radius: 10px;
+        .supplier-card {
+            background: #f8fafc;
+            border-radius: 12px;
             padding: 15px;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
+            border: 2px solid transparent;
         }
 
-        .tech-card:hover {
+        .supplier-card:hover {
             background: white;
+            border-color: #4299e1;
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
-        .tech-avatar {
+        .supplier-avatar {
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -352,334 +429,506 @@
             color: white;
         }
 
-        .tech-avatar.available {
-            background: linear-gradient(135deg, #10b981, #059669);
+        .supplier-avatar.available {
+            background: linear-gradient(135deg, #48bb78, #38a169);
         }
 
-        .tech-avatar.busy {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+        .supplier-avatar.busy {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
         }
 
-        .tech-name {
+        .supplier-avatar.offline {
+            background: linear-gradient(135deg, #a0aec0, #718096);
+        }
+
+        .supplier-name {
             font-weight: 600;
             margin-bottom: 5px;
-            color: #333;
+            color: #2d3748;
+            font-size: 0.95em;
         }
 
-        .tech-status {
+        .supplier-specialty {
+            font-size: 0.8em;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .supplier-status {
             font-size: 0.85em;
-            color: #666;
+            font-weight: 500;
         }
 
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: white;
-            font-size: 0.9em;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+        /* Quick Actions */
+        .quick-actions {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            max-width: 300px;
-            z-index: 1000;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
         }
 
-        .notification.show {
-            transform: translateX(0);
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .notification-header {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .notification-body {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .map-placeholder {
-            background: #f0f0f0;
-            height: 400px;
-            border-radius: 15px;
+        .action-btn {
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            color: #2d3748;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
+            gap: 10px;
         }
 
-        .map-placeholder::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shine 3s infinite;
+        .action-btn:hover {
+            background: #1e3c72;
+            color: white;
+            border-color: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30,60,114,0.3);
         }
 
-        @keyframes shine {
-            0% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-            100% {
-                transform: translateX(100%) translateY(100%) rotate(45deg);
-            }
+        .action-icon {
+            font-size: 1.2em;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        /* Unauthorized Screen */
+        .unauthorized-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+
+        .unauthorized-content {
+            text-align: center;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        .unauthorized-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .unauthorized-title {
+            font-size: 1.8em;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .unauthorized-message {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        .btn-login {
+            background: #1e3c72;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: #2a5298;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Emergency Response Platform</h1>
-            <p>Unified dispatch system for Eek Mobile Mechanical & Coolth Emergency Refrigeration</p>
-        </div>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        <div class="loading-text">Verifying authentication...</div>
+    </div>
 
-        <div class="stats-grid">
-            <div class="stat-card eek">
-                <div class="stat-label">Eek Active Jobs</div>
-                <div class="stat-value">7</div>
-                <div class="stat-label">Vehicle Services</div>
-            </div>
-            <div class="stat-card coolth">
-                <div class="stat-label">Coolth Active Jobs</div>
-                <div class="stat-value">5</div>
-                <div class="stat-label">Refrigeration Services</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Technicians Online</div>
-                <div class="stat-value">12</div>
-                <div class="stat-label">Available: 8</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg Response Time</div>
-                <div class="stat-value">28m</div>
-                <div class="stat-label">Last 24 Hours</div>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="service-panel">
-                <h2>
-                    Active Jobs 
-                    <span class="brand-badge eek-badge">EEK</span>
-                </h2>
-                <ul class="job-list">
-                    <li class="job-item urgent">
-                        <div class="job-info">
-                            <h3>Wrong Fuel Rescue - Diesel in Petrol</h3>
-                            <p>📍 Auckland CBD - Shell Station</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-dispatched">Dispatched</span>
-                            <span class="eta">ETA: 12 mins</span>
-                        </div>
-                    </li>
-                    <li class="job-item">
-                        <div class="job-info">
-                            <h3>Pre-Purchase Inspection</h3>
-                            <p>📍 Mt Wellington - Private Seller</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-onsite">On Site</span>
-                            <span class="eta">Tech: Mike R.</span>
-                        </div>
-                    </li>
-                    <li class="job-item">
-                        <div class="job-info">
-                            <h3>Battery Jump Start</h3>
-                            <p>📍 Newmarket - Office Building</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-pending">Pending</span>
-                            <span class="eta">Queue: #3</span>
-                        </div>
-                    </li>
-                    <li class="job-item">
-                        <div class="job-info">
-                            <h3>Trailer Wiring Repair</h3>
-                            <p>📍 Manukau - Construction Site</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-complete">Complete</span>
-                            <span class="eta">Invoice sent</span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="service-panel">
-                <h2>
-                    Active Jobs
-                    <span class="brand-badge coolth-badge">COOLTH</span>
-                </h2>
-                <ul class="job-list">
-                    <li class="job-item urgent">
-                        <div class="job-info">
-                            <h3>Walk-in Freezer Down</h3>
-                            <p>📍 Ponsonby - Restaurant</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-onsite">On Site</span>
-                            <span class="eta">Tech: Sarah L.</span>
-                        </div>
-                    </li>
-                    <li class="job-item">
-                        <div class="job-info">
-                            <h3>Display Fridge Not Cooling</h3>
-                            <p>📍 Grey Lynn - Supermarket</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-dispatched">Dispatched</span>
-                            <span class="eta">ETA: 22 mins</span>
-                        </div>
-                    </li>
-                    <li class="job-item">
-                        <div class="job-info">
-                            <h3>Chiller Unit Service</h3>
-                            <p>📍 Takapuna - Food Processing</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-pending">Pending</span>
-                            <span class="eta">Queue: #2</span>
-                        </div>
-                    </li>
-                    <li class="job-item">
-                        <div class="job-info">
-                            <h3>Ice Machine Repair</h3>
-                            <p>📍 Mission Bay - Bar</p>
-                        </div>
-                        <div class="job-status">
-                            <span class="status-badge status-complete">Complete</span>
-                            <span class="eta">Resolved</span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="action-panel">
-            <h2>Quick Actions</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <button class="btn btn-primary" onclick="createNewJob()">
-                    + New Service Request
-                </button>
-                <button class="btn btn-secondary" onclick="viewTechnicians()">
-                    View All Technicians
-                </button>
-            </div>
-            <div class="tech-grid">
-                <div class="tech-card">
-                    <div class="tech-avatar available">MR</div>
-                    <div class="tech-name">Mike Robinson</div>
-                    <div class="tech-status">Available - Eek</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-avatar busy">SL</div>
-                    <div class="tech-name">Sarah Lee</div>
-                    <div class="tech-status">On Job - Coolth</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-avatar available">JT</div>
-                    <div class="tech-name">James Taylor</div>
-                    <div class="tech-status">Available - Both</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-avatar busy">AP</div>
-                    <div class="tech-name">Anna Park</div>
-                    <div class="tech-status">Driving - Coolth</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="service-panel" style="margin-top: 30px;">
-            <h2>Live Technician Map</h2>
-            <div class="map-placeholder">
-                <span style="font-size: 1.5em;">🗺️ Interactive Map View</span>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>&copy; 2025 Eek & Coolth Emergency Services | Powered by Unified Dispatch System</p>
+    <!-- Unauthorized Screen -->
+    <div class="unauthorized-screen" id="unauthorizedScreen">
+        <div class="unauthorized-content">
+            <div class="unauthorized-icon">🔒</div>
+            <h1 class="unauthorized-title">Authentication Required</h1>
+            <p class="unauthorized-message">You must be logged in to access the FormanPacific Admin Dashboard.</p>
+            <a href="/admin" class="btn-login">Go to Login</a>
         </div>
     </div>
 
-    <div class="notification" id="notification">
-        <div class="notification-header">🆕 New Service Request</div>
-        <div class="notification-body">Walk-in cooler failure at Downtown Deli - Priority dispatch requested</div>
+    <!-- Main Dashboard (Hidden until authenticated) -->
+    <div class="dashboard-container" id="dashboardContainer">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">FP</div>
+                    <div class="company-info">
+                        <div class="company-name">FormanPacific</div>
+                        <div class="dashboard-label">Administrator Dashboard</div>
+                    </div>
+                </div>
+                <div class="user-section">
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-role">System Administrator</div>
+                    </div>
+                    <button class="btn-logout" onclick="logout()">Sign Out</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card emergency">
+                    <div class="stat-label">Active Emergency Jobs</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-change positive">↑ 15% from yesterday</div>
+                </div>
+                <div class="stat-card claims">
+                    <div class="stat-label">Claims Processing</div>
+                    <div class="stat-value">47</div>
+                    <div class="stat-change positive">↑ 8% from last week</div>
+                </div>
+                <div class="stat-card suppliers">
+                    <div class="stat-label">Active Suppliers</div>
+                    <div class="stat-value">523</div>
+                    <div class="stat-change positive">↑ 12 this month</div>
+                </div>
+                <div class="stat-card compliance">
+                    <div class="stat-label">Avg Response Time</div>
+                    <div class="stat-value">32m</div>
+                    <div class="stat-change positive">↓ 5 min improvement</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2 class="panel-title">Quick Actions</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="createNewClaim()">
+                        <span class="action-icon">📋</span>
+                        New Claim
+                    </button>
+                    <button class="action-btn" onclick="dispatchSupplier()">
+                        <span class="action-icon">🚀</span>
+                        Dispatch Supplier
+                    </button>
+                    <button class="action-btn" onclick="viewReports()">
+                        <span class="action-icon">📊</span>
+                        View Reports
+                    </button>
+                    <button class="action-btn" onclick="manageSuppliers()">
+                        <span class="action-icon">👥</span>
+                        Manage Suppliers
+                    </button>
+                    <button class="action-btn" onclick="systemStatus()">
+                        <span class="action-icon">🔧</span>
+                        System Status
+                    </button>
+                    <button class="action-btn" onclick="togglePhoneSystem()">
+                        <span class="action-icon">📞</span>
+                        Phone System
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
+            <div class="main-grid">
+                <!-- Active Claims -->
+                <div class="service-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Active Claims</h2>
+                        <a href="#" class="view-all">View All →</a>
+                    </div>
+                    <ul class="job-list">
+                        <li class="job-item urgent insurance">
+                            <div class="job-info">
+                                <h3>Water Damage - Commercial Property</h3>
+                                <p>📍 Auckland CBD - Tower Insurance</p>
+                            </div>
+                            <div class="job-status">
+                                <span class="status-badge status-in-progress">In Progress</span>
+                                <span class="response-time">Response: 28 min</span>
+                            </div>
+                        </li>
+                        <li class="job-item insurance">
+                            <div class="job-info">
+                                <h3>Vehicle Breakdown - Mechanical</h3>
+                                <p>📍 Wellington - AA Insurance</p>
+                            </div>
+                            <div class="job-status">
+                                <span class="status-badge status-assigned">Assigned</span>
+                                <span class="response-time">ETA: 15 min</span>
+                            </div>
+                        </li>
+                        <li class="job-item corporate">
+                            <div class="job-info">
+                                <h3>HVAC Emergency - Office Building</h3>
+                                <p>📍 Christchurch - Corporate Direct</p>
+                            </div>
+                            <div class="job-status">
+                                <span class="status-badge status-pending">Pending</span>
+                                <span class="response-time">Queue: #3</span>
+                            </div>
+                        </li>
+                        <li class="job-item insurance">
+                            <div class="job-info">
+                                <h3>Tree Removal - Storm Damage</h3>
+                                <p>📍 Hamilton - State Insurance</p>
+                            </div>
+                            <div class="job-status">
+                                <span class="status-badge status-complete">Complete</span>
+                                <span class="response-time">Resolved: 45 min</span>
+                            </div>
+                        </li>
+                        <li class="job-item corporate">
+                            <div class="job-info">
+                                <h3>Electrical Fault - Retail Store</h3>
+                                <p>📍 Tauranga - Corporate Client</p>
+                            </div>
+                            <div class="job-status">
+                                <span class="status-badge status-assigned">Assigned</span>
+                                <span class="response-time">ETA: 20 min</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Supplier Status -->
+                <div class="service-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Supplier Status</h2>
+                        <a href="#" class="view-all">Manage All →</a>
+                    </div>
+                    <div class="supplier-grid">
+                        <div class="supplier-card">
+                            <div class="supplier-avatar available">JB</div>
+                            <div class="supplier-name">John Brown</div>
+                            <div class="supplier-specialty">Plumbing</div>
+                            <div class="supplier-status positive">Available</div>
+                        </div>
+                        <div class="supplier-card">
+                            <div class="supplier-avatar busy">SK</div>
+                            <div class="supplier-name">Sarah Kim</div>
+                            <div class="supplier-specialty">Electrical</div>
+                            <div class="supplier-status negative">On Job</div>
+                        </div>
+                        <div class="supplier-card">
+                            <div class="supplier-avatar available">MT</div>
+                            <div class="supplier-name">Mike Taylor</div>
+                            <div class="supplier-specialty">HVAC</div>
+                            <div class="supplier-status positive">Available</div>
+                        </div>
+                        <div class="supplier-card">
+                            <div class="supplier-avatar busy">AL</div>
+                            <div class="supplier-name">Anna Lee</div>
+                            <div class="supplier-specialty">Building</div>
+                            <div class="supplier-status negative">Driving</div>
+                        </div>
+                        <div class="supplier-card">
+                            <div class="supplier-avatar offline">RP</div>
+                            <div class="supplier-name">Rob Park</div>
+                            <div class="supplier-specialty">Automotive</div>
+                            <div class="supplier-status">Offline</div>
+                        </div>
+                        <div class="supplier-card">
+                            <div class="supplier-avatar available">LW</div>
+                            <div class="supplier-name">Lisa Wong</div>
+                            <div class="supplier-specialty">Tree Services</div>
+                            <div class="supplier-status positive">Available</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="service-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">System Health & Performance</h2>
+                    <a href="#" class="view-all">Full Analytics →</a>
+                </div>
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 0.9em; color: #718096; margin-bottom: 10px;">Phone System</div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #48bb78;">ACTIVE</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 0.9em; color: #718096; margin-bottom: 10px;">API Status</div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #48bb78;">OPERATIONAL</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 0.9em; color: #718096; margin-bottom: 10px;">Response Rate</div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #4299e1;">98.5%</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 0.9em; color: #718096; margin-bottom: 10px;">Active Users</div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #9f7aea;">47</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>&copy; 2025 FormanPacific Service Claims Management. All rights reserved. | Admin Portal v2.1</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Simulate real-time updates
-        let notificationCount = 0;
-        const notifications = [
-            { title: "🆕 New Service Request", body: "Battery jump needed at Queen St parking" },
-            { title: "✅ Job Complete", body: "Freezer repair completed at Fresh Market" },
-            { title: "🚗 Technician En Route", body: "Mike R. dispatched to wrong fuel rescue" },
-            { title: "⚠️ Urgent Request", body: "Commercial freezer down - Restaurant chain" },
-            { title: "📍 Tech Available", body: "Sarah L. now available for dispatch" }
-        ];
+        // Microsoft Authentication Configuration
+        const msalConfig = {
+            auth: {
+                clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+                authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+                redirectUri: window.location.origin + '/admin/dashboard'
+            },
+            cache: {
+                cacheLocation: 'sessionStorage',
+                storeAuthStateInCookie: false
+            }
+        };
 
-        function showNotification() {
-            const notification = document.getElementById('notification');
-            const notif = notifications[notificationCount % notifications.length];
-            notification.querySelector('.notification-header').textContent = notif.title;
-            notification.querySelector('.notification-body').textContent = notif.body;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 5000);
-            
-            notificationCount++;
+        // Create MSAL instance
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+        // Check authentication on page load
+        async function checkAuthentication() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const dashboardContainer = document.getElementById('dashboardContainer');
+            const unauthorizedScreen = document.getElementById('unauthorizedScreen');
+
+            try {
+                // Check for active account
+                const accounts = msalInstance.getAllAccounts();
+                
+                if (accounts.length > 0) {
+                    // User is authenticated
+                    const account = accounts[0];
+                    
+                    // Update UI with user info
+                    document.getElementById('userName').textContent = account.name || account.username;
+                    
+                    // Show dashboard
+                    loadingScreen.classList.add('authenticated');
+                    dashboardContainer.classList.add('authenticated');
+                } else {
+                    // No active session - check sessionStorage for temporary bypass
+                    const msalAccount = sessionStorage.getItem('msalAccount');
+                    
+                    if (msalAccount) {
+                        const account = JSON.parse(msalAccount);
+                        document.getElementById('userName').textContent = account.name || account.username || 'Administrator';
+                        
+                        // Show dashboard
+                        loadingScreen.classList.add('authenticated');
+                        dashboardContainer.classList.add('authenticated');
+                    } else {
+                        // Not authenticated - show unauthorized screen
+                        loadingScreen.style.display = 'none';
+                        unauthorizedScreen.style.display = 'flex';
+                    }
+                }
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                // Show unauthorized screen on error
+                loadingScreen.style.display = 'none';
+                unauthorizedScreen.style.display = 'flex';
+            }
         }
 
-        // Show notifications periodically
-        setTimeout(() => {
-            showNotification();
-            setInterval(showNotification, 15000);
-        }, 3000);
+        // Logout function
+        async function logout() {
+            try {
+                // Clear session storage
+                sessionStorage.clear();
+                
+                // Logout from MSAL
+                const accounts = msalInstance.getAllAccounts();
+                if (accounts.length > 0) {
+                    const logoutRequest = {
+                        account: accounts[0],
+                        postLogoutRedirectUri: window.location.origin + '/admin'
+                    };
+                    await msalInstance.logoutRedirect(logoutRequest);
+                } else {
+                    // No MSAL session, just redirect
+                    window.location.href = '/admin';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Force redirect on error
+                sessionStorage.clear();
+                window.location.href = '/admin';
+            }
+        }
 
-        // Update stats randomly
+        // Quick Action Functions
+        function createNewClaim() {
+            alert('Opening new claim form...\n\nThis would open the claim creation interface.');
+        }
+
+        function dispatchSupplier() {
+            alert('Opening supplier dispatch panel...\n\nThis would show available suppliers and allow dispatching.');
+        }
+
+        function viewReports() {
+            alert('Opening reports dashboard...\n\nThis would show analytics and reporting tools.');
+        }
+
+        function manageSuppliers() {
+            alert('Opening supplier management...\n\nThis would show the full supplier database and management tools.');
+        }
+
+        function systemStatus() {
+            alert('System Status:\n\n✅ All systems operational\n✅ API endpoints responding\n✅ Database connected\n✅ Phone system active');
+        }
+
+        function togglePhoneSystem() {
+            if (confirm('Toggle phone system status?\n\nThis will affect phone availability on the main website.')) {
+                alert('Phone system status toggled.\n\nChanges will be reflected on the main website immediately.');
+            }
+        }
+
+        // Simulate real-time updates
         function updateStats() {
             const statValues = document.querySelectorAll('.stat-value');
             statValues.forEach((stat, index) => {
-                if (index < 3) { // Don't update response time
+                if (Math.random() > 0.7) {
                     const current = parseInt(stat.textContent);
                     const change = Math.random() > 0.5 ? 1 : -1;
                     const newValue = Math.max(0, current + change);
                     if (newValue !== current) {
                         stat.style.transform = 'scale(1.1)';
-                        stat.textContent = newValue;
+                        stat.textContent = index === 3 ? `${newValue}m` : newValue;
                         setTimeout(() => {
                             stat.style.transform = 'scale(1)';
                         }, 300);
@@ -688,67 +937,31 @@
             });
         }
 
-        setInterval(updateStats, 10000);
-
-        // Button click handlers
-        function createNewJob() {
-            alert('Opening new service request form...\n\nSelect Service Type:\n• Eek Mobile Mechanical\n• Coolth Emergency Refrigeration');
-        }
-
-        function viewTechnicians() {
-            alert('Opening technician management panel...\n\n12 technicians currently online\n8 available for dispatch');
-        }
-
-        // Add click handlers to job items
-        document.querySelectorAll('.job-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const jobTitle = this.querySelector('h3').textContent;
-                alert(`Opening job details for:\n${jobTitle}\n\nCustomer info, job history, and dispatch options would appear here.`);
-            });
-        });
-
-        // Add click handlers to tech cards
-        document.querySelectorAll('.tech-card').forEach(card => {
-            card.addEventListener('click', function() {
-                const techName = this.querySelector('.tech-name').textContent;
-                alert(`Technician Profile: ${techName}\n\nSkills, current location, job history, and availability would appear here.`);
-            });
-        });
-
-        // Simulate real-time status updates
-        function updateJobStatuses() {
-            const statuses = ['status-pending', 'status-dispatched', 'status-onsite', 'status-complete'];
-            const badges = document.querySelectorAll('.status-badge');
+        // Initialize authentication check on page load
+        window.addEventListener('load', () => {
+            checkAuthentication();
             
-            // Randomly update one job status
-            if (badges.length > 0 && Math.random() > 0.7) {
-                const randomBadge = badges[Math.floor(Math.random() * badges.length)];
-                const currentStatus = Array.from(randomBadge.classList).find(c => c.startsWith('status-'));
-                const currentIndex = statuses.indexOf(currentStatus);
-                
-                if (currentIndex < statuses.length - 1) {
-                    randomBadge.classList.remove(currentStatus);
-                    randomBadge.classList.add(statuses[currentIndex + 1]);
-                    
-                    // Update badge text
-                    const statusTexts = {
-                        'status-pending': 'Pending',
-                        'status-dispatched': 'Dispatched',
-                        'status-onsite': 'On Site',
-                        'status-complete': 'Complete'
-                    };
-                    randomBadge.textContent = statusTexts[statuses[currentIndex + 1]];
-                    
-                    // Add animation
-                    randomBadge.style.transform = 'scale(1.2)';
-                    setTimeout(() => {
-                        randomBadge.style.transform = 'scale(1)';
-                    }, 300);
-                }
+            // Only start updates if authenticated
+            const dashboardContainer = document.getElementById('dashboardContainer');
+            if (dashboardContainer.classList.contains('authenticated')) {
+                setInterval(updateStats, 10000);
             }
-        }
+        });
 
-        setInterval(updateJobStatuses, 8000);
+        // Handle redirect from login
+        msalInstance.handleRedirectPromise()
+            .then(response => {
+                if (response) {
+                    // User successfully logged in via redirect
+                    sessionStorage.setItem('msalAccount', JSON.stringify(response.account));
+                    checkAuthentication();
+                }
+            })
+            .catch(error => {
+                console.error('Redirect error:', error);
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('unauthorizedScreen').style.display = 'flex';
+            });
     </script>
 </body>
 </html>
