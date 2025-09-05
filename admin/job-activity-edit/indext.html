@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Build Notes | FormanPacific Service Claims Management</title>
+  <meta name="description" content="Edit and manage job build notes in SharePoint JobBuildNotes list">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Microsoft Authentication Library -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
+  <!-- AG Grid Community Edition -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #1e3c72;
+      --primary-dark: #152a52;
+      --secondary: #2a5298;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --bg-light: #f8fafc;
+      --bg-white: #ffffff;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-white);
+      box-shadow: var(--shadow-md);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: var(--shadow-md);
+    }
+
+    .brand-text h1 {
+      font-size: 24px;
+      color: var(--primary);
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .brand-text small {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.secondary {
+      background: var(--bg-light);
+      color: var(--text-primary);
+      border: 2px solid var(--border);
+    }
+
+    .btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .btn.success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn.success:hover {
+      background: #059669;
+    }
+
+    .btn.warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn.warning:hover {
+      background: #d97706;
+    }
+
+    .btn.danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn.danger:hover {
+      background: #dc2626;
+    }
+
+    .btn.info {
+      background: var(--info);
+      color: white;
+    }
+
+    .btn.info:hover {
+      background: #2563eb;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1600px;
+      margin: 24px auto;
+      padding: 0 24px 40px;
+    }
+
+    /* Panel */
+    .panel {
+      background: var(--bg-white);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar .spacer {
+      flex: 1;
+    }
+
+    /* Pills/Badges */
+    .pill {
+      background: var(--bg-light);
+      color: var(--text-primary);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .pill.success {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #6ee7b7;
+    }
+
+    .pill.warning {
+      background: #fed7aa;
+      color: #92400e;
+      border-color: #fb923c;
+    }
+
+    .pill.danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    .pill.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #93c5fd;
+    }
+
+    /* Status Bar */
+    .statusbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    /* Grid Container */
+    #grid {
+      height: 600px;
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* Search Box */
+    .search-box {
+      position: relative;
+      flex: 0 1 300px;
+    }
+
+    .search-input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 36px 8px 12px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+    }
+
+    /* Select Dropdown */
+    select {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      background: var(--bg-white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    /* Loading & Login Screens */
+    .overlay-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .overlay-content {
+      text-align: center;
+      max-width: 480px;
+      padding: 40px;
+      background: var(--bg-white);
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: var(--bg-white);
+      border-radius: 16px;
+      width: 520px;
+      max-width: 92vw;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: var(--shadow-xl);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--bg-light);
+      color: var(--text-primary);
+    }
+
+    .form-row {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    .form-help {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: var(--bg-white);
+      padding: 14px 18px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      animation: slideInRight 0.3s ease;
+      border-left: 4px solid;
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning);
+    }
+
+    .toast.info {
+      border-left-color: var(--info);
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Bulk Actions Menu */
+    .bulk-actions {
+      position: relative;
+      display: inline-block;
+    }
+
+    .bulk-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 8px;
+      background: var(--bg-white);
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      padding: 8px;
+      min-width: 200px;
+      display: none;
+      z-index: 50;
+    }
+
+    .bulk-menu.show {
+      display: block;
+    }
+
+    .bulk-menu-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bulk-menu-item:hover {
+      background: var(--bg-light);
+    }
+
+    .bulk-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0;
+    }
+
+    /* Grid Stats */
+    .grid-stats {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .grid-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .grid-stat strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Notes Preview */
+    .notes-preview {
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .notes-preview:hover {
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-inner {
+        padding: 12px 16px;
+      }
+
+      .brand-text h1 {
+        font-size: 20px;
+      }
+
+      .container {
+        padding: 0 16px 24px;
+        margin: 16px auto;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .toolbar {
+        gap: 8px;
+      }
+
+      #grid {
+        height: 400px;
+      }
+
+      .modal-card {
+        width: 95vw;
+        padding: 20px;
+      }
+
+      .search-box {
+        flex: 1 1 100%;
+      }
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-white: #0f172a;
+        --bg-light: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border: #334155;
+      }
+
+      body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+
+      .ag-theme-alpine {
+        --ag-background-color: var(--bg-white);
+        --ag-header-background-color: var(--bg-light);
+        --ag-odd-row-background-color: var(--bg-light);
+        --ag-border-color: var(--border);
+      }
+
+      .form-input, .form-select, .form-textarea, select {
+        background: var(--bg-light);
+        color: var(--text-primary);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="overlay-screen">
+    <div class="overlay-content">
+      <div class="logo" style="margin: 0 auto 20px; width: 80px; height: 80px; font-size: 32px;">FP</div>
+      <h2 style="margin-bottom: 12px; color: var(--text-primary);">Sign In Required</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 24px;">
+        Access the Job Build Notes editor with your Microsoft work account.
+      </p>
+      <div class="pill info" style="margin: 0 auto 24px; display: inline-flex;">
+        <span>📝</span> JobBuildNotes SharePoint List
+      </div>
+      <button id="btnLogin" class="btn primary" style="font-size: 16px; padding: 12px 24px;">
+        Sign in with Microsoft
+      </button>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-top: 16px;">
+        SharePoint permissions are enforced
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="overlay-screen hidden">
+    <div class="overlay-content">
+      <div class="spinner"></div>
+      <h3 style="color: var(--text-primary);">Loading Job Build Notes</h3>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Connecting to SharePoint...</p>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">FP</div>
+        <div class="brand-text">
+          <h1>FormanPacific <small>Build Notes</small></h1>
+          <small>📝 JobBuildNotes (SharePoint Live)</small>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn secondary" onclick="location.href='/admin/dashboard'">
+          ← Dashboard
+        </button>
+        <button class="btn secondary" onclick="location.href='/admin/jobs-master'">
+          📊 Jobs Master
+        </button>
+        <button class="btn info" id="btnRefresh">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <div class="panel">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <button id="btnAddNote" class="btn success">
+            ➕ Add Note
+          </button>
+          <button id="btnBulkEdit" class="btn secondary">
+            ✏️ Bulk Edit
+          </button>
+          <button id="btnDeleteSelected" class="btn danger">
+            🗑️ Delete Selected
+          </button>
+          <button id="btnSave" class="btn primary" disabled>
+            💾 Save Changes
+          </button>
+          <button id="btnDiscard" class="btn secondary" disabled>
+            ❌ Discard
+          </button>
+        </div>
+        
+        <div class="spacer"></div>
+        
+        <div class="toolbar-group">
+          <div class="search-box">
+            <input type="text" id="quickSearch" class="search-input" placeholder="Search notes...">
+            <span class="search-icon">🔍</span>
+          </div>
+          <button id="btnFilter" class="btn secondary">
+            🔽 Filter
+          </button>
+          <button id="btnExport" class="btn info">
+            📥 Export
+          </button>
+          <button id="btnImport" class="btn warning">
+            📤 Import
+          </button>
+        </div>
+      </div>
+
+      <!-- AG Grid -->
+      <div id="grid" class="ag-theme-alpine"></div>
+
+      <!-- Status Bar -->
+      <div class="statusbar">
+        <div class="grid-stats">
+          <div class="grid-stat">
+            <span>Notes:</span> <strong id="noteCount">0</strong>
+          </div>
+          <div class="grid-stat">
+            <span>Selected:</span> <strong id="selectedCount">0</strong>
+          </div>
+          <div class="grid-stat">
+            <span>Jobs Referenced:</span> <strong id="jobCount">0</strong>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <span id="userPill" class="pill">Not signed in</span>
+        <span id="changesPill" class="pill">0 pending changes</span>
+        <span id="statusPill" class="pill info">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Note Modal -->
+  <div id="noteModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="noteModalTitle">Add Build Note</h3>
+        <button class="modal-close" onclick="closeNoteModal()">×</button>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Job Reference</label>
+        <input id="noteJobRef" type="text" class="form-input" placeholder="Enter Job ID or reference">
+        <div class="form-help">Link this note to a specific job</div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Note Type</label>
+        <select id="noteType" class="form-select">
+          <option value="General">General Note</option>
+          <option value="Technical">Technical Details</option>
+          <option value="Issue">Issue/Problem</option>
+          <option value="Resolution">Resolution</option>
+          <option value="Customer">Customer Request</option>
+          <option value="Internal">Internal Note</option>
+          <option value="Safety">Safety Concern</option>
+          <option value="Quality">Quality Check</option>
+        </select>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Priority</label>
+        <select id="notePriority" class="form-select">
+          <option value="Low">Low</option>
+          <option value="Normal" selected>Normal</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Note Content</label>
+        <textarea id="noteContent" class="form-textarea" placeholder="Enter your detailed notes here..." rows="6"></textarea>
+        <div class="form-help">Be as detailed as needed for future reference</div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Tags (comma-separated)</label>
+        <input id="noteTags" type="text" class="form-input" placeholder="e.g., electrical, warranty, follow-up">
+        <div class="form-help">Add tags for easier searching</div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Attachments</label>
+        <input type="file" id="noteAttachments" class="form-input" multiple>
+        <div class="form-help">Attach relevant documents or images</div>
+      </div>
+      
+      <div class="form-row">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="noteFollowUp" style="width: 18px; height: 18px;">
+          <span class="form-label" style="margin: 0;">Requires follow-up action</span>
+        </label>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn secondary" onclick="closeNoteModal()">Cancel</button>
+        <button id="btnSaveNote" class="btn primary">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    // ===== Configuration =====
+    const CONFIG = {
+      sharepoint: {
+        tenant: 'roadandrescue.sharepoint.com',
+        siteRelative: '/sites/rar',
+        listTitle: 'JobBuildNotes'
+      },
+      msal: {
+        auth: {
+          clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+          authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+          redirectUri: window.location.origin + '/admin/job-build-notes'
+        },
+        cache: {
+          cacheLocation: 'sessionStorage',
+          storeAuthStateInCookie: true
+        }
+      },
+      grid: {
+        pagination: true,
+        paginationPageSize: 50,
+        animateRows: true,
+        enableRangeSelection: true,
+        enableCellChangeFlash: true,
+        undoRedoCellEditing: true,
+        undoRedoCellEditingLimit: 20,
+        stopEditingWhenCellsLoseFocus: true,
+        rowHeight: 60
+      }
+    };
+
+    // ===== State Management =====
+    const state = {
+      msalInstance: null,
+      account: null,
+      accessToken: null,
+      gridApi: null,
+      columnApi: null,
+      originalData: [],
+      pendingChanges: {
+        updates: new Map(),
+        creates: [],
+        deletes: new Set()
+      },
+      columnDefs: [],
+      isDirty: false,
+      currentNote: null
+    };
+
+    // ===== Utility Functions =====
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    function showToast(message, type = 'info') {
+      const container = $('#toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icons = {
+        success: '✓',
+        error: '✖',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+      
+      toast.innerHTML = `
+        <span style="font-size: 18px;">${icons[type]}</span>
+        <span style="flex: 1;">${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; font-size: 18px;">×</button>
+      `;
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    }
+
+    function setStatus(text, type = 'info') {
+      const pill = $('#statusPill');
+      pill.textContent = text;
+      pill.className = `pill ${type}`;
+    }
+
+    function updateChangeCount() {
+      const count = state.pendingChanges.updates.size + 
+                   state.pendingChanges.creates.length + 
+                   state.pendingChanges.deletes.size;
+      
+      $('#changesPill').textContent = `${count} pending changes`;
+      $('#changesPill').className = count > 0 ? 'pill warning' : 'pill';
+      $('#btnSave').disabled = count === 0;
+      $('#btnDiscard').disabled = count === 0;
+      state.isDirty = count > 0;
+      
+      updateGridStats();
+    }
+
+    function updateGridStats() {
+      if (!state.gridApi) return;
+      
+      $('#noteCount').textContent = state.gridApi.getDisplayedRowCount();
+      $('#selectedCount').textContent = state.gridApi.getSelectedRows().length;
+      
+      // Count unique job references
+      const uniqueJobs = new Set();
+      state.gridApi.forEachNode(node => {
+        if (node.data.JobReference) {
+          uniqueJobs.add(node.data.JobReference);
+        }
+      });
+      $('#jobCount').textContent = uniqueJobs.size;
+    }
+
+    // ===== Authentication =====
+    async function initAuth() {
+      try {
+        state.msalInstance = new msal.PublicClientApplication(CONFIG.msal);
+        await state.msalInstance.initialize();
+        
+        const response = await state.msalInstance.handleRedirectPromise();
+        if (response) {
+          console.log('Redirect handled successfully');
+        }
+        
+        const accounts = state.msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+          state.account = accounts[0];
+          $('#loginScreen').classList.add('hidden');
+          $('#loadingScreen').classList.remove('hidden');
+          $('#userPill').textContent = state.account.username;
+          
+          await getAccessToken();
+          await initializeApp();
+          
+          $('#loadingScreen').classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Auth initialization failed:', error);
+        showToast('Authentication failed. Please refresh and try again.', 'error');
+      }
+    }
+
+    async function getAccessToken() {
+      const scopes = [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`];
+      
+      try {
+        const response = await state.msalInstance.acquireTokenSilent({
+          scopes,
+          account: state.account
+        });
+        state.accessToken = response.accessToken;
+        return response.accessToken;
+      } catch (error) {
+        try {
+          const response = await state.msalInstance.acquireTokenPopup({ scopes });
+          state.accessToken = response.accessToken;
+          return response.accessToken;
+        } catch (popupError) {
+          console.error('Token acquisition failed:', popupError);
+          throw popupError;
+        }
+      }
+    }
+
+    // ===== SharePoint API =====
+    async function spRequest(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${state.accessToken}`,
+          'Accept': 'application/json;odata=nometadata',
+          ...options.headers
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`SharePoint API error: ${response.status} ${response.statusText}`);
+      }
+      
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    function getSiteUrl(path = '') {
+      return `https://${CONFIG.sharepoint.tenant}${CONFIG.sharepoint.siteRelative}${path}`;
+    }
+
+    async function loadListData() {
+      setStatus('Loading notes...', 'info');
+      
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
+      const body = {
+        parameters: {
+          RenderOptions: 570,
+          ViewXml: '<View><RowLimit>5000</RowLimit><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query></View>'
+        }
+      };
+      
+      const data = await spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(body)
+      });
+      
+      return data;
+    }
+
+    async function createItem(item) {
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
+      
+      return spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(item)
+      });
+    }
+
+    async function updateItem(id, updates) {
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+      
+      await spRequest(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;odata=verbose',
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'MERGE'
+        },
+        body: JSON.stringify(updates)
+      });
+    }
+
+    async function deleteItem(id) {
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+      
+      await spRequest(url, {
+        method: 'POST',
+        headers: {
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'DELETE'
+        }
+      });
+    }
+
+    // ===== Grid Configuration =====
+    function buildColumnDefs() {
+      const defs = [
+        {
+          headerName: '',
+          field: '__selection__',
+          checkboxSelection: true,
+          headerCheckboxSelection: true,
+          width: 50,
+          pinned: 'left',
+          lockPosition: true,
+          suppressMenu: true
+        },
+        {
+          headerName: 'ID',
+          field: 'ID',
+          width: 80,
+          pinned: 'left',
+          editable: false,
+          cellStyle: { fontWeight: 'bold' }
+        },
+        {
+          headerName: 'Job Reference',
+          field: 'JobReference',
+          width: 150,
+          editable: true,
+          cellStyle: { color: 'var(--primary)' }
+        },
+        {
+          headerName: 'Type',
+          field: 'NoteType',
+          width: 120,
+          editable: true,
+          cellEditor: 'agSelectCellEditor',
+          cellEditorParams: {
+            values: ['General', 'Technical', 'Issue', 'Resolution', 'Customer', 'Internal', 'Safety', 'Quality']
+          }
+        },
+        {
+          headerName: 'Priority',
+          field: 'Priority',
+          width: 100,
+          editable: true,
+          cellEditor: 'agSelectCellEditor',
+          cellEditorParams: {
+            values: ['Low', 'Normal', 'High', 'Critical']
+          },
+          cellStyle: params => {
+            const colors = {
+              'Critical': { color: 'white', backgroundColor: 'var(--danger)' },
+              'High': { color: 'white', backgroundColor: 'var(--warning)' },
+              'Normal': { backgroundColor: 'var(--bg-light)' },
+              'Low': { backgroundColor: 'transparent' }
+            };
+            return colors[params.value] || {};
+          }
+        },
+        {
+          headerName: 'Note Content',
+          field: 'Content',
+          flex: 2,
+          minWidth: 300,
+          editable: true,
+          cellRenderer: params => {
+            return `<div class="notes-preview" title="${params.value || ''}">${params.value || ''}</div>`;
+          },
+          autoHeight: true,
+          wrapText: true
+        },
+        {
+          headerName: 'Tags',
+          field: 'Tags',
+          width: 200,
+          editable: true
+        },
+        {
+          headerName: 'Follow Up',
+          field: 'RequiresFollowUp',
+          width: 100,
+          editable: true,
+          cellRenderer: params => params.value ? '⚠️ Yes' : ''
+        },
+        {
+          headerName: 'Created By',
+          field: 'Author',
+          width: 150,
+          editable: false
+        },
+        {
+          headerName: 'Created',
+          field: 'Created',
+          width: 150,
+          editable: false,
+          valueFormatter: params => {
+            if (!params.value) return '';
+            const date = new Date(params.value);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          }
+        },
+        {
+          headerName: 'Modified',
+          field: 'Modified',
+          width: 150,
+          editable: false,
+          valueFormatter: params => {
+            if (!params.value) return '';
+            const date = new Date(params.value);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          }
+        }
+      ];
+      
+      return defs;
+    }
+
+    function initGrid(columnDefs, rowData) {
+      const gridContainer = $('#grid');
+      
+      const gridOptions = {
+        ...CONFIG.grid,
+        columnDefs,
+        rowData,
+        defaultColDef: {
+          flex: 1,
+          minWidth: 100,
+          resizable: true,
+          sortable: true,
+          filter: true
+        },
+        onCellValueChanged: onCellValueChanged,
+        onSelectionChanged: updateGridStats,
+        onFilterChanged: updateGridStats,
+        onSortChanged: updateGridStats,
+        onRowDoubleClicked: onRowDoubleClicked,
+        onGridReady: params => {
+          state.gridApi = params.api;
+          state.columnApi = params.columnApi;
+          updateGridStats();
+        }
+      };
+      
+      new agGrid.Grid(gridContainer, gridOptions);
+    }
+
+    function onCellValueChanged(params) {
+      const id = params.data.ID;
+      
+      if (String(id).startsWith('NEW_')) {
+        params.data[params.colDef.field] = params.newValue;
+      } else {
+        const updates = state.pendingChanges.updates.get(id) || {};
+        updates[params.colDef.field] = params.newValue;
+        state.pendingChanges.updates.set(id, updates);
+      }
+      
+      updateChangeCount();
+    }
+
+    function onRowDoubleClicked(params) {
+      openNoteModal(params.data);
+    }
+
+    // ===== Main Application =====
+    async function initializeApp() {
+      try {
+        setStatus('Loading build notes...', 'info');
+        
+        const listData = await loadListData();
+        const columnDefs = buildColumnDefs();
+        const rowData = listData.Row ? listData.Row.map(row => ({ ...row })) : [];
+        
+        state.columnDefs = columnDefs;
+        state.originalData = JSON.parse(JSON.stringify(rowData));
+        
+        initGrid(columnDefs, rowData);
+        setupEventHandlers();
+        
+        setStatus(`Loaded ${rowData.length} notes`, 'success');
+        showToast(`Successfully loaded ${rowData.length} build notes`, 'success');
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+        setStatus('Failed to load notes', 'error');
+        showToast('Failed to load build notes. Please refresh.', 'error');
+      }
+    }
+
+    function setupEventHandlers() {
+      // Login
+      $('#btnLogin').onclick = async () => {
+        await state.msalInstance.loginRedirect({
+          scopes: [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`]
+        });
+      };
+      
+      // Refresh
+      $('#btnRefresh').onclick = async () => {
+        if (state.isDirty) {
+          if (!confirm('You have unsaved changes. Refresh anyway?')) return;
+        }
+        window.location.reload();
+      };
+      
+      // Add note
+      $('#btnAddNote').onclick = () => {
+        openNoteModal();
+      };
+      
+      // Delete selected
+      $('#btnDeleteSelected').onclick = () => {
+        const selected = state.gridApi.getSelectedRows();
+        if (selected.length === 0) {
+          showToast('No notes selected', 'warning');
+          return;
+        }
+        
+        if (!confirm(`Delete ${selected.length} selected notes?`)) return;
+        
+        selected.forEach(row => {
+          if (String(row.ID).startsWith('NEW_')) {
+            state.pendingChanges.creates = state.pendingChanges.creates.filter(r => r.ID !== row.ID);
+          } else {
+            state.pendingChanges.deletes.add(row.ID);
+          }
+        });
+        
+        state.gridApi.applyTransaction({ remove: selected });
+        updateChangeCount();
+        showToast(`${selected.length} notes marked for deletion`, 'warning');
+      };
+      
+      // Save changes
+      $('#btnSave').onclick = saveChanges;
+      
+      // Discard changes
+      $('#btnDiscard').onclick = () => {
+        if (!confirm('Discard all pending changes?')) return;
+        
+        state.pendingChanges.updates.clear();
+        state.pendingChanges.creates = [];
+        state.pendingChanges.deletes.clear();
+        
+        state.gridApi.setRowData(JSON.parse(JSON.stringify(state.originalData)));
+        
+        updateChangeCount();
+        showToast('Changes discarded', 'info');
+      };
+      
+      // Quick search
+      $('#quickSearch').oninput = (e) => {
+        state.gridApi.setQuickFilter(e.target.value);
+      };
+      
+      // Export
+      $('#btnExport').onclick = () => {
+        const allData = [];
+        state.gridApi.forEachNode(node => allData.push(node.data));
+        exportToCSV(allData);
+      };
+      
+      // Save note in modal
+      $('#btnSaveNote').onclick = saveNoteFromModal;
+      
+      // Close modals on background click
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.onclick = (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('active');
+          }
+        };
+      });
+      
+      // Prevent navigation if unsaved changes
+      window.addEventListener('beforeunload', (e) => {
+        if (state.isDirty) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+    }
+
+    function openNoteModal(noteData = null) {
+      state.currentNote = noteData;
+      
+      if (noteData) {
+        $('#noteModalTitle').textContent = 'Edit Build Note';
+        $('#noteJobRef').value = noteData.JobReference || '';
+        $('#noteType').value = noteData.NoteType || 'General';
+        $('#notePriority').value = noteData.Priority || 'Normal';
+        $('#noteContent').value = noteData.Content || '';
+        $('#noteTags').value = noteData.Tags || '';
+        $('#noteFollowUp').checked = noteData.RequiresFollowUp || false;
+      } else {
+        $('#noteModalTitle').textContent = 'Add Build Note';
+        $('#noteJobRef').value = '';
+        $('#noteType').value = 'General';
+        $('#notePriority').value = 'Normal';
+        $('#noteContent').value = '';
+        $('#noteTags').value = '';
+        $('#noteFollowUp').checked = false;
+      }
+      
+      $('#noteModal').classList.add('active');
+    }
+
+    function closeNoteModal() {
+      $('#noteModal').classList.remove('active');
+      state.currentNote = null;
+    }
+
+    function saveNoteFromModal() {
+      const noteData = {
+        JobReference: $('#noteJobRef').value.trim(),
+        NoteType: $('#noteType').value,
+        Priority: $('#notePriority').value,
+        Content: $('#noteContent').value.trim(),
+        Tags: $('#noteTags').value.trim(),
+        RequiresFollowUp: $('#noteFollowUp').checked
+      };
+      
+      if (!noteData.Content) {
+        showToast('Note content is required', 'warning');
+        return;
+      }
+      
+      if (state.currentNote) {
+        // Update existing note
+        if (String(state.currentNote.ID).startsWith('NEW_')) {
+          Object.assign(state.currentNote, noteData);
+        } else {
+          const updates = state.pendingChanges.updates.get(state.currentNote.ID) || {};
+          Object.assign(updates, noteData);
+          state.pendingChanges.updates.set(state.currentNote.ID, updates);
+        }
+        state.gridApi.refreshCells();
+      } else {
+        // Add new note
+        const newNote = {
+          ID: `NEW_${Date.now()}`,
+          ...noteData,
+          Author: state.account.username,
+          Created: new Date().toISOString(),
+          Modified: new Date().toISOString()
+        };
+        
+        state.pendingChanges.creates.push(newNote);
+        state.gridApi.applyTransaction({
+          add: [newNote],
+          addIndex: 0
+        });
+      }
+      
+      updateChangeCount();
+      closeNoteModal();
+      showToast('Note saved to pending changes', 'info');
+    }
+
+    async function saveChanges() {
+      try {
+        setStatus('Saving changes...', 'info');
+        $('#btnSave').disabled = true;
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Process creates
+        for (const newNote of state.pendingChanges.creates) {
+          try {
+            const copy = { ...newNote };
+            delete copy.ID;
+            delete copy.__selection__;
+            delete copy.Author;
+            delete copy.Created;
+            delete copy.Modified;
+            
+            const created = await createItem(copy);
+            newNote.ID = created.ID || created.Id;
+            successCount++;
+          } catch (error) {
+            console.error('Failed to create note:', error);
+            errorCount++;
+          }
+        }
+        
+        // Process updates
+        for (const [id, updates] of state.pendingChanges.updates.entries()) {
+          try {
+            await updateItem(id, updates);
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to update note ${id}:`, error);
+            errorCount++;
+          }
+        }
+        
+        // Process deletes
+        for (const id of state.pendingChanges.deletes) {
+          try {
+            await deleteItem(id);
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to delete note ${id}:`, error);
+            errorCount++;
+          }
+        }
+        
+        // Clear pending changes
+        state.pendingChanges.updates.clear();
+        state.pendingChanges.creates = [];
+        state.pendingChanges.deletes.clear();
+        
+        // Update original data
+        const allNotes = [];
+        state.gridApi.forEachNode(node => {
+          if (!state.pendingChanges.deletes.has(node.data.ID)) {
+            allNotes.push(node.data);
+          }
+        });
+        state.originalData = JSON.parse(JSON.stringify(allNotes));
+        
+        updateChangeCount();
+        
+        if (errorCount > 0) {
+          setStatus(`Saved with ${errorCount} errors`, 'warning');
+          showToast(`Saved ${successCount} changes, ${errorCount} failed`, 'warning');
+        } else {
+          setStatus('All changes saved', 'success');
+          showToast(`Successfully saved ${successCount} changes`, 'success');
+        }
+      } catch (error) {
+        console.error('Save failed:', error);
+        setStatus('Save failed', 'error');
+        showToast('Failed to save changes. Please try again.', 'error');
+      } finally {
+        $('#btnSave').disabled = false;
+      }
+    }
+
+    function exportToCSV(data) {
+      const headers = Object.keys(data[0]).filter(k => k !== '__selection__');
+      const csv = [
+        headers.join(','),
+        ...data.map(row => 
+          headers.map(h => {
+            const val = row[h];
+            return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+          }).join(',')
+        )
+      ].join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `job_build_notes_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showToast(`Exported ${data.length} notes`, 'success');
+    }
+
+    // ===== Initialize on Load =====
+    window.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+</body>
+</html>
