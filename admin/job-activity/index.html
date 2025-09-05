@@ -6,8 +6,6 @@
   <title>Job Activity Log | FormanPacific Service Claims Management</title>
   <meta name="description" content="Read-only viewer for JobActivityLog SharePoint list">
   <meta name="robots" content="noindex, nofollow">
-
-  <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
   <style>
@@ -41,7 +39,6 @@
     .unauthorized-content{text-align:center;max-width:450px;padding:50px;background:var(--bg-white);border-radius:20px;box-shadow:var(--shadow-xl)}
     .unauthorized-icon{width:100px;height:100px;margin:0 auto 20px;background:linear-gradient(135deg,#fecaca 0%,#ef4444 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px}
     .btn-login{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:#fff;padding:14px 32px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
-
     .header{background:var(--bg-white);box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1000;border-bottom:2px solid var(--border-color)}
     .header-content{max-width:1600px;margin:0 auto;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
     .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;box-shadow:var(--shadow-md)}
@@ -52,7 +49,6 @@
     .btn-nav{background:var(--primary-color);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;font-size:14px}
     .btn-nav:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:var(--shadow-md)}
     .btn-nav.secondary{background:var(--text-secondary)}.btn-nav.success{background:var(--success-color)}
-
     .container{max-width:1600px;margin:0 auto;padding:20px}
     .filter-section{background:var(--bg-white);border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow-md);border:1px solid var(--border-color)}
     .filter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
@@ -65,12 +61,10 @@
     .btn-apply{background:var(--success-color);color:#fff}
     .btn-clear{background:var(--bg-light);color:var(--text-primary);border:2px solid var(--border-color)}
     .btn-export{background:var(--info-color);color:#fff}
-
     .stats-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
     .stat-tile{background:var(--bg-white);padding:20px;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border-color);text-align:center;position:relative;overflow:hidden}
     .stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color))}
     .stat-value{font-size:2em;font-weight:700;margin:5px 0}
-
     .table-section{background:var(--bg-white);border-radius:16px;padding:24px;box-shadow:var(--shadow-lg);border:1px solid var(--border-color)}
     .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px}
     .record-count{background:var(--bg-light);padding:4px 12px;border-radius:20px;font-weight:600}
@@ -92,18 +86,15 @@
     .status-completed{background:#dbeafe;color:#1e40af}
     .status-cancelled{background:#fee2e2;color:#991b1b}
     .empty-state{text-align:center;padding:80px 20px;color:var(--text-secondary)}
-
     .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
     .modal.active{display:flex}
     .modal-content{background:var(--bg-white);border-radius:16px;padding:32px;max-width:900px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-xl)}
     .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--border-color)}
     .detail-grid{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-top:20px}
-
     .pagination{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:2px solid var(--border-color);flex-wrap:wrap;gap:16px}
     .pagination-controls{display:flex;align-items:center;gap:10px}
     .page-btn{padding:8px 16px;border:2px solid var(--border-color);background:var(--bg-white);border-radius:8px;cursor:pointer;font-weight:500}
     .page-size-selector{display:flex;align-items:center;gap:10px}
-
     @media (max-width:768px){
       .table-wrapper{max-height:400px}
       .detail-grid{grid-template-columns:1fr}
@@ -111,10 +102,8 @@
   </style>
 </head>
 <body>
-  <!-- Toasts -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Loading -->
   <div class="loading-screen" id="loadingScreen">
     <div class="spinner-container">
       <div class="spinner"></div><div class="spinner-logo">FP</div>
@@ -122,7 +111,6 @@
     <div class="loading-text">Authenticating and loading data...</div>
   </div>
 
-  <!-- Unauthorized -->
   <div class="unauthorized-screen" id="unauthorizedScreen">
     <div class="unauthorized-content">
       <div class="unauthorized-icon">🔒</div>
@@ -132,7 +120,6 @@
     </div>
   </div>
 
-  <!-- Main -->
   <div class="main-container" id="mainContainer">
     <header class="header">
       <div class="header-content">
@@ -153,7 +140,6 @@
     </header>
 
     <div class="container">
-      <!-- Filters -->
       <div class="filter-section">
         <div class="filter-header">
           <div class="filter-title">🔍 Search & Filters</div>
@@ -207,31 +193,14 @@
         </div>
       </div>
 
-      <!-- Stats -->
       <div class="stats-summary">
-        <div class="stat-tile">
-          <div class="stat-label">Total Events</div>
-          <div id="statTotal" class="stat-value">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">This Month</div>
-          <div id="statMonth" class="stat-value">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">Unique Jobs</div>
-          <div id="statJobs" class="stat-value">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">Top Activity</div>
-          <div id="statTopType" class="stat-value">—</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">Active Users</div>
-          <div id="statUsers" class="stat-value">0</div>
-        </div>
+        <div class="stat-tile"><div class="stat-label">Total Events</div><div id="statTotal" class="stat-value">0</div></div>
+        <div class="stat-tile"><div class="stat-label">This Month</div><div id="statMonth" class="stat-value">0</div></div>
+        <div class="stat-tile"><div class="stat-label">Unique Jobs</div><div id="statJobs" class="stat-value">0</div></div>
+        <div class="stat-tile"><div class="stat-label">Top Activity</div><div id="statTopType" class="stat-value">—</div></div>
+        <div class="stat-tile"><div class="stat-label">Active Users</div><div id="statUsers" class="stat-value">0</div></div>
       </div>
 
-      <!-- Table -->
       <div class="table-section">
         <div class="table-header">
           <h2>📋 Job Activity Log</h2>
@@ -272,7 +241,6 @@
       </div>
     </div>
 
-    <!-- Detail Modal -->
     <div class="modal" id="detailModal">
       <div class="modal-content">
         <div class="modal-header">
@@ -290,10 +258,10 @@
   <script>
     'use strict';
 
-    // ---------- CONFIG ----------
+    // ---------- CONFIG (identical base; list/title differs) ----------
     const SPO_HOST       = 'roadandrescue.sharepoint.com';
     const SPO_SITE_PATH  = '/sites/rar';
-    const SPO_LIST_TITLE = 'JobActivityLog'; // <-- target list for activity
+    const SPO_LIST_TITLE = 'JobActivityLog';
 
     const MSAL_CONFIG = {
       auth: {
@@ -376,18 +344,30 @@
       return r.json();
     }
 
+    function humanizeHeader(h){
+      return h.replace(/_x0020_/g,' ')
+              .replace(/([A-Z])/g,' $1')
+              .replace(/^\s+/, '')
+              .trim();
+    }
+
     async function fetchSharePointRows(){
       const token = await getGraphToken();
       const site = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:/sites${SPO_SITE_PATH}`, token);
 
-      // Get the list by displayName (exact match)
-      const lists = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${encodeURIComponent(SPO_LIST_TITLE)}'`, token);
+      // Exact displayName match (no URL-encoding of the literal)
+      const listNameOData = SPO_LIST_TITLE.replace(/'/g, "''");
+      const lists = await fetchJson(
+        `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`,
+        token
+      );
       if (!lists.value?.length) throw new Error(`List not found: ${SPO_LIST_TITLE}`);
       const listId = lists.value[0].id;
 
-      // Pull up to 5000 items with expanded fields
-      const url = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5000`;
-      const items = await fetchJson(url, token);
+      const items = await fetchJson(
+        `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5000`,
+        token
+      );
 
       return items.value.map(v => v.fields);
     }
@@ -402,19 +382,12 @@
         generateTableHeaders();
         updateStatistics();
         renderTable();
-        showToast(\`Loaded \${rows.length} rows.\`, 'success');
+        showToast(`Loaded ${rows.length} rows.`, 'success');
       }catch(err){
         console.error('Failed to load SharePoint data', err);
         showToast('Failed to load SharePoint data. Check permissions.', 'error');
         showEmptyState('Failed to connect to SharePoint');
       }
-    }
-
-    function humanizeHeader(h){
-      return h.replace(/_x0020_/g,' ')
-              .replace(/([A-Z])/g,' $1')
-              .replace(/^\s+/, '')
-              .trim();
     }
 
     function generateTableHeaders(){
@@ -426,7 +399,7 @@
       headers.forEach(h=>{
         const th = document.createElement('th');
         th.textContent = humanizeHeader(h);
-        th.className = (state.sortColumn === h) ? \`sorted sorted-\${state.sortDirection}\` : '';
+        th.className = (state.sortColumn === h) ? `sorted sorted-${state.sortDirection}` : '';
         th.onclick = ()=> sortTable(h);
         tableHeaders.appendChild(th);
       });
@@ -458,9 +431,9 @@
 
           if (/status/i.test(k)){
             const val = String(rec[k] ?? '').toLowerCase();
-            td.innerHTML = \`<span class="status-badge status-\${val}">\${rec[k] ?? '-'}</span>\`;
+            td.innerHTML = `<span class="status-badge status-${val}">${rec[k] ?? '-'}</span>`;
           } else if (/price|amount|total|cost|value/i.test(k) && typeof rec[k] === 'number'){
-            td.innerHTML = \`<strong>$\${rec[k].toLocaleString()}</strong>\`;
+            td.innerHTML = `<strong>$${rec[k].toLocaleString()}</strong>`;
           } else {
             td.textContent = (rec[k] ?? '').toString();
           }
@@ -480,14 +453,12 @@
 
       const thisMonth = state.allJobsData.filter(j=>{
         const d = new Date(j.Created || j.createdDateTime || j.When || j.Modified || 0);
-        return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+        return d && !isNaN(d) && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
       }).length;
 
-      // Unique Jobs (guess a job id key)
       const jobKey = Object.keys(state.allJobsData[0] || {}).find(k=>/job.?id|rego|jobref|jobreference/i.test(k)) || null;
       const jobs = jobKey ? new Set(state.allJobsData.map(r => r[jobKey])).size : 0;
 
-      // Top ActivityType (guess key)
       const typeKey = Object.keys(state.allJobsData[0] || {}).find(k=>/activity.?type|type/i.test(k)) || null;
       let topType = '—';
       if (typeKey){
@@ -498,10 +469,9 @@
           counts[t] = (counts[t]||0)+1;
         });
         const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
-        topType = top ? \`\${top[0]} (\${top[1]})\` : '—';
+        topType = top ? `${top[0]} (${top[1]})` : '—';
       }
 
-      // Active users (guess user key)
       const userKey = Object.keys(state.allJobsData[0] || {}).find(k=>/actor|user|author|created.?by|modified.?by|owner/i.test(k)) || null;
       const users = userKey ? new Set(state.allJobsData.map(r => r[userKey]).filter(Boolean)).size : 0;
 
@@ -525,13 +495,12 @@
       f.contains  = document.getElementById('filterContains').value.toLowerCase();
 
       state.filteredData = state.allJobsData.filter(item=>{
-        const jobIdKey = Object.keys(item).find(k=>/job.?id|rego|jobref|jobreference/i.test(k));
-        const typeKey = Object.keys(item).find(k=>/activity.?type|type/i.test(k));
-        const userKey = Object.keys(item).find(k=>/actor|user|author|created.?by|modified.?by|owner/i.test(k));
+        const jobIdKey  = Object.keys(item).find(k=>/job.?id|rego|jobref|jobreference/i.test(k));
+        const typeKey   = Object.keys(item).find(k=>/activity.?type|type/i.test(k));
+        const userKey   = Object.keys(item).find(k=>/actor|user|author|created.?by|modified.?by|owner/i.test(k));
         const statusKey = Object.keys(item).find(k=>/status/i.test(k));
-        const dateKey = Object.keys(item).find(k=>/when|created|date|datetime/i.test(k));
-        const moneyKey = Object.keys(item).find(k=>/price|amount|total|cost|value/i.test(k));
-        const detailsKey = Object.keys(item).find(k=>/detail|note|description|message|comment/i.test(k));
+        const dateKey   = Object.keys(item).find(k=>/when|created|date|datetime/i.test(k));
+        const moneyKey  = Object.keys(item).find(k=>/price|amount|total|cost|value/i.test(k));
 
         if (f.jobId && jobIdKey && !String(item[jobIdKey]||'').toLowerCase().includes(f.jobId)) return false;
         if (f.typeText && typeKey && !String(item[typeKey]||'').toLowerCase().includes(f.typeText)) return false;
@@ -544,7 +513,6 @@
         if (f.priceMin && moneyKey && Number(item[moneyKey]||0) < Number(f.priceMin)) return false;
 
         if (f.contains){
-          // check all string fields for substring
           const hit = Object.keys(item).some(k=>{
             if (k.startsWith('@')) return false;
             const v = item[k];
@@ -558,7 +526,7 @@
 
       state.currentPage = 1;
       renderTable();
-      showToast(\`Filters applied: \${state.filteredData.length} records\`, 'info');
+      showToast(`Filters applied: ${state.filteredData.length} records`, 'info');
     }
 
     function clearFilters(){
@@ -627,9 +595,9 @@
         const value = document.createElement('div');
         value.className='detail-value';
         if (/status/i.test(k)){
-          value.innerHTML = \`<span class="status-badge status-\${String(record[k]??'').toLowerCase()}">\${record[k]??'-'}</span>\`;
+          value.innerHTML = `<span class="status-badge status-${String(record[k]??'').toLowerCase()}">${record[k]??'-'}</span>`;
         }else if (/price|amount|total|cost|value/i.test(k) && typeof record[k]==='number'){
-          value.innerHTML = \`<strong>$\${record[k].toLocaleString()}</strong>\`;
+          value.innerHTML = `<strong>$${record[k].toLocaleString()}</strong>`;
         }else{
           value.textContent = record[k] ?? '-';
         }
@@ -648,23 +616,23 @@
         const row = headers.map(h=>{
           let v = r[h]; if (v==null) v = '';
           v = String(v).replace(/"/g,'""');
-          return (v.includes(',')||v.includes('"')||v.includes('\n')) ? \`"\${v}"\` : v;
+          return (v.includes(',')||v.includes('"')||v.includes('\n')) ? `"${v}"` : v;
         }).join(',');
         lines.push(row);
       });
       const blob = new Blob([lines.join('\n')],{type:'text/csv'});
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = \`job_activity_export_\${new Date().toISOString().slice(0,10)}.csv\`;
+      const a = document.createElement('a'); a.href = url; a.download = `job_activity_export_${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      showToast(\`Exported \${state.filteredData.length} records\`, 'success');
+      showToast(`Exported ${state.filteredData.length} records`, 'success');
     }
 
     // ---------- UTILS ----------
     function showToast(message,type='info'){
       const container = document.getElementById('toastContainer');
-      const el = document.createElement('div'); el.className = \`toast \${type}\`;
+      const el = document.createElement('div'); el.className = `toast ${type}`;
       const icons = {success:'✓',error:'✖',warning:'⚠',info:'ℹ'};
-      el.innerHTML = \`<span>\${icons[type]}</span><span class="toast-message">\${message}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>\`;
+      el.innerHTML = `<span>${icons[type]}</span><span class="toast-message">${message}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
       container.appendChild(el); setTimeout(()=> el.remove(), 5000);
     }
     function showEmptyState(msg){
