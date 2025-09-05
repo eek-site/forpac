@@ -783,7 +783,6 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Jobs Master List loaded');
-            // In production, this would fetch initial data from SharePoint
         });
 
         // Initialize authentication check on page load
@@ -805,6 +804,35 @@
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('unauthorizedScreen').style.display = 'flex';
             });
+
+        // Auto-refresh data every 5 minutes
+        setInterval(() => {
+            const mainContainer = document.getElementById('mainContainer');
+            if (mainContainer.classList.contains('authenticated')) {
+                fetchSharePointData();
+            }
+        }, 300000);
+
+        // Load data after authentication
+        async function initializeData() {
+            const mainContainer = document.getElementById('mainContainer');
+            if (mainContainer.classList.contains('authenticated')) {
+                await fetchSharePointData();
+            }
+        }
+
+        // Modify checkAuthentication to load data after successful auth
+        const originalCheckAuth = checkAuthentication;
+        checkAuthentication = async function() {
+            await originalCheckAuth();
+            const mainContainer = document.getElementById('mainContainer');
+            if (mainContainer.classList.contains('authenticated')) {
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    fetchSharePointData();
+                }, 100);
+            }
+        }
     </script>
 </body>
 </html>
