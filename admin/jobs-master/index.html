@@ -89,10 +89,8 @@
   </style>
 </head>
 <body>
-  <!-- Toasts -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Loading -->
   <div class="loading-screen" id="loadingScreen">
     <div class="spinner-container">
       <div class="spinner"></div><div class="spinner-logo">FP</div>
@@ -100,7 +98,6 @@
     <div class="loading-text">Authenticating and loading data...</div>
   </div>
 
-  <!-- Unauthorized -->
   <div class="unauthorized-screen" id="unauthorizedScreen">
     <div class="unauthorized-content">
       <div class="unauthorized-icon">🔒</div>
@@ -110,7 +107,6 @@
     </div>
   </div>
 
-  <!-- Main -->
   <div class="main-container" id="mainContainer">
     <header class="header">
       <div class="header-content">
@@ -131,7 +127,6 @@
     </header>
 
     <div class="container">
-      <!-- Filters -->
       <div class="filter-section">
         <div class="filter-header">
           <div class="filter-title">🔍 Search & Filters</div>
@@ -190,31 +185,14 @@
         </div>
       </div>
 
-      <!-- Stats -->
       <div class="stats-summary">
-        <div class="stat-tile">
-          <div class="stat-label">Total Jobs</div>
-          <div id="statTotal" class="stat-value">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">This Month</div>
-          <div id="statMonth" class="stat-value">0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">Avg Price</div>
-          <div id="statAvgPrice" class="stat-value">$0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">Total Revenue</div>
-          <div id="statRevenue" class="stat-value">$0</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-label">Active Suppliers</div>
-          <div id="statSuppliers" class="stat-value">0</div>
-        </div>
+        <div class="stat-tile"><div class="stat-label">Total Jobs</div><div id="statTotal" class="stat-value">0</div></div>
+        <div class="stat-tile"><div class="stat-label">This Month</div><div id="statMonth" class="stat-value">0</div></div>
+        <div class="stat-tile"><div class="stat-label">Avg Price</div><div id="statAvgPrice" class="stat-value">$0</div></div>
+        <div class="stat-tile"><div class="stat-label">Total Revenue</div><div id="statRevenue" class="stat-value">$0</div></div>
+        <div class="stat-tile"><div class="stat-label">Active Suppliers</div><div id="statSuppliers" class="stat-value">0</div></div>
       </div>
 
-      <!-- Table -->
       <div class="table-section">
         <div class="table-header">
           <h2>📋 Complete Jobs Register</h2>
@@ -255,7 +233,6 @@
       </div>
     </div>
 
-    <!-- Detail Modal -->
     <div class="modal" id="detailModal">
       <div class="modal-content">
         <div class="modal-header">
@@ -274,16 +251,16 @@
   <script>
     'use strict';
 
-    // ---------- CONFIG (adjust if needed) ----------
-    const SPO_HOST       = 'roadandrescue.sharepoint.com'; // your tenant host
-    const SPO_SITE_PATH  = '/sites/rar';                   // site path after host
-    const SPO_LIST_TITLE = 'BookAJobMaster';               // list display name
+    // ---------- CONFIG (identical base; list/title differs) ----------
+    const SPO_HOST       = 'roadandrescue.sharepoint.com';
+    const SPO_SITE_PATH  = '/sites/rar';
+    const SPO_LIST_TITLE = 'BookAJobMaster';
 
     const MSAL_CONFIG = {
       auth: {
         clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
         authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
-        redirectUri: window.location.origin + '/admin/jobs-master'
+        redirectUri: window.location.origin + window.location.pathname
       },
       cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: true }
     };
@@ -357,16 +334,34 @@
       return r.json();
     }
 
+    function humanizeHeader(h){
+      return h.replace(/_x0020_/g,' ')
+              .replace(/([A-Z])/g,' $1')
+              .replace(/^\s+/, '')
+              .trim();
+    }
+
     async function fetchSharePointRows(){
       const token = await getGraphToken();
+
+      // Get site
       const site = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:/sites${SPO_SITE_PATH}`, token);
-      const lists = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${encodeURIComponent(SPO_LIST_TITLE)}'`, token);
+
+      // Get the list by exact displayName (NO encodeURIComponent)
+      // If your list has a single quote, escape it for OData: O'Brien => O''Brien
+      const listNameOData = SPO_LIST_TITLE.replace(/'/g, "''");
+      const lists = await fetchJson(
+        `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`,
+        token
+      );
       if (!lists.value?.length) throw new Error(`List not found: ${SPO_LIST_TITLE}`);
       const listId = lists.value[0].id;
 
       // Pull up to 5000 items with expanded fields
-      let url = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5000`;
-      const items = await fetchJson(url, token);
+      const items = await fetchJson(
+        `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5000`,
+        token
+      );
 
       return items.value.map(v => v.fields);
     }
@@ -397,7 +392,7 @@
       const headers = Object.keys(state.allJobsData[0]).filter(h => !h.startsWith('@'));
       headers.forEach(h=>{
         const th = document.createElement('th');
-        th.textContent = h.replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').trim();
+        th.textContent = humanizeHeader(h);
         th.className = (state.sortColumn === h) ? `sorted sorted-${state.sortDirection}` : '';
         th.onclick = ()=> sortTable(h);
         tableHeaders.appendChild(th);
@@ -430,7 +425,7 @@
           if (k.toLowerCase().includes('status')){
             const val = String(rec[k] ?? '').toLowerCase();
             td.innerHTML = `<span class="status-badge status-${val}">${rec[k] ?? '-'}</span>`;
-          } else if (/price|amount|total/i.test(k) && typeof rec[k] === 'number'){
+          } else if (/price|amount|total|cost|value/i.test(k) && typeof rec[k] === 'number'){
             td.innerHTML = `<strong>$${rec[k].toLocaleString()}</strong>`;
           } else {
             td.textContent = (rec[k] ?? '').toString();
@@ -450,11 +445,10 @@
       const now = new Date();
       const thisMonth = state.allJobsData.filter(j=>{
         const d = new Date(j.Created || j.CreatedDate || j.createdDateTime || j.Modified || 0);
-        return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+        return d && !isNaN(d) && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
       }).length;
 
-      // Try to guess price column
-      const priceKey = Object.keys(state.allJobsData[0] || {}).find(k=>/price|amount|total/i.test(k)) || null;
+      const priceKey = Object.keys(state.allJobsData[0] || {}).find(k=>/price|amount|total|cost|value/i.test(k)) || null;
       const prices = priceKey ? state.allJobsData.map(r=> Number(r[priceKey]) || 0) : [];
       const avg = prices.length ? prices.reduce((a,b)=>a+b,0)/prices.length : 0;
       const revenue = prices.reduce((a,b)=>a+b,0);
@@ -482,13 +476,13 @@
       f.priceMin  = document.getElementById('filterPriceMin').value;
 
       state.filteredData = state.allJobsData.filter(job=>{
-        const jobIdKey = Object.keys(job).find(k=>/job.?id/i.test(k));
+        const jobIdKey    = Object.keys(job).find(k=>/job.?id/i.test(k));
         const supplierKey = Object.keys(job).find(k=>/supplier/i.test(k));
         const customerKey = Object.keys(job).find(k=>/customer|name/i.test(k));
-        const statusKey = Object.keys(job).find(k=>/status/i.test(k));
-        const typeKey = Object.keys(job).find(k=>/type/i.test(k));
-        const dateKey = Object.keys(job).find(k=>/created|date/i.test(k));
-        const priceKey = Object.keys(job).find(k=>/price|amount|total/i.test(k));
+        const statusKey   = Object.keys(job).find(k=>/status/i.test(k));
+        const typeKey     = Object.keys(job).find(k=>/type/i.test(k));
+        const dateKey     = Object.keys(job).find(k=>/created|date/i.test(k));
+        const priceKey    = Object.keys(job).find(k=>/price|amount|total|cost|value/i.test(k));
 
         if (f.jobId && jobIdKey && !String(job[jobIdKey]||'').toLowerCase().includes(f.jobId)) return false;
         if (f.supplier && supplierKey && !String(job[supplierKey]||'').toLowerCase().includes(f.supplier)) return false;
@@ -570,12 +564,12 @@
         if (k.startsWith('@')) return;
         const label = document.createElement('div');
         label.className='detail-label';
-        label.textContent = k.replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').trim();
+        label.textContent = humanizeHeader(k);
         const value = document.createElement('div');
         value.className='detail-value';
         if (/status/i.test(k)){
           value.innerHTML = `<span class="status-badge status-${String(record[k]??'').toLowerCase()}">${record[k]??'-'}</span>`;
-        }else if (/price|amount|total/i.test(k) && typeof record[k]==='number'){
+        }else if (/price|amount|total|cost|value/i.test(k) && typeof record[k]==='number'){
           value.innerHTML = `<strong>$${record[k].toLocaleString()}</strong>`;
         }else{
           value.textContent = record[k] ?? '-';
@@ -585,7 +579,12 @@
       document.getElementById('detailModal').classList.add('active');
     }
     function closeModal(){ document.getElementById('detailModal').classList.remove('active'); state.currentJobDetail=null; }
-    function editJob(){ if (state.currentJobDetail){ const idKey = Object.keys(state.currentJobDetail).find(k=>/job.?id|id/i.test(k)) || 'ID'; window.location.href = `/admin/jobs-edit?id=${encodeURIComponent(state.currentJobDetail[idKey]||'')}`; } }
+    function editJob(){
+      if (!state.currentJobDetail) return;
+      const idKey = Object.keys(state.currentJobDetail).find(k=>/job.?id|^id$/i.test(k)) || 'ID';
+      const idVal = state.currentJobDetail[idKey] || '';
+      window.location.href = `/admin/jobs-edit?id=${encodeURIComponent(idVal)}`;
+    }
 
     // ---------- EXPORT ----------
     function exportData(){
