@@ -177,6 +177,7 @@
               <div class="bulk-menu-item" id="btnDuplicateSelected">📋 Duplicate Selected</div>
               <div class="bulk-menu-divider"></div>
               <div class="bulk-menu-item" id="btnExportSelected">📥 Export Selected</div>
+              <div class="bulk-menu-item" id="btnExportAll">📥 Export All</div>
             </div>
           </div>
 
@@ -202,7 +203,7 @@
 
           <button id="btnAddColumn" class="btn warning">➕ Add Column</button>
           <button id="btnImport" class="btn warning">📤 Import</button>
-          <button id="btnExportAll" class="btn info">📥 Export All</button>
+          <button id="btnExportAllTop" class="btn info">📥 Export All</button>
         </div>
       </div>
 
@@ -320,6 +321,8 @@
           <option value="DateTime">Date and Time</option>
           <option value="Boolean">Yes/No (checkbox)</option>
           <option value="Choice">Choice (dropdown)</option>
+          <option value="MultiChoice">Multiple choice (checkboxes)</option>
+          <option value="URL">Hyperlink</option>
         </select>
       </div>
 
@@ -355,7 +358,7 @@
       sharepoint: {
         tenant: 'roadandrescue.sharepoint.com',
         siteRelative: '/sites/rar',
-        listTitle: 'JobActivityLog' // ensure this matches your list
+        listTitle: 'JobActivityLog'
       },
       msal: {
         auth: {
@@ -570,6 +573,12 @@
         case 'Choice':
           body = { ...common, '__metadata':{ 'type':'SP.FieldChoice' },   FieldTypeKind: 6, Choices:{ results: fieldConfig.choices || [] } };
           break;
+        case 'MultiChoice':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldMultiChoice' }, FieldTypeKind: 15, Choices:{ results: fieldConfig.choices || [] } };
+          break;
+        case 'URL':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldUrl' }, FieldTypeKind: 11 };
+          break;
         case 'Note':
           body = { ...common, '__metadata':{ 'type':'SP.FieldMultiLineText' }, FieldTypeKind: 3 };
           break;
@@ -594,6 +603,7 @@
       const getType = (f) => String(f.TypeAsString || f.Type || '').toLowerCase();
       const getChoices = (f) => Array.isArray(f.Choices) ? f.Choices
                            : Array.isArray(f.Choice)   ? f.Choice
+                           : Array.isArray(f.Choices?.results) ? f.Choices.results
                            : [];
 
       const defs = [
@@ -637,7 +647,7 @@
           cd.width = Math.max(cd.width, 110);
         }
 
-        if (type === 'choice'){
+        if (type === 'choice' || type === 'multichoice'){
           const values = getChoices(field);
           if (values.length){
             cd.cellEditor = 'agSelectCellEditor';
@@ -725,27 +735,43 @@
       }
     }
 
+    function populateColumnMenu(){
+      const list = $('#columnList');
+      if (!state.columnApi) return;
+      list.innerHTML = '';
+      state.columnDefs.forEach(cd=>{
+        if (!cd.field || cd.field === '__selection__') return;
+        const id = `colvis_${cd.field}`;
+        const colState = state.columnApi.getColumn(cd.field);
+        const visible = colState ? colState.isVisible() !== false : true;
+
+        const row = document.createElement('label');
+        row.className = 'bulk-menu-item';
+        row.style.cursor = 'pointer';
+        row.innerHTML = `
+          <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
+          <span>${cd.headerName}</span>
+        `;
+        row.querySelector('input').onchange = (e)=> state.columnApi.setColumnVisible(cd.field, e.target.checked);
+        list.appendChild(row);
+      });
+    }
+
     function setupEvents(){
       // Sign-in
-      $('#btnLogin').onclick = async ()=>{
-        await state.msalInstance.loginRedirect({ scopes:[`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`] });
-      };
+      $('#btnLogin').onclick = async ()=>{ await state.msalInstance.loginRedirect({ scopes:[`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`] }); };
 
       // Refresh
-      $('#btnRefresh').onclick = ()=>{
-        if (state.isDirty && !confirm('You have unsaved changes. Refresh anyway?')) return;
-        window.location.reload();
-      };
+      $('#btnRefresh').onclick = ()=>{ if (state.isDirty && !confirm('You have unsaved changes. Refresh anyway?')) return; window.location.reload(); };
 
       // Add activity (modal)
       $('#btnAddRow').onclick = ()=>{
-        // default the datetime-local to now
         const now = new Date(Date.now() - (new Date()).getTimezoneOffset()*60000).toISOString().slice(0,16);
         $('#actWhen').value = now;
         openActivityModal();
       };
 
-      // Save
+      // Save changes
       $('#btnSave').onclick = saveChanges;
 
       // Discard
@@ -759,7 +785,7 @@
         showToast('Changes discarded','info');
       };
 
-      // Bulk menu
+      // Bulk menu toggles
       $('#btnBulkActions').onclick = ()=> $('#bulkMenu').classList.toggle('show');
       document.addEventListener('click', e=>{
         if (!e.target.closest('.bulk-actions')) $('#bulkMenu').classList.remove('show');
@@ -807,11 +833,13 @@
         if (!sel.length) return showToast('No rows selected','warning');
         exportToCSV(sel, 'job_activity_selected');
       };
-      $('#btnExportAll').onclick = ()=>{
+      const exportAll = ()=>{
         const rows = [];
         state.gridApi.forEachNode(n => rows.push(n.data));
         exportToCSV(rows, 'job_activity_all');
       };
+      $('#btnExportAll').onclick = exportAll;
+      $('#btnExportAllTop').onclick = exportAll;
 
       // Quick search
       $('#quickSearch').oninput = e => state.gridApi.setQuickFilter(e.target.value);
@@ -821,7 +849,7 @@
 
       // Add column modal behaviors
       $('#colDisplay').oninput = e => $('#colInternal').value = generateInternalName(e.target.value);
-      $('#colType').onchange = e => { $('#choiceRow').style.display = (e.target.value === 'Choice') ? 'block' : 'none'; };
+      $('#colType').onchange = e => { $('#choiceRow').style.display = (e.target.value === 'Choice' || e.target.value === 'MultiChoice') ? 'block' : 'none'; };
       $('#btnCreateColumn').onclick = createColumn;
 
       // Import
@@ -834,36 +862,10 @@
       $$('.modal').forEach(m => m.onclick = e => { if (e.target === m) m.classList.remove('active'); });
 
       // Navigation guard
-      window.addEventListener('beforeunload', e=>{
-        if (state.isDirty){ e.preventDefault(); e.returnValue = ''; }
-      });
+      window.addEventListener('beforeunload', e=>{ if (state.isDirty){ e.preventDefault(); e.returnValue = ''; } });
 
       // Open column modal
       $('#btnAddColumn').addEventListener('click', openColumnModal);
-    }
-
-    function populateColumnMenu(){
-      const list = $('#columnList');
-      if (!state.columnApi) return;
-      list.innerHTML = '';
-      state.columnDefs.forEach(cd=>{
-        if (!cd.field || cd.field === '__selection__') return;
-        const id = `colvis_${cd.field}`;
-        const colState = state.columnApi.getColumn(cd.field);
-        const visible = colState ? colState.isVisible() !== false : true;
-
-        const row = document.createElement('label');
-        row.className = 'bulk-menu-item';
-        row.style.cursor = 'pointer';
-        row.innerHTML = `
-          <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
-          <span>${cd.headerName}</span>
-        `;
-        row.querySelector('input').onchange = (e)=>{
-          state.columnApi.setColumnVisible(cd.field, e.target.checked);
-        };
-        list.appendChild(row);
-      });
     }
 
     function openActivityModal(activity = null){
@@ -908,7 +910,6 @@
       }
 
       if (state.currentActivity){
-        // Update
         if (String(state.currentActivity.ID).startsWith('NEW_')){
           Object.assign(state.currentActivity, payload);
           state.gridApi.refreshCells();
@@ -918,7 +919,6 @@
           state.pendingChanges.updates.set(state.currentActivity.ID, updates);
         }
       } else {
-        // Create
         const newRow = {
           ID: `NEW_${Date.now()}`,
           ...payload,
@@ -957,7 +957,6 @@
             if (realId){
               idMap.set(tempId, realId);
 
-              // locate node with tempId and update
               let targetNode = null;
               state.gridApi.forEachNode(n => { if (n.data.ID === tempId) targetNode = n; });
               if (targetNode){
@@ -1029,6 +1028,9 @@
       const choices = $('#colChoices').value.split('\n').map(s=>s.trim()).filter(Boolean);
 
       if (!displayName) return showToast('Enter a display name','warning');
+      if ((type === 'Choice' || type === 'MultiChoice') && !choices.length){
+        return showToast('Enter at least one choice','warning');
+      }
 
       try{
         setStatus('Creating column...','info');
