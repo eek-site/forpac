@@ -748,11 +748,11 @@
             top: '$top=5000'
         };
 
-        // MSAL Configuration
+        // MSAL Configuration - using the correct tenant ID
         const msalConfig = {
             auth: {
                 clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
-                authority: 'https://login.microsoftonline.com/common',
+                authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
                 redirectUri: window.location.origin + '/admin/jobs-master'
             },
             cache: {
