@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Master List | FormanPacific Service Claims Management</title>
+    
+    <!-- Microsoft Authentication Library -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -16,6 +20,119 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             color: #2c3e50;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .loading-screen.hidden {
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        /* Main Container - Hidden by default */
+        .main-container {
+            display: none;
+        }
+
+        .main-container.authenticated {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Unauthorized Screen */
+        .unauthorized-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+
+        .unauthorized-screen.show {
+            display: flex;
+        }
+
+        .unauthorized-content {
+            text-align: center;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        .unauthorized-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .unauthorized-title {
+            font-size: 1.8em;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .unauthorized-message {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        .btn-login {
+            background: #1e3c72;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-login:hover {
+            background: #2a5298;
+            transform: translateY(-2px);
         }
 
         /* Header */
@@ -312,6 +429,29 @@
             background: #e6f4ff;
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-message {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .empty-submessage {
+            font-size: 0.9em;
+            color: #a0aec0;
+        }
+
         /* Status Badges */
         .status-badge {
             display: inline-block;
@@ -445,307 +585,481 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="logo">FP</div>
-                <div class="company-info">
-                    <div class="company-name">FormanPacific</div>
-                    <div class="page-label">Jobs Master List</div>
-                </div>
-            </div>
-            <div class="nav-section">
-                <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
-                    ← Back to Dashboard
-                </button>
-                <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
-                    Job Activity Log →
-                </button>
-            </div>
-        </div>
-    </header>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        <div class="loading-text">Verifying authentication...</div>
+    </div>
 
-    <div class="container">
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">Job ID (Rego2)</label>
-                    <input type="text" class="filter-input" id="filterJobId" placeholder="e.g. LZY696">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Supplier</label>
-                    <input type="text" class="filter-input" id="filterSupplier" placeholder="Supplier name">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Date Range</label>
-                    <input type="date" class="filter-input" id="filterDateFrom">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">To</label>
-                    <input type="date" class="filter-input" id="filterDateTo">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select class="filter-select" id="filterType">
-                        <option value="">All Types</option>
-                        <option value="billable">Billable</option>
-                        <option value="supplier">Supplier</option>
-                    </select>
-                </div>
-                <button class="btn-filter btn-apply" onclick="applyFilters()">Apply Filters</button>
-                <button class="btn-filter btn-clear" onclick="clearFilters()">Clear</button>
-                <button class="btn-filter btn-export" onclick="exportData()">Export CSV</button>
-            </div>
-        </div>
-
-        <!-- Stats Summary -->
-        <div class="stats-summary">
-            <div class="stat-tile">
-                <div class="stat-label">Total Jobs</div>
-                <div class="stat-value" id="statTotal">1,872</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">This Month</div>
-                <div class="stat-value" id="statMonth">47</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">Avg Price</div>
-                <div class="stat-value" id="statAvgPrice">$289</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">Total Revenue</div>
-                <div class="stat-value" id="statRevenue">$541K</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">Active Suppliers</div>
-                <div class="stat-value" id="statSuppliers">23</div>
-            </div>
-        </div>
-
-        <!-- Table Section -->
-        <div class="table-section">
-            <div class="table-header">
-                <h2 class="table-title">Complete Jobs Register</h2>
-                <span class="table-info">Showing <span id="recordCount">50</span> of <span id="totalRecords">1,872</span> records</span>
-            </div>
-            
-            <div class="table-wrapper">
-                <table id="jobsTable">
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable(0)">ID ↕</th>
-                            <th onclick="sortTable(1)">Job ID ↕</th>
-                            <th onclick="sortTable(2)">Date/Time ↕</th>
-                            <th onclick="sortTable(3)">Price ↕</th>
-                            <th onclick="sortTable(4)">Supplier ↕</th>
-                            <th onclick="sortTable(5)">Type ↕</th>
-                            <th onclick="sortTable(6)">Email ↕</th>
-                            <th onclick="sortTable(7)">Description ↕</th>
-                            <th onclick="sortTable(8)">Reimbursement ↕</th>
-                            <th onclick="sortTable(9)">Charges ↕</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Sample data - this would be populated from SharePoint -->
-                        <tr onclick="showDetails(this)">
-                            <td>3432</td>
-                            <td><strong>LZY696</strong></td>
-                            <td>09/05/2025 08:51:53 AM</td>
-                            <td class="price-cell">$369.00</td>
-                            <td>A&J's Automotive, Kaiapoi Automotive Services</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>Joegunnz@gmail.com</td>
-                            <td>Joseph gunn 64 275243930 Pre-Purchase Inspection</td>
-                            <td>Services Rendered</td>
-                            <td>$369</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>3433</td>
-                            <td><strong>LZY696</strong></td>
-                            <td>09/05/2025 08:52:00 AM</td>
-                            <td class="price-cell">$0.00</td>
-                            <td>Kaiapoi Automotive Services</td>
-                            <td><span class="status-badge status-supplier">Supplier</span></td>
-                            <td>zx@roadandrescue.com</td>
-                            <td>Additional supplier allocation</td>
-                            <td>Services Rendered</td>
-                            <td>$0</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>3434</td>
-                            <td><strong>KDH557</strong></td>
-                            <td>04/09/2025 02:14:11 PM</td>
-                            <td class="price-cell">$250.00</td>
-                            <td>Rust Alley Ltd</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>james.bristow@example.com</td>
-                            <td>James Bristow 64 224886199 Mechanical Breakdown</td>
-                            <td>Services Rendered</td>
-                            <td>$250</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1869</td>
-                            <td><strong>RDF234</strong></td>
-                            <td>01/09/2025 02:27:38 PM</td>
-                            <td class="price-cell">$289.00</td>
-                            <td>Pit Stop Levin</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>tristin.carey@example.com</td>
-                            <td>Tristin Carey-Bailey 64 273729169 1996 Mitsubishi</td>
-                            <td>Services Rendered</td>
-                            <td>$289</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1867</td>
-                            <td><strong>LGU541</strong></td>
-                            <td>01/09/2025 08:09:39 AM</td>
-                            <td class="price-cell">$249.00</td>
-                            <td>Motavation</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>david.herring@example.com</td>
-                            <td>David herring 64 273844124 Engine won't start all</td>
-                            <td>Services Rendered</td>
-                            <td>$249</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1868</td>
-                            <td><strong>MUC820</strong></td>
-                            <td>01/09/2025 08:22:37 AM</td>
-                            <td class="price-cell">$249.00</td>
-                            <td>Pit Stop Levin</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>rod.johnston@example.com</td>
-                            <td>ROD Johnston 64 21364887 Engine won't start.pc</td>
-                            <td>Services Rendered</td>
-                            <td>$249</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1870</td>
-                            <td><strong>NWK954</strong></td>
-                            <td>04/09/2025 12:18:03 PM</td>
-                            <td class="price-cell">$149.00</td>
-                            <td>Omokoroa Automotive</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>karmin.selwyn@example.com</td>
-                            <td>Karmin Selwyn 64 223933274 There were no lights</td>
-                            <td>Services Rendered</td>
-                            <td>$149</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination">
-                <button class="page-btn" onclick="previousPage()">Previous</button>
-                <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">38</span></span>
-                <button class="page-btn" onclick="nextPage()">Next</button>
-            </div>
+    <!-- Unauthorized Screen -->
+    <div class="unauthorized-screen" id="unauthorizedScreen">
+        <div class="unauthorized-content">
+            <div class="unauthorized-icon">🔒</div>
+            <h1 class="unauthorized-title">Authentication Required</h1>
+            <p class="unauthorized-message">You must be logged in to access the Jobs Master List.</p>
+            <button onclick="window.location.href='/admin'" class="btn-login">Go to Login</button>
         </div>
     </div>
 
-    <!-- Detail Modal -->
-    <div class="modal" id="detailModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Job Details</h2>
-                <button class="btn-close" onclick="closeModal()">×</button>
+    <!-- Main Container (Hidden until authenticated) -->
+    <div class="main-container" id="mainContainer">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">FP</div>
+                    <div class="company-info">
+                        <div class="company-name">FormanPacific</div>
+                        <div class="page-label">Jobs Master List</div>
+                    </div>
+                </div>
+                <div class="nav-section">
+                    <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
+                        ← Back to Dashboard
+                    </button>
+                    <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
+                        Job Activity Log →
+                    </button>
+                </div>
             </div>
-            <div class="detail-grid" id="modalDetails">
-                <!-- Details will be populated here -->
+        </header>
+
+        <div class="container">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Job ID</label>
+                        <input type="text" class="filter-input" id="filterJobId" placeholder="Search...">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Supplier</label>
+                        <input type="text" class="filter-input" id="filterSupplier" placeholder="Supplier name">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Date Range</label>
+                        <input type="date" class="filter-input" id="filterDateFrom">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">To</label>
+                        <input type="date" class="filter-input" id="filterDateTo">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select class="filter-select" id="filterType">
+                            <option value="">All Types</option>
+                            <option value="billable">Billable</option>
+                            <option value="supplier">Supplier</option>
+                        </select>
+                    </div>
+                    <button class="btn-filter btn-apply" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn-filter btn-clear" onclick="clearFilters()">Clear</button>
+                    <button class="btn-filter btn-export" onclick="exportData()">Export CSV</button>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-summary">
+                <div class="stat-tile">
+                    <div class="stat-label">Total Jobs</div>
+                    <div class="stat-value" id="statTotal">-</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value" id="statMonth">-</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Avg Price</div>
+                    <div class="stat-value" id="statAvgPrice">-</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Total Revenue</div>
+                    <div class="stat-value" id="statRevenue">-</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Active Suppliers</div>
+                    <div class="stat-value" id="statSuppliers">-</div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2 class="table-title">Complete Jobs Register</h2>
+                    <span class="table-info">Showing <span id="recordCount">0</span> of <span id="totalRecords">0</span> records</span>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table id="jobsTable">
+                        <thead>
+                            <tr id="tableHeaders">
+                                <!-- Headers will be dynamically generated -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" onclick="previousPage()">Previous</button>
+                    <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                    <button class="page-btn" onclick="nextPage()">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal -->
+        <div class="modal" id="detailModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Job Details</h2>
+                    <button class="btn-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="detail-grid" id="modalDetails">
+                    <!-- Details will be populated here -->
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Sample data management
+        // Strict mode
+        'use strict';
+
+        // Global variables
+        let allJobsData = [];
+        let filteredData = [];
         let currentPage = 1;
         let pageSize = 50;
         let sortColumn = -1;
         let sortDirection = 1;
+        let msalInstance = null;
+        let isAuthenticated = false;
 
-        // Apply filters
-        function applyFilters() {
-            const jobId = document.getElementById('filterJobId').value;
-            const supplier = document.getElementById('filterSupplier').value;
-            const dateFrom = document.getElementById('filterDateFrom').value;
-            const dateTo = document.getElementById('filterDateTo').value;
-            const type = document.getElementById('filterType').value;
+        // SharePoint Configuration
+        const SHAREPOINT_CONFIG = {
+            siteUrl: 'https://roadandrescue.sharepoint.com/sites/rar',
+            listName: 'BookAJobMaster',
+            selectFields: '$select=*',
+            orderBy: '$orderby=Created desc',
+            top: '$top=5000'
+        };
 
-            console.log('Applying filters:', { jobId, supplier, dateFrom, dateTo, type });
-            // In production, this would fetch filtered data from SharePoint
-            alert('Filters applied! (This would fetch filtered data from SharePoint)');
+        // MSAL Configuration
+        const msalConfig = {
+            auth: {
+                clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+                authority: 'https://login.microsoftonline.com/61fc6bc-d9ce-458b-8120-d32187c3770d',
+                redirectUri: window.location.origin + '/admin/jobs-master'
+            },
+            cache: {
+                cacheLocation: 'sessionStorage',
+                storeAuthStateInCookie: false
+            }
+        };
+
+        // Initialize MSAL
+        function initializeMSAL() {
+            try {
+                msalInstance = new msal.PublicClientApplication(msalConfig);
+                return true;
+            } catch (error) {
+                console.error('Failed to initialize MSAL:', error);
+                return false;
+            }
         }
 
-        // Clear filters
+        // Check authentication
+        async function checkAuthentication() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContainer = document.getElementById('mainContainer');
+            const unauthorizedScreen = document.getElementById('unauthorizedScreen');
+
+            if (!msalInstance) {
+                console.error('MSAL not initialized');
+                showUnauthorized();
+                return;
+            }
+
+            try {
+                const accounts = msalInstance.getAllAccounts();
+                
+                if (accounts.length > 0) {
+                    // Authenticated
+                    isAuthenticated = true;
+                    console.log('User authenticated:', accounts[0].username);
+                    
+                    loadingScreen.classList.add('hidden');
+                    mainContainer.classList.add('authenticated');
+                    
+                    // Load SharePoint data
+                    await fetchSharePointData();
+                } else {
+                    // Not authenticated
+                    showUnauthorized();
+                }
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                showUnauthorized();
+            }
+        }
+
+        // Show unauthorized screen
+        function showUnauthorized() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('unauthorizedScreen').classList.add('show');
+            document.getElementById('mainContainer').classList.remove('authenticated');
+        }
+
+        // Get SharePoint token
+        async function getSharePointToken() {
+            if (!msalInstance) return null;
+            
+            try {
+                const accounts = msalInstance.getAllAccounts();
+                if (accounts.length > 0) {
+                    const request = {
+                        scopes: ["https://roadandrescue.sharepoint.com/.default"],
+                        account: accounts[0]
+                    };
+                    
+                    const response = await msalInstance.acquireTokenSilent(request);
+                    return response.accessToken;
+                }
+            } catch (error) {
+                console.error('Token acquisition failed:', error);
+                // Try interactive
+                try {
+                    const request = {
+                        scopes: ["https://roadandrescue.sharepoint.com/.default"]
+                    };
+                    const response = await msalInstance.acquireTokenPopup(request);
+                    return response.accessToken;
+                } catch (interactiveError) {
+                    console.error('Interactive token acquisition failed:', interactiveError);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        // Fetch SharePoint data
+        async function fetchSharePointData() {
+            try {
+                console.log('Fetching SharePoint data...');
+                const token = await getSharePointToken();
+                
+                if (!token) {
+                    console.error('No token available');
+                    showEmptyState('Authentication failed. Please refresh and try again.');
+                    return;
+                }
+
+                const endpoint = `${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listName}')/items?${SHAREPOINT_CONFIG.selectFields}&${SHAREPOINT_CONFIG.orderBy}&${SHAREPOINT_CONFIG.top}`;
+                
+                const response = await fetch(endpoint, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json;odata=nometadata'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`SharePoint API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                processSharePointData(data.value || []);
+                
+            } catch (error) {
+                console.error('Failed to fetch SharePoint data:', error);
+                showEmptyState('Failed to connect to SharePoint. Please check your permissions.');
+            }
+        }
+
+        // Process SharePoint data
+        function processSharePointData(data) {
+            console.log('Processing', data.length, 'records');
+            
+            if (data.length > 0) {
+                // Log first record to see structure
+                console.log('Sample record:', data[0]);
+                console.log('Available fields:', Object.keys(data[0]));
+            }
+
+            allJobsData = data;
+            filteredData = [...allJobsData];
+            
+            // Generate table headers from data
+            if (data.length > 0) {
+                generateTableHeaders(Object.keys(data[0]));
+            }
+            
+            updateStatistics();
+            renderTable();
+        }
+
+        // Generate table headers dynamically
+        function generateTableHeaders(fields) {
+            const headerRow = document.getElementById('tableHeaders');
+            headerRow.innerHTML = '';
+            
+            fields.forEach((field, index) => {
+                if (!field.startsWith('@')) { // Skip metadata fields
+                    const th = document.createElement('th');
+                    th.textContent = field.replace(/_x0020_/g, ' '); // Replace encoded spaces
+                    th.onclick = () => sortTable(index, field);
+                    headerRow.appendChild(th);
+                }
+            });
+        }
+
+        // Show empty state
+        function showEmptyState(message) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <div class="empty-message">${message || 'No data available'}</div>
+                        <div class="empty-submessage">Data will appear here once connected to SharePoint</div>
+                    </td>
+                </tr>
+            `;
+            
+            // Reset statistics
+            document.getElementById('statTotal').textContent = '0';
+            document.getElementById('statMonth').textContent = '0';
+            document.getElementById('statAvgPrice').textContent = '$0';
+            document.getElementById('statRevenue').textContent = '$0';
+            document.getElementById('statSuppliers').textContent = '0';
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            if (allJobsData.length === 0) {
+                showEmptyState('No jobs found');
+                return;
+            }
+
+            document.getElementById('statTotal').textContent = allJobsData.length.toLocaleString();
+            // Add more statistics calculations based on actual field names
+        }
+
+        // Render table
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            
+            if (filteredData.length === 0) {
+                showEmptyState('No data to display');
+                return;
+            }
+
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredData.slice(start, end);
+            
+            tableBody.innerHTML = '';
+            
+            pageData.forEach(record => {
+                const row = document.createElement('tr');
+                row.onclick = () => showDetails(record);
+                
+                // Add cells for each field
+                Object.keys(record).forEach(field => {
+                    if (!field.startsWith('@')) { // Skip metadata fields
+                        const cell = document.createElement('td');
+                        cell.textContent = record[field] || '';
+                        row.appendChild(cell);
+                    }
+                });
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Update pagination
+            updatePagination();
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            document.getElementById('recordCount').textContent = filteredData.length;
+            document.getElementById('totalRecords').textContent = allJobsData.length;
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages || 1;
+        }
+
+        // Filter functions
+        function applyFilters() {
+            // Implement filtering logic based on actual field names
+            console.log('Applying filters...');
+            renderTable();
+        }
+
         function clearFilters() {
             document.getElementById('filterJobId').value = '';
             document.getElementById('filterSupplier').value = '';
             document.getElementById('filterDateFrom').value = '';
             document.getElementById('filterDateTo').value = '';
             document.getElementById('filterType').value = '';
-            applyFilters();
+            
+            filteredData = [...allJobsData];
+            currentPage = 1;
+            renderTable();
         }
 
         // Export data
         function exportData() {
-            alert('Exporting data to CSV... (This would export the current filtered view)');
+            if (filteredData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            // Implement CSV export
+            console.log('Exporting', filteredData.length, 'records');
         }
 
         // Sort table
-        function sortTable(column) {
-            if (sortColumn === column) {
-                sortDirection *= -1;
-            } else {
-                sortColumn = column;
-                sortDirection = 1;
-            }
-            console.log('Sorting by column', column, 'direction', sortDirection);
-            // In production, this would sort the data
+        function sortTable(columnIndex, fieldName) {
+            console.log('Sorting by', fieldName);
+            // Implement sorting logic
         }
 
-        // Show job details
-        function showDetails(row) {
+        // Pagination
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        // Show details modal
+        function showDetails(record) {
             const modal = document.getElementById('detailModal');
             const details = document.getElementById('modalDetails');
             
-            // Extract data from row
-            const cells = row.getElementsByTagName('td');
+            details.innerHTML = '';
             
-            // Build detail HTML
-            details.innerHTML = `
-                <div class="detail-label">Record ID:</div>
-                <div class="detail-value">${cells[0].textContent}</div>
-                
-                <div class="detail-label">Job ID (Rego2):</div>
-                <div class="detail-value">${cells[1].textContent}</div>
-                
-                <div class="detail-label">Date/Time:</div>
-                <div class="detail-value">${cells[2].textContent}</div>
-                
-                <div class="detail-label">Price:</div>
-                <div class="detail-value"><strong>${cells[3].textContent}</strong></div>
-                
-                <div class="detail-label">Supplier(s):</div>
-                <div class="detail-value">${cells[4].textContent}</div>
-                
-                <div class="detail-label">Type:</div>
-                <div class="detail-value">${cells[5].innerHTML}</div>
-                
-                <div class="detail-label">Contact Email:</div>
-                <div class="detail-value">${cells[6].textContent}</div>
-                
-                <div class="detail-label">Description:</div>
-                <div class="detail-value">${cells[7].textContent}</div>
-                
-                <div class="detail-label">Reimbursement:</div>
-                <div class="detail-value">${cells[8].textContent}</div>
-                
-                <div class="detail-label">Total Charges:</div>
-                <div class="detail-value"><strong>${cells[9].textContent}</strong></div>
-            `;
+            Object.keys(record).forEach(field => {
+                if (!field.startsWith('@')) {
+                    details.innerHTML += `
+                        <div class="detail-label">${field.replace(/_x0020_/g, ' ')}:</div>
+                        <div class="detail-value">${record[field] || '-'}</div>
+                    `;
+                }
+            });
             
             modal.classList.add('active');
         }
@@ -755,84 +1069,42 @@
             document.getElementById('detailModal').classList.remove('active');
         }
 
-        // Pagination
-        function previousPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                document.getElementById('currentPage').textContent = currentPage;
-                // In production, fetch new page data
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing Jobs Master List...');
+            
+            // Initialize MSAL
+            if (typeof msal === 'undefined') {
+                console.error('MSAL library not loaded');
+                showUnauthorized();
+                return;
             }
-        }
-
-        function nextPage() {
-            const totalPages = parseInt(document.getElementById('totalPages').textContent);
-            if (currentPage < totalPages) {
-                currentPage++;
-                document.getElementById('currentPage').textContent = currentPage;
-                // In production, fetch new page data
+            
+            if (initializeMSAL()) {
+                // Handle redirect promise
+                try {
+                    const response = await msalInstance.handleRedirectPromise();
+                    if (response) {
+                        console.log('Redirect handled successfully');
+                    }
+                } catch (error) {
+                    console.error('Redirect handling error:', error);
+                }
+                
+                // Check authentication
+                await checkAuthentication();
+            } else {
+                showUnauthorized();
             }
-        }
+        });
 
         // Close modal on background click
-        document.getElementById('detailModal').addEventListener('click', function(e) {
-            if (e.target === this) {
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('detailModal');
+            if (e.target === modal) {
                 closeModal();
             }
         });
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Jobs Master List loaded');
-        });
-
-        // Initialize authentication check on page load
-        window.addEventListener('load', () => {
-            checkAuthentication();
-        });
-
-        // Handle redirect from login
-        msalInstance.handleRedirectPromise()
-            .then(response => {
-                if (response) {
-                    // User successfully logged in via redirect
-                    sessionStorage.setItem('msalAccount', JSON.stringify(response.account));
-                    checkAuthentication();
-                }
-            })
-            .catch(error => {
-                console.error('Redirect error:', error);
-                document.getElementById('loadingScreen').style.display = 'none';
-                document.getElementById('unauthorizedScreen').style.display = 'flex';
-            });
-
-        // Auto-refresh data every 5 minutes
-        setInterval(() => {
-            const mainContainer = document.getElementById('mainContainer');
-            if (mainContainer.classList.contains('authenticated')) {
-                fetchSharePointData();
-            }
-        }, 300000);
-
-        // Load data after authentication
-        async function initializeData() {
-            const mainContainer = document.getElementById('mainContainer');
-            if (mainContainer.classList.contains('authenticated')) {
-                await fetchSharePointData();
-            }
-        }
-
-        // Modify checkAuthentication to load data after successful auth
-        const originalCheckAuth = checkAuthentication;
-        checkAuthentication = async function() {
-            await originalCheckAuth();
-            const mainContainer = document.getElementById('mainContainer');
-            if (mainContainer.classList.contains('authenticated')) {
-                // Small delay to ensure DOM is ready
-                setTimeout(() => {
-                    fetchSharePointData();
-                }, 100);
-            }
-        }
     </script>
 </body>
 </html>
