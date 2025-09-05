@@ -1,1814 +1,632 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jobs Master List | FormanPacific Service Claims Management</title>
-    <meta name="description" content="Complete jobs register and management system for FormanPacific">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <!-- Microsoft Authentication Library -->
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #1e3c72;
-            --primary-dark: #152a52;
-            --secondary-color: #2a5298;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --info-color: #3b82f6;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            --bg-light: #f8fafc;
-            --bg-white: #ffffff;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-            min-height: 100vh;
-            color: var(--text-primary);
-        }
-
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            z-index: 9999;
-            transition: opacity 0.3s ease;
-        }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .spinner-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
-
-        .spinner {
-            width: 100%;
-            height: 100%;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-        }
-
-        .spinner-logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-weight: bold;
-            color: var(--primary-color);
-            font-size: 24px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-secondary);
-            font-size: 1.1em;
-            margin-top: 20px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Main Container */
-        .main-container {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-        }
-
-        .main-container.authenticated {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Unauthorized Screen */
-        .unauthorized-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            z-index: 10000;
-        }
-
-        .unauthorized-screen.show {
-            display: flex;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .unauthorized-content {
-            text-align: center;
-            max-width: 450px;
-            padding: 50px;
-            background: var(--bg-white);
-            border-radius: 20px;
-            box-shadow: var(--shadow-xl);
-        }
-
-        .unauthorized-icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #fecaca 0%, #ef4444 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-        }
-
-        .unauthorized-title {
-            font-size: 2em;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .unauthorized-message {
-            color: var(--text-secondary);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .btn-login {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 14px 32px;
-            border-radius: 10px;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Header */
-        .header {
-            background: var(--bg-white);
-            box-shadow: var(--shadow-md);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 24px;
-            box-shadow: var(--shadow-md);
-        }
-
-        .company-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .company-name {
-            font-size: 1.6em;
-            font-weight: 700;
-            color: var(--primary-color);
-            letter-spacing: -0.5px;
-        }
-
-        .page-label {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .nav-section {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn-nav {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .btn-nav:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-nav.secondary {
-            background: var(--text-secondary);
-        }
-
-        .btn-nav.secondary:hover {
-            background: var(--text-primary);
-        }
-
-        .btn-nav.success {
-            background: var(--success-color);
-        }
-
-        .btn-nav.success:hover {
-            background: #059669;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Filter Section */
-        .filter-section {
-            background: var(--bg-white);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-        }
-
-        .filter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .filter-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-toggle {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 24px;
-            transition: transform 0.3s ease;
-        }
-
-        .filter-toggle.collapsed {
-            transform: rotate(-90deg);
-        }
-
-        .filter-content {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .filter-content.collapsed {
-            display: none;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .filter-label {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .filter-input, .filter-select {
-            padding: 10px 14px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            background: var(--bg-white);
-        }
-
-        .filter-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .btn-filter {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-apply {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .btn-apply:hover {
-            background: #059669;
-            transform: translateY(-2px);
-        }
-
-        .btn-clear {
-            background: var(--bg-light);
-            color: var(--text-primary);
-            border: 2px solid var(--border-color);
-        }
-
-        .btn-clear:hover {
-            background: var(--border-color);
-        }
-
-        .btn-export {
-            background: var(--info-color);
-            color: white;
-        }
-
-        .btn-export:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-        }
-
-        /* Stats Summary */
-        .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-tile {
-            background: var(--bg-white);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-tile:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-tile::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            margin: 0 auto 10px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin: 5px 0;
-        }
-
-        .stat-label {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-        }
-
-        .stat-change {
-            font-size: 0.8em;
-            margin-top: 5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-
-        .stat-change.positive {
-            color: var(--success-color);
-            background: #d1fae5;
-        }
-
-        .stat-change.negative {
-            color: var(--error-color);
-            background: #fee2e2;
-        }
-
-        /* Table Section */
-        .table-section {
-            background: var(--bg-white);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .table-title {
-            font-size: 1.4em;
-            color: var(--text-primary);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .table-info {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .record-count {
-            background: var(--bg-light);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            position: relative;
-        }
-
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            min-width: 1200px;
-        }
-
-        thead {
-            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        th {
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--border-color);
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        th:hover {
-            background: var(--bg-light);
-            color: var(--primary-color);
-        }
-
-        th.sorted {
-            color: var(--primary-color);
-        }
-
-        th::after {
-            content: '⇅';
-            position: absolute;
-            right: 8px;
-            opacity: 0.3;
-            transition: opacity 0.2s ease;
-        }
-
-        th:hover::after {
-            opacity: 0.7;
-        }
-
-        th.sorted-asc::after {
-            content: '↑';
-            opacity: 1;
-            color: var(--primary-color);
-        }
-
-        th.sorted-desc::after {
-            content: '↓';
-            opacity: 1;
-            color: var(--primary-color);
-        }
-
-        tbody tr {
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        tbody tr:hover {
-            background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-
-        tbody tr.selected {
-            background: #e0f2fe;
-        }
-
-        td {
-            padding: 12px 16px;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 300px;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-pending {
-            background: #fed7aa;
-            color: #92400e;
-        }
-
-        .status-completed {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-cancelled {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            background: var(--bg-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-        }
-
-        .empty-message {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .empty-submessage {
-            font-size: 0.95em;
-            color: var(--text-secondary);
-            max-width: 400px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: var(--bg-white);
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 900px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .modal-title {
-            font-size: 1.6em;
-            color: var(--text-primary);
-            font-weight: 700;
-        }
-
-        .btn-close {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .btn-close:hover {
-            background: var(--bg-light);
-            color: var(--text-primary);
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            font-size: 0.85em;
-            letter-spacing: 0.5px;
-            padding: 8px 0;
-        }
-
-        .detail-value {
-            color: var(--text-primary);
-            padding: 8px 0;
-            font-size: 0.95em;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .page-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--border-color);
-            background: var(--bg-white);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            color: var(--text-primary);
-        }
-
-        .page-btn:hover:not(:disabled) {
-            background: var(--bg-light);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .page-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .page-info {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            font-weight: 500;
-        }
-
-        .page-size-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-        }
-
-        .page-size-selector select {
-            padding: 6px 10px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--bg-white);
-            cursor: pointer;
-        }
-
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        .toast {
-            background: var(--bg-white);
-            padding: 16px 20px;
-            border-radius: 10px;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 300px;
-            animation: slideInRight 0.3s ease;
-            border-left: 4px solid;
-        }
-
-        .toast.success {
-            border-left-color: var(--success-color);
-        }
-
-        .toast.error {
-            border-left-color: var(--error-color);
-        }
-
-        .toast.warning {
-            border-left-color: var(--warning-color);
-        }
-
-        .toast.info {
-            border-left-color: var(--info-color);
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .toast-icon {
-            font-size: 20px;
-        }
-
-        .toast-message {
-            flex: 1;
-            color: var(--text-primary);
-            font-size: 0.95em;
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header-content {
-                padding: 15px;
-            }
-
-            .nav-section {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .filter-row {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-summary {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .table-wrapper {
-                max-height: 400px;
-            }
-
-            .modal-content {
-                padding: 20px;
-                width: 95%;
-            }
-
-            .detail-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .pagination {
-                justify-content: center;
-            }
-        }
-
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-white: #0f172a;
-                --bg-light: #1e293b;
-                --text-primary: #f1f5f9;
-                --text-secondary: #94a3b8;
-                --border-color: #334155;
-            }
-
-            body {
-                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            }
-
-            .filter-input, .filter-select {
-                background: var(--bg-light);
-                color: var(--text-primary);
-            }
-
-            .modal-content {
-                background: var(--bg-light);
-            }
-
-            thead {
-                background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
-            }
-        }
-
-        /* Print Styles */
-        @media print {
-            .header, .filter-section, .pagination, .btn-nav, .btn-filter {
-                display: none;
-            }
-
-            .table-section {
-                box-shadow: none;
-                border: none;
-            }
-
-            .table-wrapper {
-                max-height: none;
-                overflow: visible;
-                border: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jobs Master List | FormanPacific Service Claims Management</title>
+  <meta name="description" content="Complete jobs register and management system for FormanPacific">
+  <meta name="robots" content="noindex, nofollow">
+  <!-- MSAL -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary-color:#1e3c72;--primary-dark:#152a52;--secondary-color:#2a5298;
+      --success-color:#10b981;--warning-color:#f59e0b;--error-color:#ef4444;--info-color:#3b82f6;
+      --text-primary:#1e293b;--text-secondary:#64748b;--border-color:#e2e8f0;
+      --bg-light:#f8fafc;--bg-white:#ffffff;--shadow-sm:0 1px 2px 0 rgba(0,0,0,.05);
+      --shadow-md:0 4px 6px -1px rgba(0,0,0,.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);
+      --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1)
+    }
+    body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:linear-gradient(135deg,#f0f4f8 0%,#d9e2ec 100%);min-height:100vh;color:var(--text-primary)}
+    .toast-container{position:fixed;top:20px;right:20px;z-index:9999}
+    .toast{background:var(--bg-white);padding:16px 20px;border-radius:10px;box-shadow:var(--shadow-lg);margin-bottom:10px;display:flex;align-items:center;gap:12px;min-width:300px;border-left:4px solid}
+    .toast.success{border-left-color:var(--success-color)}.toast.error{border-left-color:var(--error-color)}.toast.warning{border-left-color:var(--warning-color)}.toast.info{border-left-color:var(--info-color)}
+    .toast-message{flex:1}.toast-close{background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px}
+    .loading-screen{position:fixed;inset:0;background:var(--bg-white);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9998;transition:opacity .3s ease}
+    .loading-screen.hidden{opacity:0;pointer-events:none}
+    .spinner-container{position:relative;width:80px;height:80px}
+    .spinner{width:100%;height:100%;border:4px solid var(--border-color);border-top:4px solid var(--primary-color);border-radius:50%;animation:spin 1s cubic-bezier(.68,-.55,.265,1.55) infinite}
+    .spinner-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700;color:var(--primary-color);font-size:24px}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    .loading-text{color:var(--text-secondary);font-size:1.1em;margin-top:20px;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .main-container{opacity:0;transform:translateY(20px);transition:all .5s ease}
+    .main-container.authenticated{opacity:1;transform:translateY(0)}
+    .unauthorized-screen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-color) 0%,var(--secondary-color) 100%);align-items:center;justify-content:center;flex-direction:column;z-index:10000}
+    .unauthorized-screen.show{display:flex;animation:fadeIn .5s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .unauthorized-content{text-align:center;max-width:450px;padding:50px;background:var(--bg-white);border-radius:20px;box-shadow:var(--shadow-xl)}
+    .unauthorized-icon{width:100px;height:100px;margin:0 auto 20px;background:linear-gradient(135deg,#fecaca 0%,#ef4444 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px}
+    .btn-login{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:#fff;padding:14px 32px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+    .header{background:var(--bg-white);box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1000;border-bottom:2px solid var(--border-color)}
+    .header-content{max-width:1600px;margin:0 auto;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+    .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;box-shadow:var(--shadow-md)}
+    .company-info{display:flex;flex-direction:column}.company-name{font-size:1.6em;font-weight:700;color:var(--primary-color);letter-spacing:-.5px}.page-label{font-size:.9em;color:var(--text-secondary);font-weight:500}
+    .nav-section{display:flex;gap:12px;flex-wrap:wrap}
+    .btn-nav{background:var(--primary-color);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;font-size:14px}
+    .btn-nav:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+    .btn-nav.secondary{background:var(--text-secondary)}.btn-nav.success{background:var(--success-color)}
+    .container{max-width:1600px;margin:0 auto;padding:20px}
+    .filter-section{background:var(--bg-white);border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow-md);border:1px solid var(--border-color)}
+    .filter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    .filter-title{font-size:1.2em;font-weight:600;color:var(--text-primary)}
+    .filter-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+    .filter-label{font-size:.85em;color:var(--text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+    .filter-input,.filter-select{padding:10px 14px;border:2px solid var(--border-color);border-radius:8px;font-size:.95em;background:var(--bg-white)}
+    .filter-actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+    .btn-filter{padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;border:none;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+    .btn-apply{background:var(--success-color);color:#fff}.btn-clear{background:var(--bg-light);color:var(--text-primary);border:2px solid var(--border-color)}.btn-export{background:var(--info-color);color:#fff}
+    .stats-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
+    .stat-tile{background:var(--bg-white);padding:20px;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border-color);text-align:center;position:relative;overflow:hidden}
+    .stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color))}
+    .stat-value{font-size:2em;font-weight:700;margin:5px 0}
+    .table-section{background:var(--bg-white);border-radius:16px;padding:24px;box-shadow:var(--shadow-lg);border:1px solid var(--border-color)}
+    .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px}
+    .record-count{background:var(--bg-light);padding:4px 12px;border-radius:20px;font-weight:600}
+    .table-wrapper{overflow-x:auto;max-height:600px;overflow-y:auto;border:2px solid var(--border-color);border-radius:10px;position:relative}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1200px}
+    thead{background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);position:sticky;top:0;z-index:100}
+    th{padding:14px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--border-color);font-size:.85em;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none;white-space:nowrap;position:relative}
+    th:hover{background:var(--bg-light);color:var(--primary-color)}th.sorted{color:var(--primary-color)}
+    th::after{content:'⇅';position:absolute;right:8px;opacity:.3}th.sorted-asc::after{content:'↑';opacity:1;color:var(--primary-color)}th.sorted-desc::after{content:'↓';opacity:1;color:var(--primary-color)}
+    tbody tr{transition:all .2s ease;cursor:pointer;border-bottom:1px solid var(--border-color)}tbody tr:hover{background:linear-gradient(90deg,#f8fafc 0%,#f1f5f9 100%)}
+    td{padding:12px 16px;font-size:.9em;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+    .status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:.8em;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .status-active{background:#d1fae5;color:#065f46}.status-pending{background:#fed7aa;color:#92400e}.status-completed{background:#dbeafe;color:#1e40af}.status-cancelled{background:#fee2e2;color:#991b1b}
+    .empty-state{text-align:center;padding:80px 20px;color:var(--text-secondary)}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    .modal.active{display:flex}
+    .modal-content{background:var(--bg-white);border-radius:16px;padding:32px;max-width:900px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-xl)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--border-color)}
+    .detail-grid{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-top:20px}
+    .pagination{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:2px solid var(--border-color);flex-wrap:wrap;gap:16px}
+    .pagination-controls{display:flex;align-items:center;gap:10px}
+    .page-btn{padding:8px 16px;border:2px solid var(--border-color);background:var(--bg-white);border-radius:8px;cursor:pointer;font-weight:500}
+    .page-size-selector{display:flex;align-items:center;gap:10px}
+    @media (max-width:768px){.table-wrapper{max-height:400px}.detail-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
+  <!-- Toasts -->
+  <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="spinner-container">
-            <div class="spinner"></div>
-            <div class="spinner-logo">FP</div>
+  <!-- Loading -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="spinner-container">
+      <div class="spinner"></div><div class="spinner-logo">FP</div>
+    </div>
+    <div class="loading-text">Authenticating and loading data...</div>
+  </div>
+
+  <!-- Unauthorized -->
+  <div class="unauthorized-screen" id="unauthorizedScreen">
+    <div class="unauthorized-content">
+      <div class="unauthorized-icon">🔒</div>
+      <h1 class="unauthorized-title">Authentication Required</h1>
+      <p class="unauthorized-message">Please sign in with your Microsoft work account.</p>
+      <button onclick="window.location.href='/admin'" class="btn-login">Sign In</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-container" id="mainContainer">
+    <header class="header">
+      <div class="header-content">
+        <div style="display:flex;align-items:center;gap:15px">
+          <div class="logo">FP</div>
+          <div class="company-info">
+            <div class="company-name">FormanPacific</div>
+            <div class="page-label">Jobs Master List</div>
+          </div>
         </div>
-        <div class="loading-text">Authenticating and loading data...</div>
+        <div class="nav-section">
+          <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">← Dashboard</button>
+          <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">Activity Log →</button>
+          <button class="btn-nav success" onclick="window.location.href='/admin/jobs-edit'">✏️ Edit Jobs</button>
+          <button class="btn-nav" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Filters -->
+      <div class="filter-section">
+        <div class="filter-header">
+          <div class="filter-title">🔍 Search & Filters</div>
+        </div>
+        <div class="filter-row">
+          <div>
+            <label class="filter-label">Job ID</label>
+            <input id="filterJobId" class="filter-input" placeholder="Search by ID...">
+          </div>
+          <div>
+            <label class="filter-label">Supplier</label>
+            <input id="filterSupplier" class="filter-input" placeholder="Supplier name...">
+          </div>
+          <div>
+            <label class="filter-label">Customer</label>
+            <input id="filterCustomer" class="filter-input" placeholder="Customer name...">
+          </div>
+          <div>
+            <label class="filter-label">Status</label>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div>
+            <label class="filter-label">Date From</label>
+            <input id="filterDateFrom" type="date" class="filter-input">
+          </div>
+          <div>
+            <label class="filter-label">Date To</label>
+            <input id="filterDateTo" type="date" class="filter-input">
+          </div>
+          <div>
+            <label class="filter-label">Type</label>
+            <select id="filterType" class="filter-select">
+              <option value="">All Types</option>
+              <option value="billable">Billable</option>
+              <option value="supplier">Supplier</option>
+              <option value="warranty">Warranty</option>
+            </select>
+          </div>
+          <div>
+            <label class="filter-label">Price Min</label>
+            <input id="filterPriceMin" type="number" class="filter-input" placeholder="Min price...">
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="btn-filter btn-clear" onclick="clearFilters()">✖ Clear</button>
+          <button class="btn-filter btn-apply" onclick="applyFilters()">✓ Apply Filters</button>
+          <button class="btn-filter btn-export" onclick="exportData()">📥 Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-summary">
+        <div class="stat-tile">
+          <div class="stat-label">Total Jobs</div>
+          <div id="statTotal" class="stat-value">0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">This Month</div>
+          <div id="statMonth" class="stat-value">0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Avg Price</div>
+          <div id="statAvgPrice" class="stat-value">$0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Total Revenue</div>
+          <div id="statRevenue" class="stat-value">$0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Active Suppliers</div>
+          <div id="statSuppliers" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-section">
+        <div class="table-header">
+          <h2>📋 Complete Jobs Register</h2>
+          <div class="record-count">Showing <span id="recordCount">0</span> of <span id="totalRecords">0</span> records</div>
+        </div>
+
+        <div class="table-wrapper">
+          <table id="jobsTable">
+            <thead><tr id="tableHeaders"></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty-state" style="display:none">
+            <div style="font-size:48px">📊</div>
+            <div class="empty-message">No Jobs Found</div>
+            <div class="empty-submessage">Try refreshing the page or checking your filters.</div>
+          </div>
+        </div>
+
+        <div class="pagination">
+          <div class="pagination-controls">
+            <button class="page-btn" id="btnFirst" onclick="firstPage()">First</button>
+            <button class="page-btn" id="btnPrev" onclick="previousPage()">Previous</button>
+            <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+            <button class="page-btn" id="btnNext" onclick="nextPage()">Next</button>
+            <button class="page-btn" id="btnLast" onclick="lastPage()">Last</button>
+          </div>
+          <div class="page-size-selector">
+            Show
+            <select id="pageSizeSelect" onchange="changePageSize()">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+            </select>
+            records per page
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Unauthorized Screen -->
-    <div class="unauthorized-screen" id="unauthorizedScreen">
-        <div class="unauthorized-content">
-            <div class="unauthorized-icon">🔒</div>
-            <h1 class="unauthorized-title">Authentication Required</h1>
-            <p class="unauthorized-message">You must be logged in to access the Jobs Master List. Please sign in with your Microsoft work account.</p>
-            <button onclick="window.location.href='/admin'" class="btn-login">Sign In</button>
+    <!-- Detail Modal -->
+    <div class="modal" id="detailModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Job Details</h2>
+          <button class="btn-close" onclick="closeModal()">×</button>
         </div>
+        <div class="detail-grid" id="modalDetails"></div>
+        <div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end">
+          <button class="btn-filter btn-clear" onclick="closeModal()">Close</button>
+          <button class="btn-filter btn-apply" onclick="editJob()">Edit Job</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Main Container -->
-    <div class="main-container" id="mainContainer">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo">FP</div>
-                    <div class="company-info">
-                        <div class="company-name">FormanPacific</div>
-                        <div class="page-label">Jobs Master List</div>
-                    </div>
-                </div>
-                <div class="nav-section">
-                    <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
-                        ← Dashboard
-                    </button>
-                    <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
-                        Activity Log →
-                    </button>
-                    <button class="btn-nav success" onclick="window.location.href='/admin/jobs-edit'">
-                        ✏️ Edit Jobs
-                    </button>
-                    <button class="btn-nav" onclick="refreshData()">
-                        🔄 Refresh
-                    </button>
-                </div>
-            </div>
-        </header>
+  <script>
+    'use strict';
 
-        <div class="container">
-            <!-- Filter Section -->
-            <div class="filter-section">
-                <div class="filter-header">
-                    <div class="filter-title">
-                        🔍 Search & Filters
-                    </div>
-                    <button class="filter-toggle" id="filterToggle" onclick="toggleFilters()">▼</button>
-                </div>
-                <div class="filter-content" id="filterContent">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="filter-label">Job ID</label>
-                            <input type="text" class="filter-input" id="filterJobId" placeholder="Search by ID...">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Supplier</label>
-                            <input type="text" class="filter-input" id="filterSupplier" placeholder="Supplier name...">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Customer</label>
-                            <input type="text" class="filter-input" id="filterCustomer" placeholder="Customer name...">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Status</label>
-                            <select class="filter-select" id="filterStatus">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="pending">Pending</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="filter-label">Date From</label>
-                            <input type="date" class="filter-input" id="filterDateFrom">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Date To</label>
-                            <input type="date" class="filter-input" id="filterDateTo">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Type</label>
-                            <select class="filter-select" id="filterType">
-                                <option value="">All Types</option>
-                                <option value="billable">Billable</option>
-                                <option value="supplier">Supplier</option>
-                                <option value="warranty">Warranty</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Price Range</label>
-                            <input type="number" class="filter-input" id="filterPriceMin" placeholder="Min price...">
-                        </div>
-                    </div>
-                    <div class="filter-actions">
-                        <button class="btn-filter btn-clear" onclick="clearFilters()">
-                            ✖ Clear
-                        </button>
-                        <button class="btn-filter btn-apply" onclick="applyFilters()">
-                            ✓ Apply Filters
-                        </button>
-                        <button class="btn-filter btn-export" onclick="exportData()">
-                            📥 Export CSV
-                        </button>
-                    </div>
-                </div>
-            </div>
+    // ---------- CONFIG (adjust if needed) ----------
+    const SPO_HOST       = 'roadandrescue.sharepoint.com'; // your tenant host
+    const SPO_SITE_PATH  = '/sites/rar';                   // site path after host
+    const SPO_LIST_TITLE = 'BookAJobMaster';               // list display name
 
-            <!-- Stats Summary -->
-            <div class="stats-summary">
-                <div class="stat-tile">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-label">Total Jobs</div>
-                    <div class="stat-value" id="statTotal">0</div>
-                    <div class="stat-change positive">↑ 12%</div>
-                </div>
-                <div class="stat-tile">
-                    <div class="stat-icon">📅</div>
-                    <div class="stat-label">This Month</div>
-                    <div class="stat-value" id="statMonth">0</div>
-                    <div class="stat-change positive">↑ 8%</div>
-                </div>
-                <div class="stat-tile">
-                    <div class="stat-icon">💰</div>
-                    <div class="stat-label">Avg Price</div>
-                    <div class="stat-value" id="statAvgPrice">$0</div>
-                    <div class="stat-change negative">↓ 2%</div>
-                </div>
-                <div class="stat-tile">
-                    <div class="stat-icon">💵</div>
-                    <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value" id="statRevenue">$0</div>
-                    <div class="stat-change positive">↑ 15%</div>
-                </div>
-                <div class="stat-tile">
-                    <div class="stat-icon">🏢</div>
-                    <div class="stat-label">Active Suppliers</div>
-                    <div class="stat-value" id="statSuppliers">0</div>
-                    <div class="stat-change positive">↑ 3</div>
-                </div>
-            </div>
+    const MSAL_CONFIG = {
+      auth: {
+        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+        redirectUri: window.location.origin + '/admin/jobs-master'
+      },
+      cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: true }
+    };
+    const GRAPH_SCOPE_READ = 'https://graph.microsoft.com/Sites.Read.All';
 
-            <!-- Table Section -->
-            <div class="table-section">
-                <div class="table-header">
-                    <h2 class="table-title">
-                        📋 Complete Jobs Register
-                    </h2>
-                    <div class="table-info">
-                        <span class="record-count">
-                            Showing <span id="recordCount">0</span> of <span id="totalRecords">0</span> records
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="table-wrapper">
-                    <table id="jobsTable">
-                        <thead>
-                            <tr id="tableHeaders">
-                                <!-- Headers will be dynamically generated -->
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <!-- Data will be loaded dynamically -->
-                        </tbody>
-                    </table>
-                    
-                    <!-- Empty State -->
-                    <div class="empty-state" id="emptyState" style="display: none;">
-                        <div class="empty-icon">📊</div>
-                        <div class="empty-message">No Jobs Found</div>
-                        <div class="empty-submessage">
-                            Jobs will appear here once they're loaded from SharePoint. 
-                            Try refreshing the page or checking your filters.
-                        </div>
-                    </div>
-                </div>
+    // ---------- STATE ----------
+    const state = {
+      msalInstance: null,
+      isAuthenticated: false,
+      allJobsData: [],
+      filteredData: [],
+      sortColumn: null,
+      sortDirection: 'asc',
+      currentPage: 1,
+      pageSize: 50,
+      currentJobDetail: null,
+      filters: { jobId:'', supplier:'', customer:'', status:'', dateFrom:'', dateTo:'', type:'', priceMin:'' }
+    };
 
-                <!-- Pagination -->
-                <div class="pagination">
-                    <div class="pagination-controls">
-                        <button class="page-btn" onclick="firstPage()" id="btnFirst">First</button>
-                        <button class="page-btn" onclick="previousPage()" id="btnPrev">Previous</button>
-                        <span class="page-info">
-                            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
-                        </span>
-                        <button class="page-btn" onclick="nextPage()" id="btnNext">Next</button>
-                        <button class="page-btn" onclick="lastPage()" id="btnLast">Last</button>
-                    </div>
-                    <div class="page-size-selector">
-                        Show 
-                        <select id="pageSizeSelect" onchange="changePageSize()">
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                            <option value="200">200</option>
-                        </select>
-                        records per page
-                    </div>
-                </div>
-            </div>
-        </div>
+    // ---------- AUTH ----------
+    async function initializeApp(){
+      try{
+        state.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
+        await state.msalInstance.initialize();
+        await state.msalInstance.handleRedirectPromise();
+        await checkAuthentication();
+      }catch(e){
+        console.error('Initialization failed', e);
+        showUnauthorized();
+      }
+    }
 
-        <!-- Detail Modal -->
-        <div class="modal" id="detailModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">Job Details</h2>
-                    <button class="btn-close" onclick="closeModal()">×</button>
-                </div>
-                <div class="detail-grid" id="modalDetails">
-                    <!-- Details will be populated here -->
-                </div>
-                <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
-                    <button class="btn-filter btn-clear" onclick="closeModal()">Close</button>
-                    <button class="btn-filter btn-apply" onclick="editJob()">Edit Job</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    async function getGraphToken(){
+      const accounts = state.msalInstance.getAllAccounts();
+      if (!accounts.length) throw new Error('No signed-in account');
+      const request = { scopes: [GRAPH_SCOPE_READ], account: accounts[0] };
+      try{
+        const { accessToken } = await state.msalInstance.acquireTokenSilent(request);
+        return accessToken;
+      }catch{
+        const { accessToken } = await state.msalInstance.acquireTokenPopup(request);
+        return accessToken;
+      }
+    }
 
-    <script>
-        'use strict';
+    async function checkAuthentication(){
+      const accounts = state.msalInstance.getAllAccounts();
+      if (accounts.length){
+        state.isAuthenticated = true;
+        document.getElementById('loadingScreen').classList.add('hidden');
+        document.getElementById('mainContainer').classList.add('authenticated');
+        await loadData();
+      }else{
+        showUnauthorized();
+      }
+    }
 
-        // Global State Management
-        const state = {
-            allJobsData: [],
-            filteredData: [],
-            currentPage: 1,
-            pageSize: 50,
-            sortColumn: null,
-            sortDirection: 'asc',
-            isAuthenticated: false,
-            msalInstance: null,
-            currentJobDetail: null,
-            filters: {
-                jobId: '',
-                supplier: '',
-                customer: '',
-                status: '',
-                dateFrom: '',
-                dateTo: '',
-                type: '',
-                priceMin: ''
-            }
-        };
+    function showUnauthorized(){
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('unauthorizedScreen').classList.add('show');
+      document.getElementById('mainContainer').classList.remove('authenticated');
+    }
 
-        // SharePoint Configuration
-        const CONFIG = {
-            sharePoint: {
-                siteUrl: 'https://roadandrescue.sharepoint.com/sites/rar',
-                listName: 'BookAJobMaster',
-                selectFields: '$select=*',
-                orderBy: '$orderby=Created desc',
-                top: '$top=5000'
-            },
-            msal: {
-                auth: {
-                    clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
-                    authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
-                    redirectUri: window.location.origin + '/admin/jobs-master'
-                },
-                cache: {
-                    cacheLocation: 'sessionStorage',
-                    storeAuthStateInCookie: true
-                }
-            }
-        };
+    // ---------- GRAPH FETCH ----------
+    async function fetchJson(url, token){
+      const r = await fetch(url, { headers:{ Authorization:`Bearer ${token}` }});
+      if (!r.ok){
+        const text = await r.text().catch(()=> '');
+        throw new Error(`${r.status} ${r.statusText}: ${text}`);
+      }
+      return r.json();
+    }
 
-        // Initialize Application
-        async function initializeApp() {
-            try {
-                // Initialize MSAL
-                state.msalInstance = new msal.PublicClientApplication(CONFIG.msal);
-                await state.msalInstance.initialize();
-                
-                // Handle redirect
-                const response = await state.msalInstance.handleRedirectPromise();
-                if (response) {
-                    console.log('Redirect handled successfully');
-                }
-                
-                // Check authentication
-                await checkAuthentication();
-            } catch (error) {
-                console.error('Initialization failed:', error);
-                showUnauthorized();
-            }
-        }
+    async function fetchSharePointRows(){
+      const token = await getGraphToken();
+      const site = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:/sites${SPO_SITE_PATH}`, token);
+      const lists = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${encodeURIComponent(SPO_LIST_TITLE)}'`, token);
+      if (!lists.value?.length) throw new Error(`List not found: ${SPO_LIST_TITLE}`);
+      const listId = lists.value[0].id;
 
-        // Authentication Functions
-        async function checkAuthentication() {
-            try {
-                const accounts = state.msalInstance.getAllAccounts();
-                
-                if (accounts.length > 0) {
-                    state.isAuthenticated = true;
-                    console.log('User authenticated:', accounts[0].username);
-                    
-                    // Hide loading, show main
-                    document.getElementById('loadingScreen').classList.add('hidden');
-                    document.getElementById('mainContainer').classList.add('authenticated');
-                    
-                    // Load data
-                    await loadData();
-                } else {
-                    showUnauthorized();
-                }
-            } catch (error) {
-                console.error('Authentication check failed:', error);
-                showUnauthorized();
-            }
-        }
+      // Pull up to 5000 items with expanded fields
+      let url = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5000`;
+      const items = await fetchJson(url, token);
 
-        function showUnauthorized() {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('unauthorizedScreen').classList.add('show');
-            document.getElementById('mainContainer').classList.remove('authenticated');
-        }
+      return items.value.map(v => v.fields);
+    }
 
-        // Data Loading Functions
-        async function loadData() {
-            try {
-                showToast('Loading data from SharePoint...', 'info');
-                
-                // For demo purposes, load sample data
-                // In production, this would fetch from SharePoint
-                await loadSampleData();
-                
-                // Process and display data
-                state.filteredData = [...state.allJobsData];
-                generateTableHeaders();
-                updateStatistics();
-                renderTable();
-                
-                showToast('Data loaded successfully!', 'success');
-            } catch (error) {
-                console.error('Failed to load data:', error);
-                showToast('Failed to load data. Please refresh.', 'error');
-                showEmptyState('Failed to connect to SharePoint');
-            }
-        }
+    // ---------- LOADING + RENDER ----------
+    async function loadData(){
+      try{
+        showToast('Loading data from SharePoint...', 'info');
+        const rows = await fetchSharePointRows();
+        state.allJobsData = rows;
+        state.filteredData = [...rows];
+        generateTableHeaders();
+        updateStatistics();
+        renderTable();
+        showToast(`Loaded ${rows.length} rows.`, 'success');
+      }catch(err){
+        console.error('Failed to load SharePoint data', err);
+        showToast('Failed to load SharePoint data. Check permissions.', 'error');
+        showEmptyState('Failed to connect to SharePoint');
+      }
+    }
 
-        async function loadSampleData() {
-            // Generate sample data for demonstration
-            const sampleData = [];
-            const suppliers = ['ABC Corp', 'XYZ Ltd', 'Tech Solutions', 'Global Services', 'Quick Fix Inc'];
-            const customers = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson'];
-            const statuses = ['active', 'pending', 'completed', 'cancelled'];
-            const types = ['billable', 'supplier', 'warranty'];
-            
-            for (let i = 1; i <= 250; i++) {
-                sampleData.push({
-                    JobID: `JOB${String(i).padStart(5, '0')}`,
-                    Supplier: suppliers[Math.floor(Math.random() * suppliers.length)],
-                    Customer: customers[Math.floor(Math.random() * customers.length)],
-                    Status: statuses[Math.floor(Math.random() * statuses.length)],
-                    Type: types[Math.floor(Math.random() * types.length)],
-                    CreatedDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    Price: Math.floor(Math.random() * 5000) + 100,
-                    Description: `Service request for job ${i}`,
-                    Location: `Location ${Math.floor(Math.random() * 10) + 1}`,
-                    Priority: Math.random() > 0.5 ? 'High' : 'Normal'
-                });
-            }
-            
-            state.allJobsData = sampleData;
-        }
+    function generateTableHeaders(){
+      const tableHeaders = document.getElementById('tableHeaders');
+      tableHeaders.innerHTML = '';
+      if (!state.allJobsData.length) return;
 
-        // Table Generation Functions
-        function generateTableHeaders() {
-            if (state.allJobsData.length === 0) return;
-            
-            const headers = Object.keys(state.allJobsData[0]);
-            const headerRow = document.getElementById('tableHeaders');
-            headerRow.innerHTML = '';
-            
-            headers.forEach((header, index) => {
-                const th = document.createElement('th');
-                th.textContent = header.replace(/([A-Z])/g, ' $1').trim();
-                th.onclick = () => sortTable(header);
-                th.className = state.sortColumn === header ? `sorted sorted-${state.sortDirection}` : '';
-                headerRow.appendChild(th);
-            });
-        }
+      const headers = Object.keys(state.allJobsData[0]).filter(h => !h.startsWith('@'));
+      headers.forEach(h=>{
+        const th = document.createElement('th');
+        th.textContent = h.replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').trim();
+        th.className = (state.sortColumn === h) ? `sorted sorted-${state.sortDirection}` : '';
+        th.onclick = ()=> sortTable(h);
+        tableHeaders.appendChild(th);
+      });
+    }
 
-        function renderTable() {
-            const tableBody = document.getElementById('tableBody');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (state.filteredData.length === 0) {
-                tableBody.style.display = 'none';
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            tableBody.style.display = '';
-            emptyState.style.display = 'none';
-            
-            const start = (state.currentPage - 1) * state.pageSize;
-            const end = start + state.pageSize;
-            const pageData = state.filteredData.slice(start, end);
-            
-            tableBody.innerHTML = '';
-            
-            pageData.forEach(record => {
-                const row = document.createElement('tr');
-                row.onclick = () => showDetails(record);
-                
-                Object.keys(record).forEach(key => {
-                    const cell = document.createElement('td');
-                    
-                    // Special formatting for certain fields
-                    if (key === 'Status') {
-                        cell.innerHTML = `<span class="status-badge status-${record[key]}">${record[key]}</span>`;
-                    } else if (key === 'Price') {
-                        cell.innerHTML = `<strong>$${record[key].toLocaleString()}</strong>`;
-                    } else {
-                        cell.textContent = record[key] || '-';
-                    }
-                    
-                    row.appendChild(cell);
-                });
-                
-                tableBody.appendChild(row);
-            });
-            
-            updatePagination();
-        }
+    function renderTable(){
+      const body = document.getElementById('tableBody');
+      const empty = document.getElementById('emptyState');
 
-        // Statistics Functions
-        function updateStatistics() {
-            const total = state.allJobsData.length;
-            const thisMonth = state.allJobsData.filter(job => {
-                const jobDate = new Date(job.CreatedDate);
-                const now = new Date();
-                return jobDate.getMonth() === now.getMonth() && jobDate.getFullYear() === now.getFullYear();
-            }).length;
-            
-            const prices = state.allJobsData.map(job => job.Price || 0);
-            const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
-            const totalRevenue = prices.reduce((a, b) => a + b, 0);
-            
-            const suppliers = new Set(state.allJobsData.map(job => job.Supplier)).size;
-            
-            document.getElementById('statTotal').textContent = total.toLocaleString();
-            document.getElementById('statMonth').textContent = thisMonth.toLocaleString();
-            document.getElementById('statAvgPrice').textContent = `$${Math.round(avgPrice).toLocaleString()}`;
-            document.getElementById('statRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
-            document.getElementById('statSuppliers').textContent = suppliers.toLocaleString();
-        }
+      if (!state.filteredData.length){
+        body.style.display = 'none'; empty.style.display = 'block';
+        updatePagination();
+        return;
+      }
+      body.style.display = ''; empty.style.display = 'none';
 
-        // Filter Functions
-        function applyFilters() {
-            // Get filter values
-            state.filters.jobId = document.getElementById('filterJobId').value.toLowerCase();
-            state.filters.supplier = document.getElementById('filterSupplier').value.toLowerCase();
-            state.filters.customer = document.getElementById('filterCustomer').value.toLowerCase();
-            state.filters.status = document.getElementById('filterStatus').value;
-            state.filters.dateFrom = document.getElementById('filterDateFrom').value;
-            state.filters.dateTo = document.getElementById('filterDateTo').value;
-            state.filters.type = document.getElementById('filterType').value;
-            state.filters.priceMin = document.getElementById('filterPriceMin').value;
-            
-            // Apply filters
-            state.filteredData = state.allJobsData.filter(job => {
-                if (state.filters.jobId && !job.JobID.toLowerCase().includes(state.filters.jobId)) return false;
-                if (state.filters.supplier && !job.Supplier.toLowerCase().includes(state.filters.supplier)) return false;
-                if (state.filters.customer && !job.Customer.toLowerCase().includes(state.filters.customer)) return false;
-                if (state.filters.status && job.Status !== state.filters.status) return false;
-                if (state.filters.type && job.Type !== state.filters.type) return false;
-                if (state.filters.dateFrom && job.CreatedDate < state.filters.dateFrom) return false;
-                if (state.filters.dateTo && job.CreatedDate > state.filters.dateTo) return false;
-                if (state.filters.priceMin && job.Price < parseFloat(state.filters.priceMin)) return false;
-                
-                return true;
-            });
-            
-            state.currentPage = 1;
-            renderTable();
-            showToast(`Filters applied: ${state.filteredData.length} records found`, 'info');
-        }
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end   = Math.min(start + state.pageSize, state.filteredData.length);
+      const rows  = state.filteredData.slice(start, end);
 
-        function clearFilters() {
-            // Clear all filter inputs
-            document.getElementById('filterJobId').value = '';
-            document.getElementById('filterSupplier').value = '';
-            document.getElementById('filterCustomer').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterDateFrom').value = '';
-            document.getElementById('filterDateTo').value = '';
-            document.getElementById('filterType').value = '';
-            document.getElementById('filterPriceMin').value = '';
-            
-            // Reset filters
-            Object.keys(state.filters).forEach(key => state.filters[key] = '');
-            
-            state.filteredData = [...state.allJobsData];
-            state.currentPage = 1;
-            renderTable();
-            showToast('Filters cleared', 'info');
-        }
+      body.innerHTML = '';
+      rows.forEach(rec=>{
+        const tr = document.createElement('tr');
+        tr.onclick = ()=> showDetails(rec);
 
-        function toggleFilters() {
-            const content = document.getElementById('filterContent');
-            const toggle = document.getElementById('filterToggle');
-            
-            content.classList.toggle('collapsed');
-            toggle.classList.toggle('collapsed');
-        }
-
-        // Sort Functions
-        function sortTable(column) {
-            if (state.sortColumn === column) {
-                state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                state.sortColumn = column;
-                state.sortDirection = 'asc';
-            }
-            
-            state.filteredData.sort((a, b) => {
-                let valA = a[column];
-                let valB = b[column];
-                
-                // Handle different data types
-                if (typeof valA === 'number' && typeof valB === 'number') {
-                    return state.sortDirection === 'asc' ? valA - valB : valB - valA;
-                }
-                
-                valA = String(valA).toLowerCase();
-                valB = String(valB).toLowerCase();
-                
-                if (state.sortDirection === 'asc') {
-                    return valA < valB ? -1 : valA > valB ? 1 : 0;
-                } else {
-                    return valA > valB ? -1 : valA < valB ? 1 : 0;
-                }
-            });
-            
-            generateTableHeaders();
-            renderTable();
-        }
-
-        // Pagination Functions
-        function updatePagination() {
-            const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
-            
-            document.getElementById('recordCount').textContent = Math.min(state.pageSize, state.filteredData.length);
-            document.getElementById('totalRecords').textContent = state.filteredData.length;
-            document.getElementById('currentPage').textContent = state.currentPage;
-            document.getElementById('totalPages').textContent = totalPages || 1;
-            
-            // Update button states
-            document.getElementById('btnFirst').disabled = state.currentPage === 1;
-            document.getElementById('btnPrev').disabled = state.currentPage === 1;
-            document.getElementById('btnNext').disabled = state.currentPage >= totalPages;
-            document.getElementById('btnLast').disabled = state.currentPage >= totalPages;
-        }
-
-        function firstPage() {
-            state.currentPage = 1;
-            renderTable();
-        }
-
-        function previousPage() {
-            if (state.currentPage > 1) {
-                state.currentPage--;
-                renderTable();
-            }
-        }
-
-        function nextPage() {
-            const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
-            if (state.currentPage < totalPages) {
-                state.currentPage++;
-                renderTable();
-            }
-        }
-
-        function lastPage() {
-            state.currentPage = Math.ceil(state.filteredData.length / state.pageSize);
-            renderTable();
-        }
-
-        function changePageSize() {
-            state.pageSize = parseInt(document.getElementById('pageSizeSelect').value);
-            state.currentPage = 1;
-            renderTable();
-        }
-
-        // Modal Functions
-        function showDetails(record) {
-            state.currentJobDetail = record;
-            const details = document.getElementById('modalDetails');
-            
-            details.innerHTML = '';
-            
-            Object.keys(record).forEach(key => {
-                const labelDiv = document.createElement('div');
-                labelDiv.className = 'detail-label';
-                labelDiv.textContent = key.replace(/([A-Z])/g, ' $1').trim();
-                
-                const valueDiv = document.createElement('div');
-                valueDiv.className = 'detail-value';
-                
-                if (key === 'Status') {
-                    valueDiv.innerHTML = `<span class="status-badge status-${record[key]}">${record[key]}</span>`;
-                } else if (key === 'Price') {
-                    valueDiv.innerHTML = `<strong>$${record[key].toLocaleString()}</strong>`;
-                } else {
-                    valueDiv.textContent = record[key] || '-';
-                }
-                
-                details.appendChild(labelDiv);
-                details.appendChild(valueDiv);
-            });
-            
-            document.getElementById('detailModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('detailModal').classList.remove('active');
-            state.currentJobDetail = null;
-        }
-
-        function editJob() {
-            if (state.currentJobDetail) {
-                window.location.href = `/admin/jobs-edit?id=${state.currentJobDetail.JobID}`;
-            }
-        }
-
-        // Export Functions
-        function exportData() {
-            if (state.filteredData.length === 0) {
-                showToast('No data to export', 'warning');
-                return;
-            }
-            
-            const csv = convertToCSV(state.filteredData);
-            downloadCSV(csv, `jobs_export_${new Date().toISOString().split('T')[0]}.csv`);
-            showToast(`Exported ${state.filteredData.length} records`, 'success');
-        }
-
-        function convertToCSV(data) {
-            const headers = Object.keys(data[0]);
-            const csvHeaders = headers.join(',');
-            
-            const csvRows = data.map(row => {
-                return headers.map(header => {
-                    const value = row[header];
-                    return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
-                }).join(',');
-            });
-            
-            return [csvHeaders, ...csvRows].join('\n');
-        }
-
-        function downloadCSV(csv, filename) {
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
-
-        // Utility Functions
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icons = {
-                success: '✓',
-                error: '✖',
-                warning: '⚠',
-                info: 'ℹ'
-            };
-            
-            toast.innerHTML = `
-                <span class="toast-icon">${icons[type]}</span>
-                <span class="toast-message">${message}</span>
-                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 5000);
-        }
-
-        function showEmptyState(message) {
-            const emptyState = document.getElementById('emptyState');
-            const emptyMessage = emptyState.querySelector('.empty-message');
-            const emptySubmessage = emptyState.querySelector('.empty-submessage');
-            
-            emptyMessage.textContent = message || 'No data available';
-            emptySubmessage.textContent = 'Jobs will appear here once loaded from SharePoint.';
-            
-            document.getElementById('tableBody').style.display = 'none';
-            emptyState.style.display = 'block';
-        }
-
-        async function refreshData() {
-            showToast('Refreshing data...', 'info');
-            await loadData();
-        }
-
-        // Event Listeners
-        window.addEventListener('DOMContentLoaded', initializeApp);
-
-        // Close modal on background click
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('detailModal');
-            if (e.target === modal) {
-                closeModal();
-            }
+        Object.keys(rec).forEach(k=>{
+          if (k.startsWith('@')) return;
+          const td = document.createElement('td');
+          if (k.toLowerCase().includes('status')){
+            const val = String(rec[k] ?? '').toLowerCase();
+            td.innerHTML = `<span class="status-badge status-${val}">${rec[k] ?? '-'}</span>`;
+          } else if (/price|amount|total/i.test(k) && typeof rec[k] === 'number'){
+            td.innerHTML = `<strong>$${rec[k].toLocaleString()}</strong>`;
+          } else {
+            td.textContent = (rec[k] ?? '').toString();
+          }
+          tr.appendChild(td);
         });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-            if (e.ctrlKey && e.key === 'f') {
-                e.preventDefault();
-                document.getElementById('filterJobId').focus();
-            }
-        });
-    </script>
+        body.appendChild(tr);
+      });
+
+      updatePagination();
+    }
+
+    // ---------- STATS ----------
+    function updateStatistics(){
+      const total = state.allJobsData.length;
+      const now = new Date();
+      const thisMonth = state.allJobsData.filter(j=>{
+        const d = new Date(j.Created || j.CreatedDate || j.createdDateTime || j.Modified || 0);
+        return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+      }).length;
+
+      // Try to guess price column
+      const priceKey = Object.keys(state.allJobsData[0] || {}).find(k=>/price|amount|total/i.test(k)) || null;
+      const prices = priceKey ? state.allJobsData.map(r=> Number(r[priceKey]) || 0) : [];
+      const avg = prices.length ? prices.reduce((a,b)=>a+b,0)/prices.length : 0;
+      const revenue = prices.reduce((a,b)=>a+b,0);
+
+      const supplierKey = Object.keys(state.allJobsData[0] || {}).find(k=>/supplier/i.test(k)) || null;
+      const suppliers = supplierKey ? new Set(state.allJobsData.map(r=> r[supplierKey])).size : 0;
+
+      document.getElementById('statTotal').textContent = total.toLocaleString();
+      document.getElementById('statMonth').textContent = thisMonth.toLocaleString();
+      document.getElementById('statAvgPrice').textContent = `$${Math.round(avg).toLocaleString()}`;
+      document.getElementById('statRevenue').textContent = `$${Math.round(revenue).toLocaleString()}`;
+      document.getElementById('statSuppliers').textContent = suppliers.toLocaleString();
+    }
+
+    // ---------- FILTERS ----------
+    function applyFilters(){
+      const f = state.filters;
+      f.jobId     = document.getElementById('filterJobId').value.toLowerCase();
+      f.supplier  = document.getElementById('filterSupplier').value.toLowerCase();
+      f.customer  = document.getElementById('filterCustomer').value.toLowerCase();
+      f.status    = document.getElementById('filterStatus').value;
+      f.dateFrom  = document.getElementById('filterDateFrom').value;
+      f.dateTo    = document.getElementById('filterDateTo').value;
+      f.type      = document.getElementById('filterType').value;
+      f.priceMin  = document.getElementById('filterPriceMin').value;
+
+      state.filteredData = state.allJobsData.filter(job=>{
+        const jobIdKey = Object.keys(job).find(k=>/job.?id/i.test(k));
+        const supplierKey = Object.keys(job).find(k=>/supplier/i.test(k));
+        const customerKey = Object.keys(job).find(k=>/customer|name/i.test(k));
+        const statusKey = Object.keys(job).find(k=>/status/i.test(k));
+        const typeKey = Object.keys(job).find(k=>/type/i.test(k));
+        const dateKey = Object.keys(job).find(k=>/created|date/i.test(k));
+        const priceKey = Object.keys(job).find(k=>/price|amount|total/i.test(k));
+
+        if (f.jobId && jobIdKey && !String(job[jobIdKey]||'').toLowerCase().includes(f.jobId)) return false;
+        if (f.supplier && supplierKey && !String(job[supplierKey]||'').toLowerCase().includes(f.supplier)) return false;
+        if (f.customer && customerKey && !String(job[customerKey]||'').toLowerCase().includes(f.customer)) return false;
+        if (f.status && statusKey && String(job[statusKey]||'') !== f.status) return false;
+        if (f.type && typeKey && String(job[typeKey]||'') !== f.type) return false;
+
+        if (f.dateFrom && dateKey && String(job[dateKey]||'').slice(0,10) < f.dateFrom) return false;
+        if (f.dateTo && dateKey && String(job[dateKey]||'').slice(0,10) > f.dateTo) return false;
+
+        if (f.priceMin && priceKey && Number(job[priceKey]||0) < Number(f.priceMin)) return false;
+        return true;
+      });
+
+      state.currentPage = 1;
+      renderTable();
+      showToast(`Filters applied: ${state.filteredData.length} records`, 'info');
+    }
+
+    function clearFilters(){
+      ['filterJobId','filterSupplier','filterCustomer','filterStatus','filterDateFrom','filterDateTo','filterType','filterPriceMin']
+        .forEach(id=> document.getElementById(id).value = '');
+      Object.keys(state.filters).forEach(k=> state.filters[k]='');
+      state.filteredData = [...state.allJobsData];
+      state.currentPage = 1;
+      renderTable();
+      showToast('Filters cleared', 'info');
+    }
+
+    // ---------- SORT ----------
+    function sortTable(column){
+      if (state.sortColumn === column){
+        state.sortDirection = (state.sortDirection === 'asc') ? 'desc' : 'asc';
+      } else {
+        state.sortColumn = column; state.sortDirection = 'asc';
+      }
+      const dir = state.sortDirection === 'asc' ? 1 : -1;
+
+      state.filteredData.sort((a,b)=>{
+        const va = a[column], vb = b[column];
+        if (typeof va === 'number' && typeof vb === 'number') return (va - vb)*dir;
+        const sa = String(va ?? '').toLowerCase(), sb = String(vb ?? '').toLowerCase();
+        if (sa < sb) return -1*dir; if (sa > sb) return 1*dir; return 0;
+      });
+
+      generateTableHeaders();
+      renderTable();
+    }
+
+    // ---------- PAGINATION ----------
+    function updatePagination(){
+      const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = Math.min(start + state.pageSize, state.filteredData.length);
+      const shown = Math.max(0, end - start);
+
+      document.getElementById('recordCount').textContent = shown;
+      document.getElementById('totalRecords').textContent = state.filteredData.length;
+      document.getElementById('currentPage').textContent = state.currentPage;
+      document.getElementById('totalPages').textContent = totalPages || 1;
+
+      document.getElementById('btnFirst').disabled = state.currentPage === 1;
+      document.getElementById('btnPrev').disabled  = state.currentPage === 1;
+      document.getElementById('btnNext').disabled  = state.currentPage >= totalPages;
+      document.getElementById('btnLast').disabled  = state.currentPage >= totalPages;
+    }
+    function firstPage(){ state.currentPage = 1; renderTable(); }
+    function previousPage(){ if (state.currentPage>1){ state.currentPage--; renderTable(); } }
+    function nextPage(){ const t = Math.ceil(state.filteredData.length/state.pageSize); if (state.currentPage<t){ state.currentPage++; renderTable(); } }
+    function lastPage(){ state.currentPage = Math.ceil(state.filteredData.length/state.pageSize)||1; renderTable(); }
+    function changePageSize(){ state.pageSize = parseInt(document.getElementById('pageSizeSelect').value,10)||50; state.currentPage=1; renderTable(); }
+
+    // ---------- MODAL ----------
+    function showDetails(record){
+      state.currentJobDetail = record;
+      const details = document.getElementById('modalDetails');
+      details.innerHTML = '';
+      Object.keys(record).forEach(k=>{
+        if (k.startsWith('@')) return;
+        const label = document.createElement('div');
+        label.className='detail-label';
+        label.textContent = k.replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').trim();
+        const value = document.createElement('div');
+        value.className='detail-value';
+        if (/status/i.test(k)){
+          value.innerHTML = `<span class="status-badge status-${String(record[k]??'').toLowerCase()}">${record[k]??'-'}</span>`;
+        }else if (/price|amount|total/i.test(k) && typeof record[k]==='number'){
+          value.innerHTML = `<strong>$${record[k].toLocaleString()}</strong>`;
+        }else{
+          value.textContent = record[k] ?? '-';
+        }
+        details.appendChild(label); details.appendChild(value);
+      });
+      document.getElementById('detailModal').classList.add('active');
+    }
+    function closeModal(){ document.getElementById('detailModal').classList.remove('active'); state.currentJobDetail=null; }
+    function editJob(){ if (state.currentJobDetail){ const idKey = Object.keys(state.currentJobDetail).find(k=>/job.?id|id/i.test(k)) || 'ID'; window.location.href = `/admin/jobs-edit?id=${encodeURIComponent(state.currentJobDetail[idKey]||'')}`; } }
+
+    // ---------- EXPORT ----------
+    function exportData(){
+      if (!state.filteredData.length) return showToast('No data to export','warning');
+      const headers = Object.keys(state.filteredData[0]).filter(h=>!h.startsWith('@'));
+      const lines = [headers.join(',')];
+      state.filteredData.forEach(r=>{
+        const row = headers.map(h=>{
+          let v = r[h]; if (v==null) v = '';
+          v = String(v).replace(/"/g,'""');
+          return (v.includes(',')||v.includes('"')||v.includes('\n')) ? `"${v}"` : v;
+        }).join(',');
+        lines.push(row);
+      });
+      const blob = new Blob([lines.join('\n')],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `jobs_export_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      showToast(`Exported ${state.filteredData.length} records`, 'success');
+    }
+
+    // ---------- UTILS ----------
+    function showToast(message,type='info'){
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div'); el.className = `toast ${type}`;
+      const icons = {success:'✓',error:'✖',warning:'⚠',info:'ℹ'};
+      el.innerHTML = `<span>${icons[type]}</span><span class="toast-message">${message}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+      container.appendChild(el); setTimeout(()=> el.remove(), 5000);
+    }
+    function showEmptyState(msg){
+      const empty = document.getElementById('emptyState');
+      empty.querySelector('.empty-message').textContent = msg || 'No data available';
+      document.getElementById('tableBody').style.display='none';
+      empty.style.display='block';
+    }
+    async function refreshData(){ showToast('Refreshing data...','info'); await loadData(); }
+
+    // ---------- EVENTS ----------
+    window.addEventListener('DOMContentLoaded', initializeApp);
+    window.addEventListener('click', e=>{ if (e.target === document.getElementById('detailModal')) closeModal(); });
+    document.addEventListener('keydown', e=>{ if (e.key==='Escape') closeModal(); if (e.ctrlKey && e.key==='f'){ e.preventDefault(); document.getElementById('filterJobId').focus(); }});
+  </script>
 </body>
 </html>
