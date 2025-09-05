@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Jobs | FormanPacific Service Claims</title>
+
+  <!-- MSAL (Microsoft Authentication Library) -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
+  <!-- AG Grid (Community) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+  <style>
+    :root {
+      --brand1: #1e3c72;
+      --brand2: #2a5298;
+      --text: #2d3748;
+      --muted: #718096;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --ok: #48bb78;
+      --warn: #ed8936;
+      --danger: #e53e3e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg) 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .header-inner { max-width: 1600px; margin: 0 auto; padding: 16px 24px; display:flex; align-items:center; justify-content:space-between; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .logo { width:44px; height:44px; border-radius:10px; display:grid; place-items:center; font-weight:800; color:#fff; background: linear-gradient(135deg, var(--brand1), var(--brand2)); }
+    .brand h1 { font-size: 20px; margin:0; color: var(--brand1); }
+    .brand small { display:block; color: var(--muted); margin-top:2px; }
+    .actions { display:flex; gap:10px; }
+    .btn { border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+    .btn.primary { background: var(--brand1); color: #fff; }
+    .btn.secondary { background: #e2e8f0; color: #1a202c; }
+    .btn.ok { background: var(--ok); color: #fff; }
+    .btn.warn { background: var(--warn); color: #fff; }
+    .btn.danger { background: var(--danger); color: #fff; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .container { max-width: 1600px; margin: 18px auto; padding: 0 20px 30px; }
+
+    .panel { background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 16px; }
+    .toolbar { display:flex; flex-wrap: wrap; gap:10px; align-items:center; margin-bottom: 12px; }
+    .toolbar .spacer { flex:1; }
+    .pill { background:#edf2f7; color:#2d3748; padding:8px 12px; border-radius:999px; font-size: 12px; }
+
+    .statusbar { display:flex; gap:10px; align-items:center; margin-top: 10px; }
+
+    #grid {
+      height: auto;
+      min-height: 400px; /* keep some height when empty */
+      width: 100%;
+    }
+
+    .login-screen, .loading-screen { position: fixed; inset: 0; background: #fff; display: grid; place-items: center; }
+    .hidden { display:none !important; }
+
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index: 20; }
+    .modal.active { display:flex; }
+    .modal .card { background:#fff; border-radius: 14px; width: 480px; max-width: 92vw; padding: 18px; box-shadow: 0 14px 60px rgba(0,0,0,0.35); }
+    .modal h3 { margin: 0 0 12px; }
+    .row { display:flex; flex-direction: column; gap:6px; margin-bottom:10px; }
+    input[type="text"], select { border:1px solid #e2e8f0; border-radius:10px; padding:10px; font-size:14px; }
+  </style>
+</head>
+<body>
+  <!-- Login / Loading overlays -->
+  <div id="loginScreen" class="login-screen">
+    <div style="text-align:center; max-width: 420px; padding: 18px;">
+      <div class="logo" style="margin:0 auto 10px;">FP</div>
+      <h2>Sign in to edit Jobs</h2>
+      <p class="pill" style="margin: 10px auto 18px;">SharePoint permissions are respected</p>
+      <button id="btnLogin" class="btn primary">Sign in</button>
+    </div>
+  </div>
+  <div id="loadingScreen" class="loading-screen hidden"><div>Loading…</div></div>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">FP</div>
+        <div>
+          <h1>FormanPacific <small>Edit Jobs</small></h1>
+          <small>BookAJobMaster (SharePoint)</small>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" onclick="location.href='/admin/dashboard'">← Back to Dashboard</button>
+        <button class="btn secondary" onclick="location.href='/admin/jobs-master'">View Mode</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="panel">
+      <div class="toolbar">
+        <button id="btnAddRow" class="btn">Add Row</button>
+        <button id="btnDelete" class="btn danger">Delete Selected</button>
+        <button id="btnSave" class="btn ok" disabled>Save Changes</button>
+        <div class="spacer"></div>
+        <button id="btnAddColumn" class="btn warn">Add Column</button>
+        <select id="viewPicker" class="pill"></select>
+        <span id="userPill" class="pill"></span>
+      </div>
+
+      <div id="grid" class="ag-theme-alpine"></div>
+      <div class="statusbar">
+        <span id="chgPill" class="pill">0 pending changes</span>
+        <span id="infoPill" class="pill">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Column Modal -->
+  <div id="colModal" class="modal">
+    <div class="card">
+      <h3>Add Column</h3>
+      <div class="row">
+        <label>Display name</label>
+        <input id="colDisplay" type="text" placeholder="e.g. Unit Price" />
+      </div>
+      <div class="row">
+        <label>Type</label>
+        <select id="colType">
+          <option value="Text">Text</option>
+          <option value="Number">Number</option>
+          <option value="Currency">Currency</option>
+          <option value="DateTime">Date & Time</option>
+          <option value="Boolean">Yes/No</option>
+          <option value="Choice">Choice</option>
+        </select>
+      </div>
+      <div class="row" id="choiceRow" style="display:none;">
+        <label>Choices (comma separated)</label>
+        <input id="colChoices" type="text" placeholder="Open, Closed, Void" />
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn secondary" onclick="closeColModal()">Cancel</button>
+        <button id="colCreateBtn" class="btn primary">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    // ===== Config =====
+    const SPO_TENANT = 'roadandrescue.sharepoint.com';
+    const SITE_REL = '/sites/rar';
+    const LIST_TITLE = 'BookAJobMaster';
+
+    // MSAL config — same tenant as your app registration
+    const msalConfig = {
+      auth: {
+        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+        redirectUri: window.location.origin + '/admin/jobs-edit'
+      },
+      cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
+    };
+
+    const SPO_SCOPE_READ = `https://${SPO_TENANT}/AllSites.Read`;
+    const SPO_SCOPE_FULL = `https://${SPO_TENANT}/AllSites.FullControl`;
+
+    let msalInstance, account, accessToken;
+    let gridOptions;
+    let columnDefs = [];
+    let pending = { updates: new Map(), creates: [], deletes: [] };
+    let viewFieldsOrder = [];
+
+    // ===== UI helpers =====
+    const $ = sel => document.querySelector(sel);
+    const setInfo = (t) => $('#infoPill').textContent = t;
+    const setChanges = () => {
+      const n = pending.updates.size + pending.creates.length + pending.deletes.length;
+      $('#chgPill').textContent = `${n} pending changes`;
+      $('#btnSave').disabled = n === 0;
+    };
+
+    // ===== Auth =====
+    async function initAuth() {
+      msalInstance = new msal.PublicClientApplication(msalConfig);
+      await msalInstance.initialize();
+      try { await msalInstance.handleRedirectPromise(); } catch(e) {}
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length) {
+        account = accounts[0];
+        $('#loginScreen').classList.add('hidden');
+        $('#loadingScreen').classList.remove('hidden');
+        $('#userPill').textContent = account.username;
+        accessToken = await getToken([SPO_SCOPE_FULL]);
+        await bootstrap();
+        $('#loadingScreen').classList.add('hidden');
+      } else {
+        $('#loginScreen').classList.remove('hidden');
+      }
+      $('#btnLogin').onclick = async () => {
+        await msalInstance.loginRedirect({ scopes: [SPO_SCOPE_FULL] });
+      };
+    }
+
+    async function getToken(scopes) {
+      try {
+        const res = await msalInstance.acquireTokenSilent({ scopes, account: msalInstance.getAllAccounts()[0] });
+        return res.accessToken;
+      } catch (e) {
+        const res = await msalInstance.acquireTokenPopup({ scopes });
+        return res.accessToken;
+      }
+    }
+
+    // ===== SharePoint REST helpers =====
+    async function sp(url, opt={}) {
+      const res = await fetch(url, {
+        ...opt,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json;odata=nometadata',
+          ...(opt.headers || {})
+        }
+      });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${url}`);
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    function siteUrl(path='') { return `https://${SPO_TENANT}${SITE_REL}${path}`; }
+
+    // Get views for picker (optional)
+    async function getViews() {
+      const j = await sp(siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/views?$select=Id,Title,DefaultView`));
+      return j.value || [];
+    }
+
+    // RenderListDataAsStream loads schema + rows for a view
+    async function loadViewData(viewXml='<View/>') {
+      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/RenderListDataAsStream`);
+      const body = { parameters: { RenderOptions: 570, ViewXml: viewXml } };
+      return sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(body) });
+    }
+
+    // CRUD
+    async function createItem(payload) {
+      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/items`);
+      return sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(payload) });
+    }
+    async function updateItem(id, patch) {
+      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/items(${id})`);
+      await sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose', 'IF-MATCH':'*', 'X-HTTP-Method':'MERGE' }, body: JSON.stringify(patch) });
+    }
+    async function deleteItem(id) {
+      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/items(${id})`);
+      await sp(url, { method:'POST', headers:{ 'IF-MATCH':'*', 'X-HTTP-Method':'DELETE' } });
+    }
+
+    // Add field/column
+    async function addField({ displayName, type, choices }) {
+      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/fields`);
+      let body;
+      switch (type) {
+        case 'Number':
+          body = { '__metadata': { 'type': 'SP.FieldNumber' }, Title: displayName, FieldTypeKind: 9 };
+          break;
+        case 'Currency':
+          body = { '__metadata': { 'type': 'SP.FieldCurrency' }, Title: displayName, FieldTypeKind: 10, CurrencyLocaleId: 5129 };// NZD locale
+          break;
+        case 'DateTime':
+          body = { '__metadata': { 'type': 'SP.FieldDateTime' }, Title: displayName, FieldTypeKind: 4, DisplayFormat: 1 };
+          break;
+        case 'Boolean':
+          body = { '__metadata': { 'type': 'SP.Field' }, Title: displayName, FieldTypeKind: 8 };
+          break;
+        case 'Choice':
+          body = { '__metadata': { 'type': 'SP.FieldChoice' }, Title: displayName, FieldTypeKind: 6, Choices: { results: choices || [] } };
+          break;
+        default:
+          body = { '__metadata': { 'type': 'SP.FieldText' }, Title: displayName, FieldTypeKind: 2 };
+      }
+      return sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(body) });
+    }
+
+    // ===== Grid setup =====
+    function schemaToColumnDefs(schemaFields) {
+      const visible = schemaFields.filter(f => !f.Hidden);
+      viewFieldsOrder = visible.map(f => f.Name);
+      const defs = visible.map(f => ({
+        headerName: f.DisplayName || f.Name,
+        field: f.Name,
+        editable: !f.ReadOnlyField && !f.Sealed,
+        sortable: true, filter: true, resizable: true,
+        minWidth: 120,
+        valueParser: params => {
+          // Basic coercion by type
+          if (['Number','Currency'].includes(f.Type)) {
+            const v = params.newValue; return (v === '' || v == null) ? null : Number(v);
+          }
+          if (f.Type === 'Boolean') {
+            const s = String(params.newValue).toLowerCase();
+            return ['true','1','yes','y'].includes(s);
+          }
+          return params.newValue;
+        }
+      }));
+      // Always ensure ID column exists (not editable)
+      defs.unshift({ headerName: 'ID', field: 'ID', editable: false, width: 90, pinned: 'left' });
+      return defs;
+    }
+
+    function buildGrid(rows, defs) {
+      const container = document.getElementById('grid');
+      gridOptions = {$1rowSelection: 'multiple',
+        domLayout: 'autoHeight',
+        defaultColDef: { flex: 1 },
+        animateRows: true,
+        enableRangeSelection: true,
+        onCellValueChanged: (p) => {
+          const id = p.data.ID;
+          if (String(id).startsWith('new_')) {
+            // It is a client-only new row, collect updated fields on that object
+            p.data[p.colDef.field] = p.newValue;
+          } else {
+            const curr = pending.updates.get(id) || {}; curr[p.colDef.field] = p.newValue; pending.updates.set(id, curr);
+          }
+          setChanges();
+        }
+      };
+      new agGrid.Grid(container, gridOptions);
+      // Fit columns to full width and keep them fit on resize
+      if (gridOptions && gridOptions.api) {
+        gridOptions.api.sizeColumnsToFit();
+        window.addEventListener('resize', () => {
+          if (gridOptions && gridOptions.api) gridOptions.api.sizeColumnsToFit();
+        });
+      }
+    }
+
+    // ===== Bootstrap flow =====
+    async function bootstrap() {
+      setInfo('Loading views…');
+      const views = await getViews();
+      const pick = $('#viewPicker');
+      pick.innerHTML = '';
+      for (const v of views) {
+        const opt = document.createElement('option');
+        opt.value = v.Id; opt.textContent = v.Title + (v.DefaultView ? ' (default)' : '');
+        pick.appendChild(opt);
+      }
+
+      setInfo('Loading schema & rows…');
+      const data = await loadViewData('<View/>');
+      const defs = schemaToColumnDefs(data.ListSchema.Field);
+      const rows = data.Row.map(r => ({ ...r }));
+      columnDefs = defs;
+      buildGrid(rows, defs);
+      setInfo(`Loaded ${rows.length} rows`);
+
+      // Hook buttons
+      $('#btnAddRow').onclick = () => {
+        const tempId = `new_${Date.now()}`;
+        const obj = { ID: tempId };
+        pending.creates.push(obj);
+        gridOptions.api.applyTransaction({ add: [obj], addIndex: 0 });
+        setChanges();
+      };
+      $('#btnDelete').onclick = () => {
+        const sel = gridOptions.api.getSelectedRows();
+        if (!sel.length) return;
+        sel.forEach(r => {
+          if (String(r.ID).startsWith('new_')) {
+            pending.creates = pending.creates.filter(c => c !== r);
+          } else {
+            pending.deletes.push(Number(r.ID));
+          }
+        });
+        gridOptions.api.applyTransaction({ remove: sel });
+        setChanges();
+      };
+      $('#btnSave').onclick = saveAll;
+
+      // Add Column modal
+      $('#btnAddColumn').onclick = () => { openColModal(); };
+      $('#colType').onchange = () => {
+        $('#choiceRow').style.display = $('#colType').value === 'Choice' ? 'block' : 'none';
+      };
+      $('#colCreateBtn').onclick = createColumnFromModal;
+    }
+
+    // ===== Save logic =====
+    async function saveAll() {
+      try {
+        setInfo('Saving…');
+        $('#btnSave').disabled = true;
+
+        // 1) Creates
+        const allData = []; gridOptions.api.forEachNode(n => allData.push(n.data));
+        const newRows = allData.filter(r => String(r.ID).startsWith('new_'));
+        for (const r of newRows) {
+          const copy = { ...r }; delete copy.ID; // SharePoint assigns ID
+          const created = await createItem(copy);
+          // Replace temp row with real ID
+          r.ID = created.Id || created.ID;
+        }
+
+        // 2) Updates
+        for (const [id, patch] of pending.updates.entries()) {
+          await updateItem(id, patch);
+        }
+
+        // 3) Deletes
+        for (const id of pending.deletes) { await deleteItem(id); }
+
+        // Reset state
+        pending.updates.clear(); pending.creates = []; pending.deletes = [];
+        setChanges();
+        setInfo('Saved');
+      } catch (e) {
+        console.error(e);
+        alert('Save failed: ' + e.message);
+      } finally {
+        $('#btnSave').disabled = false;
+      }
+    }
+
+    // ===== Column modal =====
+    function openColModal() { $('#colModal').classList.add('active'); }
+    function closeColModal() { $('#colModal').classList.remove('active'); }
+    async function createColumnFromModal() {
+      const displayName = $('#colDisplay').value.trim();
+      const type = $('#colType').value;
+      const choices = $('#colChoices').value.split(',').map(s => s.trim()).filter(Boolean);
+      if (!displayName) { alert('Enter a display name'); return; }
+      try {
+        setInfo('Creating column…');
+        await addField({ displayName, type, choices });
+        closeColModal();
+        // Reload schema & refresh grid columns
+        const data = await loadViewData('<View/>');
+      const defs = schemaToColumnDefs(data.ListSchema.Field);
+        columnDefs = defs;
+        gridOptions.api.setColumnDefs(defs);
+        setInfo('Column added');
+      } catch (e) {
+        console.error(e);
+        alert('Add column failed: ' + e.message);
+      }
+    }
+
+    // ===== Start =====
+    window.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+</body>
+</html>
