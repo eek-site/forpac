@@ -189,6 +189,7 @@
               <div class="bulk-menu-item" id="btnDuplicateSelected">📋 Duplicate Selected</div>
               <div class="bulk-menu-divider"></div>
               <div class="bulk-menu-item" id="btnExportSelected">📥 Export Selected</div>
+              <div class="bulk-menu-item" id="btnExportAll">📥 Export All</div>
             </div>
           </div>
 
@@ -203,7 +204,6 @@
             <input type="text" id="quickSearch" class="search-input" placeholder="Quick search..."/>
             <span class="search-icon">🔍</span>
           </div>
-
           <select id="viewPicker" class="pill"><option>Default View</option></select>
 
           <div class="column-config">
@@ -265,8 +265,6 @@
           <option value="Boolean">Yes/No (checkbox)</option>
           <option value="Choice">Choice (dropdown)</option>
           <option value="MultiChoice">Multiple choice (checkboxes)</option>
-          <option value="Lookup">Lookup (from another list)</option>
-          <option value="User">Person or Group</option>
           <option value="URL">Hyperlink</option>
         </select>
       </div>
@@ -292,36 +290,6 @@
       <div class="modal-actions">
         <button class="btn secondary" onclick="closeColumnModal()">Cancel</button>
         <button id="btnCreateColumn" class="btn primary">Create Column</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Import Modal (kept for future) -->
-  <div id="importModal" class="modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title">Import Data</h3>
-        <button class="modal-close" onclick="closeImportModal()">×</button>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Select CSV or Excel file</label>
-        <input type="file" id="importFile" accept=".csv,.xlsx,.xls" class="form-input"/>
-        <div class="form-help">First row should contain column headers matching SharePoint fields</div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Import Options</label>
-        <label style="display:flex;align-items:center;gap:8px;margin:8px 0">
-          <input type="checkbox" id="importAppend" checked/>
-          <span>Append to existing data (unchecked will replace all data)</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:8px">
-          <input type="checkbox" id="importValidate" checked/>
-          <span>Validate data before import</span>
-        </label>
-      </div>
-      <div class="modal-actions">
-        <button class="btn secondary" onclick="closeImportModal()">Cancel</button>
-        <button id="btnImportData" class="btn primary">Import</button>
       </div>
     </div>
   </div>
@@ -396,7 +364,7 @@
       if(!state.gridApi) return;
       $('#rowCount').textContent = state.gridApi.getDisplayedRowCount();
       $('#selectedCount').textContent = state.gridApi.getSelectedRows().length;
-      const model = state.gridApi.getModel?.();
+      const model = state.gridApi.getModel?.(); // safeguard
       const filtered = model?.getRowCount ? model.getRowCount() : state.gridApi.getDisplayedRowCount();
       $('#filteredCount').textContent = filtered;
     }
@@ -503,14 +471,16 @@
     }
     async function addField(cfg){
       const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
-      const base = { '__metadata':{ 'type':'SP.Field' }, Title: cfg.displayName, Required: !!cfg.required };
+      const base = { Title: cfg.displayName, Required: !!cfg.required };
       let body;
       switch(cfg.type){
         case 'Number': body={...base,'__metadata':{type:'SP.FieldNumber'},FieldTypeKind:9}; break;
         case 'Currency': body={...base,'__metadata':{type:'SP.FieldCurrency'},FieldTypeKind:10,CurrencyLocaleId:1033}; break;
         case 'DateTime': body={...base,'__metadata':{type:'SP.FieldDateTime'},FieldTypeKind:4,DisplayFormat:1}; break;
-        case 'Boolean': body={...base,FieldTypeKind:8}; break;
+        case 'Boolean': body={...base,'__metadata':{type:'SP.Field'},FieldTypeKind:8}; break;
         case 'Choice': body={...base,'__metadata':{type:'SP.FieldChoice'},FieldTypeKind:6,Choices:{results:cfg.choices||[]}}; break;
+        case 'MultiChoice': body={...base,'__metadata':{type:'SP.FieldMultiChoice'},FieldTypeKind:15,Choices:{results:cfg.choices||[]}}; break;
+        case 'URL': body={...base,'__metadata':{type:'SP.FieldUrl'},FieldTypeKind:11}; break;
         case 'Note': body={...base,'__metadata':{type:'SP.FieldMultiLineText'},FieldTypeKind:3}; break;
         default: body={...base,'__metadata':{type:'SP.FieldText'},FieldTypeKind:2};
       }
@@ -525,29 +495,24 @@
 
       const defs = [
         { headerName:'', field:'__selection__', checkboxSelection:true, headerCheckboxSelection:true, width:50, pinned:'left', lockPosition:true, suppressMenu:true },
-        { headerName:'ID', field:'ID', width:80, pinned:'left', editable:false, cellStyle:{ fontWeight:'bold' } }
+        { headerName:'ID', field:'ID', width:90, pinned:'left', editable:false, cellStyle:{ fontWeight:'bold' } }
       ];
 
       visible.forEach(field => {
         if(field.Name === 'ID') return;
-
-        const typeStr = String(field.Type || field.TypeAsString || '').toLowerCase();
+        const type = String(field.Type || field.TypeAsString || '').toLowerCase();
         const col = {
           headerName: field.DisplayName || field.Title || field.Name,
           field: field.Name,
           editable: !field.ReadOnlyField && !field.Sealed,
           sortable: true, filter: true, resizable: true,
-          minWidth: 100, flex: 1
+          minWidth: 110, flex: 1
         };
-
-        // Numbers / Currency
-        if(typeStr.includes('number') || typeStr.includes('currency')){
+        if(type.includes('number') || type.includes('currency')){
           col.filter = 'agNumberColumnFilter';
           col.valueParser = p => { const v=p.newValue; return v===''||v==null?null:Number(v); };
         }
-
-        // DateTime
-        if(typeStr.includes('datetime')){
+        if(type.includes('datetime')){
           col.filter = 'agDateColumnFilter';
           col.valueFormatter = p => {
             if (!p.value) return '';
@@ -556,39 +521,23 @@
           };
           col.minWidth = Math.max(col.minWidth, 160);
         }
-
-        // Boolean
-        if(typeStr.includes('boolean')){
+        if(type.includes('boolean')){
           col.cellRenderer = p => (p.value ? '✓' : '✗');
           col.cellEditor = 'agSelectCellEditor';
           col.cellEditorParams = { values:[true,false] };
           col.minWidth = Math.max(col.minWidth, 110);
         }
-
-        // Choice values (normalize)
-        const rawChoices = field.Choices?.results || field.Choices || field.Choice || [];
-        if((typeStr.includes('choice') || Array.isArray(rawChoices)) && rawChoices.length){
-          col.cellEditor = 'agSelectCellEditor';
-          col.cellEditorParams = { values: rawChoices };
+        if(type.includes('choice') && field.Choices){
+          const choices = Array.isArray(field.Choices?.results) ? field.Choices.results : field.Choices;
+          if(Array.isArray(choices) && choices.length){
+            col.cellEditor = 'agSelectCellEditor';
+            col.cellEditorParams = { values: choices };
+          }
         }
-
-        // Notes/Description auto-height
         const lname = String(field.Name || '').toLowerCase();
         if (/notes?|description|comment|details?/.test(lname)){
           col.autoHeight = true; col.wrapText = true; col.minWidth = 240; col.flex = Math.max(col.flex, 2);
         }
-
-        // Job identifiers styling
-        if (/job.?id|jobref|jobreference|rego/.test(lname)){
-          col.cellStyle = { color:'var(--primary)', fontWeight:'600' };
-          col.minWidth = Math.max(col.minWidth, 150);
-        }
-
-        // Status helper (only if no explicit choices)
-        if (!col.cellEditor && /status/.test(lname)){
-          // leave as free text unless list provided choices
-        }
-
         defs.push(col);
       });
       return defs;
@@ -621,26 +570,6 @@
         state.pendingChanges.updates.set(id, updates);
       }
       updateChangeCount();
-    }
-
-    function populateColumnMenu(){
-      const list = document.getElementById('columnList');
-      if (!state.columnApi || !list) return;
-      list.innerHTML = '';
-      state.columnDefs.forEach(cd=>{
-        if (!cd.field || cd.field === '__selection__') return;
-        const colState = state.columnApi.getColumn(cd.field);
-        const visible = colState ? colState.isVisible() !== false : true;
-        const row = document.createElement('label');
-        row.className = 'column-item';
-        row.style.cursor = 'pointer';
-        row.innerHTML = `
-          <input type="checkbox" class="column-checkbox" ${visible ? 'checked' : ''} />
-          <span>${cd.headerName}</span>
-        `;
-        row.querySelector('input').onchange = (e)=> state.columnApi.setColumnVisible(cd.field, e.target.checked);
-        list.appendChild(row);
-      });
     }
 
     /* =================== APP =================== */
@@ -687,6 +616,28 @@
       }
     }
 
+    function populateColumnMenu(){
+      const list = $('#columnList');
+      if (!state.columnApi) return;
+      list.innerHTML = '';
+      state.columnDefs.forEach(cd=>{
+        if (!cd.field || cd.field === '__selection__') return;
+        const id = `colvis_${cd.field}`;
+        const colState = state.columnApi.getColumn(cd.field);
+        const visible = colState ? colState.isVisible() !== false : true;
+
+        const row = document.createElement('label');
+        row.className = 'column-item';
+        row.style.cursor = 'pointer';
+        row.innerHTML = `
+          <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
+          <span>${cd.headerName}</span>
+        `;
+        row.querySelector('input').onchange = (e)=> state.columnApi.setColumnVisible(cd.field, e.target.checked);
+        list.appendChild(row);
+      });
+    }
+
     function setupEventHandlers(){
       $('#btnLogin').onclick = async () => {
         await state.msalInstance.loginRedirect({ scopes: [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`] });
@@ -728,7 +679,14 @@
       $('#btnExportSelected').onclick = () => {
         const sel = state.gridApi.getSelectedRows();
         if(sel.length===0){ showToast('No rows selected','warning'); return; }
-        exportToCSV(sel);
+        exportToCSV(sel, 'jobs_selected');
+        $('#bulkMenu').classList.remove('show');
+      };
+      $('#btnExportAll').onclick = () => {
+        const rows = [];
+        state.gridApi.forEachNode(n => rows.push(n.data));
+        if(!rows.length){ showToast('No data to export','warning'); return; }
+        exportToCSV(rows, 'jobs_all');
         $('#bulkMenu').classList.remove('show');
       };
       $('#btnSave').onclick = saveChanges;
@@ -742,7 +700,10 @@
       $('#btnColumnConfig').onclick = () => { $('#columnMenu').classList.toggle('show'); };
       $('#btnAddColumn').onclick = () => { $('#columnModal').classList.add('active'); };
       $('#colDisplay').oninput = e => { $('#colInternal').value = generateInternalName(e.target.value); };
-      $('#colType').onchange = e => { const choice = e.target.value==='Choice' || e.target.value==='MultiChoice'; $('#choiceRow').style.display = choice?'block':'none'; };
+      $('#colType').onchange = e => {
+        const choice = e.target.value==='Choice' || e.target.value==='MultiChoice';
+        $('#choiceRow').style.display = choice?'block':'none';
+      };
       $('#btnCreateColumn').onclick = createColumn;
 
       document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if(e.target===m) m.classList.remove('active'); });
@@ -758,47 +719,54 @@
         setStatus('Saving changes...','info');
         $('#btnSave').disabled = true;
         let ok=0, err=0;
-
-        const idMap = new Map(); // temp -> real
+        const idMap = new Map(); // tempId -> realId
 
         // CREATES
         for(const newRow of state.pendingChanges.creates){
           try{
-            const payload = {...newRow}; const tempId = payload.ID;
+            const payload = {...newRow};
+            const tempId = payload.ID;
             delete payload.ID; delete payload.__selection__;
             const created = await createItem(payload);
             const realId = created.ID || created.Id;
-
-            // update node with real ID
-            let targetNode = null;
-            state.gridApi.forEachNode(n => { if (n.data.ID === tempId) targetNode = n; });
-            if (targetNode){
-              targetNode.setData({ ...targetNode.data, ID: realId, Created: created.Created || targetNode.data.Created, Modified: created.Modified || targetNode.data.Modified });
+            if (realId){
+              idMap.set(tempId, realId);
+              // update displayed row ID
+              let targetNode = null;
+              state.gridApi.forEachNode(n => { if (n.data.ID === tempId) targetNode = n; });
+              if (targetNode){
+                targetNode.setData({
+                  ...targetNode.data,
+                  ID: realId,
+                  Created: created.Created || targetNode.data.Created,
+                  Modified: created.Modified || targetNode.data.Modified,
+                });
+              }
             }
-            idMap.set(tempId, realId);
             ok++;
           }catch(e){ console.error('Create failed',e); err++; }
         }
-
         // UPDATES
         for(const [id, updates] of state.pendingChanges.updates.entries()){
           try{
             const realId = idMap.get(id) || id;
-            await updateItem(realId, updates); ok++;
+            await updateItem(realId, updates);
+            ok++;
           }catch(e){ console.error('Update failed',e); err++; }
         }
-
         // DELETES
         for(const id of state.pendingChanges.deletes){
           try{
             const realId = idMap.get(id) || id;
-            await deleteItem(realId); ok++;
+            await deleteItem(realId);
+            ok++;
           }catch(e){ console.error('Delete failed',e); err++; }
         }
 
         state.pendingChanges.updates.clear(); state.pendingChanges.creates=[]; state.pendingChanges.deletes.clear();
 
-        const allRows=[]; state.gridApi.forEachNode(n => allRows.push(n.data));
+        const allRows=[];
+        state.gridApi.forEachNode(n => allRows.push(n.data));
         state.originalData = JSON.parse(JSON.stringify(allRows));
         updateChangeCount();
 
@@ -818,6 +786,9 @@
       const choices = $('#colChoices').value.split('\n').map(s=>s.trim()).filter(Boolean);
 
       if(!displayName){ showToast('Please enter a display name','warning'); return; }
+      if ((type === 'Choice' || type === 'MultiChoice') && !choices.length){
+        showToast('Enter at least one choice','warning'); return;
+      }
 
       try{
         setStatus('Creating column...','info');
@@ -836,9 +807,8 @@
       $('#colDisplay').value=''; $('#colInternal').value=''; $('#colType').value='Text';
       $('#colRequired').checked=false; $('#colDefault').value=''; $('#colChoices').value=''; $('#choiceRow').style.display='none';
     }
-    function closeImportModal(){ $('#importModal').classList.remove('active'); }
 
-    function exportToCSV(rows){
+    function exportToCSV(rows, basename){
       const headers = Object.keys(rows[0]).filter(k=>k!=='__selection__');
       const csv = [headers.join(','), ...rows.map(r => headers.map(h => {
         let v = r[h]; if (v==null) v = '';
@@ -846,7 +816,7 @@
         return (v.includes(',')||v.includes('"')||v.includes('\n')) ? `"${v}"` : v;
       }).join(','))].join('\n');
       const blob = new Blob([csv],{type:'text/csv'}), url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download=`jobs_export_${new Date().toISOString().split('T')[0]}.csv`;
+      const a = document.createElement('a'); a.href=url; a.download=`${basename}_${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
       showToast(`Exported ${rows.length} rows`,'success');
     }
