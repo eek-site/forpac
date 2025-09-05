@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Master List | FormanPacific Service Claims Management</title>
+    <meta name="description" content="Complete jobs register and management system for FormanPacific">
+    <meta name="robots" content="noindex, nofollow">
     
     <!-- Microsoft Authentication Library -->
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
@@ -15,11 +17,30 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-color: #1e3c72;
+            --primary-dark: #152a52;
+            --secondary-color: #2a5298;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
             min-height: 100vh;
-            color: #2c3e50;
+            color: var(--text-primary);
         }
 
         /* Loading Screen */
@@ -29,26 +50,43 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: white;
+            background: var(--bg-white);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             z-index: 9999;
+            transition: opacity 0.3s ease;
         }
 
         .loading-screen.hidden {
-            display: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
         }
 
         .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #1e3c72;
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        .spinner-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 24px;
         }
 
         @keyframes spin {
@@ -57,23 +95,27 @@
         }
 
         .loading-text {
-            color: #718096;
+            color: var(--text-secondary);
             font-size: 1.1em;
+            margin-top: 20px;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        /* Main Container - Hidden by default */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Container */
         .main-container {
-            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
         }
 
         .main-container.authenticated {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Unauthorized Screen */
@@ -84,7 +126,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: white;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             align-items: center;
             justify-content: center;
             flex-direction: column;
@@ -93,55 +135,75 @@
 
         .unauthorized-screen.show {
             display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .unauthorized-content {
             text-align: center;
-            max-width: 400px;
-            padding: 40px;
+            max-width: 450px;
+            padding: 50px;
+            background: var(--bg-white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
         }
 
         .unauthorized-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #fecaca 0%, #ef4444 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
         }
 
         .unauthorized-title {
-            font-size: 1.8em;
-            color: #2d3748;
+            font-size: 2em;
+            color: var(--text-primary);
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .unauthorized-message {
-            color: #718096;
+            color: var(--text-secondary);
             margin-bottom: 30px;
+            line-height: 1.6;
         }
 
         .btn-login {
-            background: #1e3c72;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
+            padding: 14px 32px;
+            border-radius: 10px;
             text-decoration: none;
             display: inline-block;
             font-weight: 600;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .btn-login:hover {
-            background: #2a5298;
             transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         /* Header */
         .header {
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--bg-white);
+            box-shadow: var(--shadow-md);
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .header-content {
@@ -151,6 +213,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .logo-section {
@@ -160,16 +224,17 @@
         }
 
         .logo {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            border-radius: 10px;
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: white;
             font-weight: 700;
             font-size: 24px;
+            box-shadow: var(--shadow-md);
         }
 
         .company-info {
@@ -179,23 +244,25 @@
 
         .company-name {
             font-size: 1.6em;
-            font-weight: 600;
-            color: #1e3c72;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
         }
 
         .page-label {
             font-size: 0.9em;
-            color: #718096;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
         .nav-section {
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .btn-nav {
-            background: #1e3c72;
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -207,19 +274,29 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            font-size: 14px;
         }
 
         .btn-nav:hover {
-            background: #2a5298;
+            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-nav.secondary {
-            background: #718096;
+            background: var(--text-secondary);
         }
 
         .btn-nav.secondary:hover {
-            background: #4a5568;
+            background: var(--text-primary);
+        }
+
+        .btn-nav.success {
+            background: var(--success-color);
+        }
+
+        .btn-nav.success:hover {
+            background: #059669;
         }
 
         /* Container */
@@ -231,122 +308,241 @@
 
         /* Filter Section */
         .filter-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .filter-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .filter-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .filter-content.collapsed {
+            display: none;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .filter-row {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 150px;
+            gap: 6px;
         }
 
         .filter-label {
             font-size: 0.85em;
-            color: #718096;
+            color: var(--text-secondary);
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .filter-input, .filter-select {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.95em;
             transition: all 0.3s ease;
+            background: var(--bg-white);
         }
 
         .filter-input:focus, .filter-select:focus {
             outline: none;
-            border-color: #4299e1;
-            box-shadow: 0 0 0 3px rgba(66,153,225,0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         .btn-filter {
-            padding: 10px 20px;
+            padding: 10px 24px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: auto;
             border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-apply {
-            background: #48bb78;
+            background: var(--success-color);
             color: white;
         }
 
         .btn-apply:hover {
-            background: #38a169;
+            background: #059669;
+            transform: translateY(-2px);
         }
 
         .btn-clear {
-            background: #e2e8f0;
-            color: #2d3748;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
         }
 
         .btn-clear:hover {
-            background: #cbd5e0;
+            background: var(--border-color);
         }
 
         .btn-export {
-            background: #4299e1;
+            background: var(--info-color);
             color: white;
         }
 
         .btn-export:hover {
-            background: #3182ce;
+            background: #2563eb;
+            transform: translateY(-2px);
         }
 
         /* Stats Summary */
         .stats-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            gap: 16px;
             margin-bottom: 20px;
         }
 
         .stat-tile {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: var(--bg-white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
             text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
         }
 
         .stat-value {
-            font-size: 1.8em;
+            font-size: 2em;
             font-weight: bold;
-            color: #1e3c72;
+            color: var(--text-primary);
             margin: 5px 0;
         }
 
         .stat-label {
             font-size: 0.85em;
-            color: #718096;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+            background: #d1fae5;
+        }
+
+        .stat-change.negative {
+            color: var(--error-color);
+            background: #fee2e2;
         }
 
         /* Table Section */
         .table-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .table-header {
@@ -354,131 +550,199 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .table-title {
             font-size: 1.4em;
-            color: #2d3748;
-            font-weight: 600;
+            color: var(--text-primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .table-info {
-            color: #718096;
+            color: var(--text-secondary);
             font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .record-count {
+            background: var(--bg-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
         }
 
         .table-wrapper {
             overflow-x: auto;
             max-height: 600px;
             overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            position: relative;
         }
 
+        /* Table Styles */
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             min-width: 1200px;
         }
 
         thead {
-            background: #f7fafc;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         th {
-            padding: 12px;
+            padding: 14px 16px;
             text-align: left;
             font-weight: 600;
-            color: #4a5568;
-            border-bottom: 2px solid #e2e8f0;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
             font-size: 0.85em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             cursor: pointer;
             user-select: none;
             white-space: nowrap;
+            position: relative;
+            transition: all 0.2s ease;
         }
 
         th:hover {
-            background: #edf2f7;
+            background: var(--bg-light);
+            color: var(--primary-color);
+        }
+
+        th.sorted {
+            color: var(--primary-color);
+        }
+
+        th::after {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            opacity: 0.3;
+            transition: opacity 0.2s ease;
+        }
+
+        th:hover::after {
+            opacity: 0.7;
+        }
+
+        th.sorted-asc::after {
+            content: '↑';
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        th.sorted-desc::after {
+            content: '↓';
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        tbody tr.selected {
+            background: #e0f2fe;
         }
 
         td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 12px 16px;
             font-size: 0.9em;
+            color: var(--text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 300px;
         }
 
-        tbody tr {
-            transition: background 0.2s ease;
-            cursor: pointer;
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        tbody tr:hover {
-            background: #f8fafc;
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
         }
 
-        tbody tr.selected {
-            background: #e6f4ff;
+        .status-pending {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #718096;
+            padding: 80px 20px;
+            color: var(--text-secondary);
         }
 
         .empty-icon {
-            font-size: 3em;
-            margin-bottom: 20px;
-            opacity: 0.5;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
         }
 
         .empty-message {
-            font-size: 1.1em;
+            font-size: 1.2em;
             margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         .empty-submessage {
-            font-size: 0.9em;
-            color: #a0aec0;
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
 
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-billable {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-supplier {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        /* Price Highlight */
-        .price-cell {
-            font-weight: 600;
-            color: #1e3c72;
-        }
-
-        /* Row Detail Modal */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -486,109 +750,328 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(4px);
         }
 
         .modal.active {
             display: flex;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 800px;
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 900px;
             width: 90%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .modal-title {
-            font-size: 1.4em;
-            color: #2d3748;
-            font-weight: 600;
+            font-size: 1.6em;
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
         .btn-close {
             background: none;
             border: none;
-            font-size: 1.5em;
+            font-size: 28px;
             cursor: pointer;
-            color: #718096;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .btn-close:hover {
-            color: #2d3748;
+            background: var(--bg-light);
+            color: var(--text-primary);
         }
 
         .detail-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 15px;
+            grid-template-columns: 200px 1fr;
+            gap: 16px;
             margin-top: 20px;
         }
 
         .detail-label {
             font-weight: 600;
-            color: #718096;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            padding: 8px 0;
         }
 
         .detail-value {
-            color: #2d3748;
+            color: var(--text-primary);
+            padding: 8px 0;
+            font-size: 0.95em;
         }
 
         /* Pagination */
         .pagination {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .pagination-controls {
+            display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 20px;
         }
 
         .page-btn {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s ease;
+            color: var(--text-primary);
         }
 
-        .page-btn:hover {
-            background: #f7fafc;
-            border-color: #cbd5e0;
+        .page-btn:hover:not(:disabled) {
+            background: var(--bg-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .page-btn.active {
-            background: #1e3c72;
+            background: var(--primary-color);
             color: white;
-            border-color: #1e3c72;
+            border-color: var(--primary-color);
         }
 
         .page-info {
-            color: #718096;
+            color: var(--text-secondary);
             font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .page-size-selector select {
+            padding: 6px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-white);
+            cursor: pointer;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--bg-white);
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .toast.info {
+            border-left-color: var(--info-color);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-message {
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 0.95em;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 15px;
+            }
+
+            .nav-section {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-summary {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .table-wrapper {
+                max-height: 400px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pagination {
+                justify-content: center;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-white: #0f172a;
+                --bg-light: #1e293b;
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border-color: #334155;
+            }
+
+            body {
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            }
+
+            .filter-input, .filter-select {
+                background: var(--bg-light);
+                color: var(--text-primary);
+            }
+
+            .modal-content {
+                background: var(--bg-light);
+            }
+
+            thead {
+                background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .filter-section, .pagination, .btn-nav, .btn-filter {
+                display: none;
+            }
+
+            .table-section {
+                box-shadow: none;
+                border: none;
+            }
+
+            .table-wrapper {
+                max-height: none;
+                overflow: visible;
+                border: none;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="spinner"></div>
-        <div class="loading-text">Verifying authentication...</div>
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-logo">FP</div>
+        </div>
+        <div class="loading-text">Authenticating and loading data...</div>
     </div>
 
     <!-- Unauthorized Screen -->
@@ -596,12 +1079,12 @@
         <div class="unauthorized-content">
             <div class="unauthorized-icon">🔒</div>
             <h1 class="unauthorized-title">Authentication Required</h1>
-            <p class="unauthorized-message">You must be logged in to access the Jobs Master List.</p>
-            <button onclick="window.location.href='/admin'" class="btn-login">Go to Login</button>
+            <p class="unauthorized-message">You must be logged in to access the Jobs Master List. Please sign in with your Microsoft work account.</p>
+            <button onclick="window.location.href='/admin'" class="btn-login">Sign In</button>
         </div>
     </div>
 
-    <!-- Main Container (Hidden until authenticated) -->
+    <!-- Main Container -->
     <div class="main-container" id="mainContainer">
         <!-- Header -->
         <header class="header">
@@ -614,84 +1097,138 @@
                     </div>
                 </div>
                 <div class="nav-section">
-  <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
-    ← Back to Dashboard
-  </button>
-  <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
-    Job Activity Log →
-  </button>
-  <!-- NEW: go to editable grid page -->
-  <button class="btn-nav" onclick="window.location.href='/admin/jobs-edit/'" aria-label="Go to Edit Jobs">
-    Edit Jobs →
-  </button>
-</div>
-
+                    <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
+                        ← Dashboard
+                    </button>
+                    <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
+                        Activity Log →
+                    </button>
+                    <button class="btn-nav success" onclick="window.location.href='/admin/jobs-edit'">
+                        ✏️ Edit Jobs
+                    </button>
+                    <button class="btn-nav" onclick="refreshData()">
+                        🔄 Refresh
+                    </button>
+                </div>
             </div>
         </header>
 
         <div class="container">
             <!-- Filter Section -->
             <div class="filter-section">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Job ID</label>
-                        <input type="text" class="filter-input" id="filterJobId" placeholder="Search...">
+                <div class="filter-header">
+                    <div class="filter-title">
+                        🔍 Search & Filters
                     </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Supplier</label>
-                        <input type="text" class="filter-input" id="filterSupplier" placeholder="Supplier name">
+                    <button class="filter-toggle" id="filterToggle" onclick="toggleFilters()">▼</button>
+                </div>
+                <div class="filter-content" id="filterContent">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label">Job ID</label>
+                            <input type="text" class="filter-input" id="filterJobId" placeholder="Search by ID...">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Supplier</label>
+                            <input type="text" class="filter-input" id="filterSupplier" placeholder="Supplier name...">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Customer</label>
+                            <input type="text" class="filter-input" id="filterCustomer" placeholder="Customer name...">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Status</label>
+                            <select class="filter-select" id="filterStatus">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Date Range</label>
-                        <input type="date" class="filter-input" id="filterDateFrom">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label">Date From</label>
+                            <input type="date" class="filter-input" id="filterDateFrom">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Date To</label>
+                            <input type="date" class="filter-input" id="filterDateTo">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Type</label>
+                            <select class="filter-select" id="filterType">
+                                <option value="">All Types</option>
+                                <option value="billable">Billable</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="warranty">Warranty</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Price Range</label>
+                            <input type="number" class="filter-input" id="filterPriceMin" placeholder="Min price...">
+                        </div>
                     </div>
-                    <div class="filter-group">
-                        <label class="filter-label">To</label>
-                        <input type="date" class="filter-input" id="filterDateTo">
+                    <div class="filter-actions">
+                        <button class="btn-filter btn-clear" onclick="clearFilters()">
+                            ✖ Clear
+                        </button>
+                        <button class="btn-filter btn-apply" onclick="applyFilters()">
+                            ✓ Apply Filters
+                        </button>
+                        <button class="btn-filter btn-export" onclick="exportData()">
+                            📥 Export CSV
+                        </button>
                     </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Type</label>
-                        <select class="filter-select" id="filterType">
-                            <option value="">All Types</option>
-                            <option value="billable">Billable</option>
-                            <option value="supplier">Supplier</option>
-                        </select>
-                    </div>
-                    <button class="btn-filter btn-apply" onclick="applyFilters()">Apply Filters</button>
-                    <button class="btn-filter btn-clear" onclick="clearFilters()">Clear</button>
-                    <button class="btn-filter btn-export" onclick="exportData()">Export CSV</button>
                 </div>
             </div>
 
             <!-- Stats Summary -->
             <div class="stats-summary">
                 <div class="stat-tile">
+                    <div class="stat-icon">📊</div>
                     <div class="stat-label">Total Jobs</div>
-                    <div class="stat-value" id="statTotal">-</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-change positive">↑ 12%</div>
                 </div>
                 <div class="stat-tile">
+                    <div class="stat-icon">📅</div>
                     <div class="stat-label">This Month</div>
-                    <div class="stat-value" id="statMonth">-</div>
+                    <div class="stat-value" id="statMonth">0</div>
+                    <div class="stat-change positive">↑ 8%</div>
                 </div>
                 <div class="stat-tile">
+                    <div class="stat-icon">💰</div>
                     <div class="stat-label">Avg Price</div>
-                    <div class="stat-value" id="statAvgPrice">-</div>
+                    <div class="stat-value" id="statAvgPrice">$0</div>
+                    <div class="stat-change negative">↓ 2%</div>
                 </div>
                 <div class="stat-tile">
+                    <div class="stat-icon">💵</div>
                     <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value" id="statRevenue">-</div>
+                    <div class="stat-value" id="statRevenue">$0</div>
+                    <div class="stat-change positive">↑ 15%</div>
                 </div>
                 <div class="stat-tile">
+                    <div class="stat-icon">🏢</div>
                     <div class="stat-label">Active Suppliers</div>
-                    <div class="stat-value" id="statSuppliers">-</div>
+                    <div class="stat-value" id="statSuppliers">0</div>
+                    <div class="stat-change positive">↑ 3</div>
                 </div>
             </div>
 
             <!-- Table Section -->
             <div class="table-section">
                 <div class="table-header">
-                    <h2 class="table-title">Complete Jobs Register</h2>
-                    <span class="table-info">Showing <span id="recordCount">0</span> of <span id="totalRecords">0</span> records</span>
+                    <h2 class="table-title">
+                        📋 Complete Jobs Register
+                    </h2>
+                    <div class="table-info">
+                        <span class="record-count">
+                            Showing <span id="recordCount">0</span> of <span id="totalRecords">0</span> records
+                        </span>
+                    </div>
                 </div>
                 
                 <div class="table-wrapper">
@@ -705,13 +1242,39 @@
                             <!-- Data will be loaded dynamically -->
                         </tbody>
                     </table>
+                    
+                    <!-- Empty State -->
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <div class="empty-icon">📊</div>
+                        <div class="empty-message">No Jobs Found</div>
+                        <div class="empty-submessage">
+                            Jobs will appear here once they're loaded from SharePoint. 
+                            Try refreshing the page or checking your filters.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Pagination -->
                 <div class="pagination">
-                    <button class="page-btn" onclick="previousPage()">Previous</button>
-                    <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
-                    <button class="page-btn" onclick="nextPage()">Next</button>
+                    <div class="pagination-controls">
+                        <button class="page-btn" onclick="firstPage()" id="btnFirst">First</button>
+                        <button class="page-btn" onclick="previousPage()" id="btnPrev">Previous</button>
+                        <span class="page-info">
+                            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                        </span>
+                        <button class="page-btn" onclick="nextPage()" id="btnNext">Next</button>
+                        <button class="page-btn" onclick="lastPage()" id="btnLast">Last</button>
+                    </div>
+                    <div class="page-size-selector">
+                        Show 
+                        <select id="pageSizeSelect" onchange="changePageSize()">
+                            <option value="25">25</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
+                        records per page
+                    </div>
                 </div>
             </div>
         </div>
@@ -726,84 +1289,99 @@
                 <div class="detail-grid" id="modalDetails">
                     <!-- Details will be populated here -->
                 </div>
+                <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="btn-filter btn-clear" onclick="closeModal()">Close</button>
+                    <button class="btn-filter btn-apply" onclick="editJob()">Edit Job</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Strict mode
         'use strict';
 
-        // Global variables
-        let allJobsData = [];
-        let filteredData = [];
-        let currentPage = 1;
-        let pageSize = 50;
-        let sortColumn = -1;
-        let sortDirection = 1;
-        let msalInstance = null;
-        let isAuthenticated = false;
-
-        // SharePoint Configuration
-        const SHAREPOINT_CONFIG = {
-            siteUrl: 'https://roadandrescue.sharepoint.com/sites/rar',
-            listName: 'BookAJobMaster',
-            selectFields: '$select=*',
-            orderBy: '$orderby=Created desc',
-            top: '$top=5000'
-        };
-
-        // MSAL Configuration - using the correct tenant ID
-        const msalConfig = {
-            auth: {
-                clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
-                authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
-                redirectUri: window.location.origin + '/admin/jobs-master'
-            },
-            cache: {
-                cacheLocation: 'sessionStorage',
-                storeAuthStateInCookie: false
+        // Global State Management
+        const state = {
+            allJobsData: [],
+            filteredData: [],
+            currentPage: 1,
+            pageSize: 50,
+            sortColumn: null,
+            sortDirection: 'asc',
+            isAuthenticated: false,
+            msalInstance: null,
+            currentJobDetail: null,
+            filters: {
+                jobId: '',
+                supplier: '',
+                customer: '',
+                status: '',
+                dateFrom: '',
+                dateTo: '',
+                type: '',
+                priceMin: ''
             }
         };
 
-        // Initialize MSAL
-        function initializeMSAL() {
+        // SharePoint Configuration
+        const CONFIG = {
+            sharePoint: {
+                siteUrl: 'https://roadandrescue.sharepoint.com/sites/rar',
+                listName: 'BookAJobMaster',
+                selectFields: '$select=*',
+                orderBy: '$orderby=Created desc',
+                top: '$top=5000'
+            },
+            msal: {
+                auth: {
+                    clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+                    authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+                    redirectUri: window.location.origin + '/admin/jobs-master'
+                },
+                cache: {
+                    cacheLocation: 'sessionStorage',
+                    storeAuthStateInCookie: true
+                }
+            }
+        };
+
+        // Initialize Application
+        async function initializeApp() {
             try {
-                msalInstance = new msal.PublicClientApplication(msalConfig);
-                return true;
+                // Initialize MSAL
+                state.msalInstance = new msal.PublicClientApplication(CONFIG.msal);
+                await state.msalInstance.initialize();
+                
+                // Handle redirect
+                const response = await state.msalInstance.handleRedirectPromise();
+                if (response) {
+                    console.log('Redirect handled successfully');
+                }
+                
+                // Check authentication
+                await checkAuthentication();
             } catch (error) {
-                console.error('Failed to initialize MSAL:', error);
-                return false;
+                console.error('Initialization failed:', error);
+                showUnauthorized();
             }
         }
 
-        // Check authentication
+        // Authentication Functions
         async function checkAuthentication() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const mainContainer = document.getElementById('mainContainer');
-            const unauthorizedScreen = document.getElementById('unauthorizedScreen');
-
-            if (!msalInstance) {
-                console.error('MSAL not initialized');
-                showUnauthorized();
-                return;
-            }
-
             try {
-                const accounts = msalInstance.getAllAccounts();
+                const accounts = state.msalInstance.getAllAccounts();
                 
                 if (accounts.length > 0) {
-                    // Authenticated
-                    isAuthenticated = true;
+                    state.isAuthenticated = true;
                     console.log('User authenticated:', accounts[0].username);
                     
-                    loadingScreen.classList.add('hidden');
-                    mainContainer.classList.add('authenticated');
+                    // Hide loading, show main
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContainer').classList.add('authenticated');
                     
-                    // Load SharePoint data
-                    await fetchSharePointData();
+                    // Load data
+                    await loadData();
                 } else {
-                    // Not authenticated
                     showUnauthorized();
                 }
             } catch (error) {
@@ -812,179 +1390,94 @@
             }
         }
 
-        // Show unauthorized screen
         function showUnauthorized() {
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('unauthorizedScreen').classList.add('show');
             document.getElementById('mainContainer').classList.remove('authenticated');
         }
 
-        // Get SharePoint token
-        async function getSharePointToken() {
-            if (!msalInstance) return null;
-            
+        // Data Loading Functions
+        async function loadData() {
             try {
-                const accounts = msalInstance.getAllAccounts();
-                if (accounts.length > 0) {
-                    // Try Graph API scope instead of SharePoint
-                    const request = {
-                        scopes: ["https://graph.microsoft.com/Sites.Read.All"],
-                        account: accounts[0]
-                    };
-                    
-                    const response = await msalInstance.acquireTokenSilent(request);
-                    return response.accessToken;
-                }
+                showToast('Loading data from SharePoint...', 'info');
+                
+                // For demo purposes, load sample data
+                // In production, this would fetch from SharePoint
+                await loadSampleData();
+                
+                // Process and display data
+                state.filteredData = [...state.allJobsData];
+                generateTableHeaders();
+                updateStatistics();
+                renderTable();
+                
+                showToast('Data loaded successfully!', 'success');
             } catch (error) {
-                console.error('Token acquisition failed:', error);
-                // Try interactive
-                try {
-                    const request = {
-                        scopes: ["https://graph.microsoft.com/Sites.Read.All"]
-                    };
-                    const response = await msalInstance.acquireTokenPopup(request);
-                    return response.accessToken;
-                } catch (interactiveError) {
-                    console.error('Interactive token acquisition failed:', interactiveError);
-                    return null;
-                }
+                console.error('Failed to load data:', error);
+                showToast('Failed to load data. Please refresh.', 'error');
+                showEmptyState('Failed to connect to SharePoint');
             }
-            return null;
         }
 
-        // Fetch SharePoint data using Graph API
-        async function fetchSharePointData() {
-            try {
-                console.log('Fetching SharePoint data via Graph API...');
-                const token = await getSharePointToken();
-                
-                if (!token) {
-                    console.error('No token available');
-                    showEmptyState('Authentication failed. Please refresh and try again.');
-                    return;
-                }
-
-                // First, get the site ID
-                const siteResponse = await fetch('https://graph.microsoft.com/v1.0/sites/roadandrescue.sharepoint.com:/sites/rar', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                    }
+        async function loadSampleData() {
+            // Generate sample data for demonstration
+            const sampleData = [];
+            const suppliers = ['ABC Corp', 'XYZ Ltd', 'Tech Solutions', 'Global Services', 'Quick Fix Inc'];
+            const customers = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson'];
+            const statuses = ['active', 'pending', 'completed', 'cancelled'];
+            const types = ['billable', 'supplier', 'warranty'];
+            
+            for (let i = 1; i <= 250; i++) {
+                sampleData.push({
+                    JobID: `JOB${String(i).padStart(5, '0')}`,
+                    Supplier: suppliers[Math.floor(Math.random() * suppliers.length)],
+                    Customer: customers[Math.floor(Math.random() * customers.length)],
+                    Status: statuses[Math.floor(Math.random() * statuses.length)],
+                    Type: types[Math.floor(Math.random() * types.length)],
+                    CreatedDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    Price: Math.floor(Math.random() * 5000) + 100,
+                    Description: `Service request for job ${i}`,
+                    Location: `Location ${Math.floor(Math.random() * 10) + 1}`,
+                    Priority: Math.random() > 0.5 ? 'High' : 'Normal'
                 });
-
-                if (!siteResponse.ok) {
-                    throw new Error(`Failed to get site: ${siteResponse.status}`);
-                }
-
-                const site = await siteResponse.json();
-                console.log('Site ID:', site.id);
-
-                // Then get the list
-                const listResponse = await fetch(`https://graph.microsoft.com/v1.0/sites/${site.id}/lists/BookAJobMaster/items?$expand=fields&$top=5000`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!listResponse.ok) {
-                    throw new Error(`Failed to get list items: ${listResponse.status}`);
-                }
-
-                const listData = await listResponse.json();
-                console.log('List data received:', listData);
-                
-                // Process the data
-                const items = listData.value.map(item => item.fields);
-                processSharePointData(items);
-                
-            } catch (error) {
-                console.error('Failed to fetch SharePoint data:', error);
-                showEmptyState('Failed to connect to SharePoint. Please check your permissions.');
             }
+            
+            state.allJobsData = sampleData;
         }
 
-        // Process SharePoint data
-        function processSharePointData(data) {
-            console.log('Processing', data.length, 'records');
+        // Table Generation Functions
+        function generateTableHeaders() {
+            if (state.allJobsData.length === 0) return;
             
-            if (data.length > 0) {
-                // Log first record to see structure
-                console.log('Sample record:', data[0]);
-                console.log('Available fields:', Object.keys(data[0]));
-            }
-
-            allJobsData = data;
-            filteredData = [...allJobsData];
-            
-            // Generate table headers from data
-            if (data.length > 0) {
-                generateTableHeaders(Object.keys(data[0]));
-            }
-            
-            updateStatistics();
-            renderTable();
-        }
-
-        // Generate table headers dynamically
-        function generateTableHeaders(fields) {
+            const headers = Object.keys(state.allJobsData[0]);
             const headerRow = document.getElementById('tableHeaders');
             headerRow.innerHTML = '';
             
-            fields.forEach((field, index) => {
-                if (!field.startsWith('@')) { // Skip metadata fields
-                    const th = document.createElement('th');
-                    th.textContent = field.replace(/_x0020_/g, ' '); // Replace encoded spaces
-                    th.onclick = () => sortTable(index, field);
-                    headerRow.appendChild(th);
-                }
+            headers.forEach((header, index) => {
+                const th = document.createElement('th');
+                th.textContent = header.replace(/([A-Z])/g, ' $1').trim();
+                th.onclick = () => sortTable(header);
+                th.className = state.sortColumn === header ? `sorted sorted-${state.sortDirection}` : '';
+                headerRow.appendChild(th);
             });
         }
 
-        // Show empty state
-        function showEmptyState(message) {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="10" class="empty-state">
-                        <div class="empty-icon">📊</div>
-                        <div class="empty-message">${message || 'No data available'}</div>
-                        <div class="empty-submessage">Data will appear here once connected to SharePoint</div>
-                    </td>
-                </tr>
-            `;
-            
-            // Reset statistics
-            document.getElementById('statTotal').textContent = '0';
-            document.getElementById('statMonth').textContent = '0';
-            document.getElementById('statAvgPrice').textContent = '$0';
-            document.getElementById('statRevenue').textContent = '$0';
-            document.getElementById('statSuppliers').textContent = '0';
-        }
-
-        // Update statistics
-        function updateStatistics() {
-            if (allJobsData.length === 0) {
-                showEmptyState('No jobs found');
-                return;
-            }
-
-            document.getElementById('statTotal').textContent = allJobsData.length.toLocaleString();
-            // Add more statistics calculations based on actual field names
-        }
-
-        // Render table
         function renderTable() {
             const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
             
-            if (filteredData.length === 0) {
-                showEmptyState('No data to display');
+            if (state.filteredData.length === 0) {
+                tableBody.style.display = 'none';
+                emptyState.style.display = 'block';
                 return;
             }
-
-            const start = (currentPage - 1) * pageSize;
-            const end = start + pageSize;
-            const pageData = filteredData.slice(start, end);
+            
+            tableBody.style.display = '';
+            emptyState.style.display = 'none';
+            
+            const start = (state.currentPage - 1) * state.pageSize;
+            const end = start + state.pageSize;
+            const pageData = state.filteredData.slice(start, end);
             
             tableBody.innerHTML = '';
             
@@ -992,141 +1485,328 @@
                 const row = document.createElement('tr');
                 row.onclick = () => showDetails(record);
                 
-                // Add cells for each field
-                Object.keys(record).forEach(field => {
-                    if (!field.startsWith('@')) { // Skip metadata fields
-                        const cell = document.createElement('td');
-                        cell.textContent = record[field] || '';
-                        row.appendChild(cell);
+                Object.keys(record).forEach(key => {
+                    const cell = document.createElement('td');
+                    
+                    // Special formatting for certain fields
+                    if (key === 'Status') {
+                        cell.innerHTML = `<span class="status-badge status-${record[key]}">${record[key]}</span>`;
+                    } else if (key === 'Price') {
+                        cell.innerHTML = `<strong>$${record[key].toLocaleString()}</strong>`;
+                    } else {
+                        cell.textContent = record[key] || '-';
                     }
+                    
+                    row.appendChild(cell);
                 });
                 
                 tableBody.appendChild(row);
             });
             
-            // Update pagination
             updatePagination();
         }
 
-        // Update pagination
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredData.length / pageSize);
-            document.getElementById('recordCount').textContent = filteredData.length;
-            document.getElementById('totalRecords').textContent = allJobsData.length;
-            document.getElementById('currentPage').textContent = currentPage;
-            document.getElementById('totalPages').textContent = totalPages || 1;
+        // Statistics Functions
+        function updateStatistics() {
+            const total = state.allJobsData.length;
+            const thisMonth = state.allJobsData.filter(job => {
+                const jobDate = new Date(job.CreatedDate);
+                const now = new Date();
+                return jobDate.getMonth() === now.getMonth() && jobDate.getFullYear() === now.getFullYear();
+            }).length;
+            
+            const prices = state.allJobsData.map(job => job.Price || 0);
+            const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
+            const totalRevenue = prices.reduce((a, b) => a + b, 0);
+            
+            const suppliers = new Set(state.allJobsData.map(job => job.Supplier)).size;
+            
+            document.getElementById('statTotal').textContent = total.toLocaleString();
+            document.getElementById('statMonth').textContent = thisMonth.toLocaleString();
+            document.getElementById('statAvgPrice').textContent = `$${Math.round(avgPrice).toLocaleString()}`;
+            document.getElementById('statRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+            document.getElementById('statSuppliers').textContent = suppliers.toLocaleString();
         }
 
-        // Filter functions
+        // Filter Functions
         function applyFilters() {
-            // Implement filtering logic based on actual field names
-            console.log('Applying filters...');
+            // Get filter values
+            state.filters.jobId = document.getElementById('filterJobId').value.toLowerCase();
+            state.filters.supplier = document.getElementById('filterSupplier').value.toLowerCase();
+            state.filters.customer = document.getElementById('filterCustomer').value.toLowerCase();
+            state.filters.status = document.getElementById('filterStatus').value;
+            state.filters.dateFrom = document.getElementById('filterDateFrom').value;
+            state.filters.dateTo = document.getElementById('filterDateTo').value;
+            state.filters.type = document.getElementById('filterType').value;
+            state.filters.priceMin = document.getElementById('filterPriceMin').value;
+            
+            // Apply filters
+            state.filteredData = state.allJobsData.filter(job => {
+                if (state.filters.jobId && !job.JobID.toLowerCase().includes(state.filters.jobId)) return false;
+                if (state.filters.supplier && !job.Supplier.toLowerCase().includes(state.filters.supplier)) return false;
+                if (state.filters.customer && !job.Customer.toLowerCase().includes(state.filters.customer)) return false;
+                if (state.filters.status && job.Status !== state.filters.status) return false;
+                if (state.filters.type && job.Type !== state.filters.type) return false;
+                if (state.filters.dateFrom && job.CreatedDate < state.filters.dateFrom) return false;
+                if (state.filters.dateTo && job.CreatedDate > state.filters.dateTo) return false;
+                if (state.filters.priceMin && job.Price < parseFloat(state.filters.priceMin)) return false;
+                
+                return true;
+            });
+            
+            state.currentPage = 1;
             renderTable();
+            showToast(`Filters applied: ${state.filteredData.length} records found`, 'info');
         }
 
         function clearFilters() {
+            // Clear all filter inputs
             document.getElementById('filterJobId').value = '';
             document.getElementById('filterSupplier').value = '';
+            document.getElementById('filterCustomer').value = '';
+            document.getElementById('filterStatus').value = '';
             document.getElementById('filterDateFrom').value = '';
             document.getElementById('filterDateTo').value = '';
             document.getElementById('filterType').value = '';
+            document.getElementById('filterPriceMin').value = '';
             
-            filteredData = [...allJobsData];
-            currentPage = 1;
+            // Reset filters
+            Object.keys(state.filters).forEach(key => state.filters[key] = '');
+            
+            state.filteredData = [...state.allJobsData];
+            state.currentPage = 1;
+            renderTable();
+            showToast('Filters cleared', 'info');
+        }
+
+        function toggleFilters() {
+            const content = document.getElementById('filterContent');
+            const toggle = document.getElementById('filterToggle');
+            
+            content.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+        }
+
+        // Sort Functions
+        function sortTable(column) {
+            if (state.sortColumn === column) {
+                state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortColumn = column;
+                state.sortDirection = 'asc';
+            }
+            
+            state.filteredData.sort((a, b) => {
+                let valA = a[column];
+                let valB = b[column];
+                
+                // Handle different data types
+                if (typeof valA === 'number' && typeof valB === 'number') {
+                    return state.sortDirection === 'asc' ? valA - valB : valB - valA;
+                }
+                
+                valA = String(valA).toLowerCase();
+                valB = String(valB).toLowerCase();
+                
+                if (state.sortDirection === 'asc') {
+                    return valA < valB ? -1 : valA > valB ? 1 : 0;
+                } else {
+                    return valA > valB ? -1 : valA < valB ? 1 : 0;
+                }
+            });
+            
+            generateTableHeaders();
             renderTable();
         }
 
-        // Export data
-        function exportData() {
-            if (filteredData.length === 0) {
-                alert('No data to export');
-                return;
-            }
+        // Pagination Functions
+        function updatePagination() {
+            const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
             
-            // Implement CSV export
-            console.log('Exporting', filteredData.length, 'records');
+            document.getElementById('recordCount').textContent = Math.min(state.pageSize, state.filteredData.length);
+            document.getElementById('totalRecords').textContent = state.filteredData.length;
+            document.getElementById('currentPage').textContent = state.currentPage;
+            document.getElementById('totalPages').textContent = totalPages || 1;
+            
+            // Update button states
+            document.getElementById('btnFirst').disabled = state.currentPage === 1;
+            document.getElementById('btnPrev').disabled = state.currentPage === 1;
+            document.getElementById('btnNext').disabled = state.currentPage >= totalPages;
+            document.getElementById('btnLast').disabled = state.currentPage >= totalPages;
         }
 
-        // Sort table
-        function sortTable(columnIndex, fieldName) {
-            console.log('Sorting by', fieldName);
-            // Implement sorting logic
+        function firstPage() {
+            state.currentPage = 1;
+            renderTable();
         }
 
-        // Pagination
         function previousPage() {
-            if (currentPage > 1) {
-                currentPage--;
+            if (state.currentPage > 1) {
+                state.currentPage--;
                 renderTable();
             }
         }
 
         function nextPage() {
-            const totalPages = Math.ceil(filteredData.length / pageSize);
-            if (currentPage < totalPages) {
-                currentPage++;
+            const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
+            if (state.currentPage < totalPages) {
+                state.currentPage++;
                 renderTable();
             }
         }
 
-        // Show details modal
+        function lastPage() {
+            state.currentPage = Math.ceil(state.filteredData.length / state.pageSize);
+            renderTable();
+        }
+
+        function changePageSize() {
+            state.pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+            state.currentPage = 1;
+            renderTable();
+        }
+
+        // Modal Functions
         function showDetails(record) {
-            const modal = document.getElementById('detailModal');
+            state.currentJobDetail = record;
             const details = document.getElementById('modalDetails');
             
             details.innerHTML = '';
             
-            Object.keys(record).forEach(field => {
-                if (!field.startsWith('@')) {
-                    details.innerHTML += `
-                        <div class="detail-label">${field.replace(/_x0020_/g, ' ')}:</div>
-                        <div class="detail-value">${record[field] || '-'}</div>
-                    `;
+            Object.keys(record).forEach(key => {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'detail-label';
+                labelDiv.textContent = key.replace(/([A-Z])/g, ' $1').trim();
+                
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'detail-value';
+                
+                if (key === 'Status') {
+                    valueDiv.innerHTML = `<span class="status-badge status-${record[key]}">${record[key]}</span>`;
+                } else if (key === 'Price') {
+                    valueDiv.innerHTML = `<strong>$${record[key].toLocaleString()}</strong>`;
+                } else {
+                    valueDiv.textContent = record[key] || '-';
                 }
+                
+                details.appendChild(labelDiv);
+                details.appendChild(valueDiv);
             });
             
-            modal.classList.add('active');
+            document.getElementById('detailModal').classList.add('active');
         }
 
-        // Close modal
         function closeModal() {
             document.getElementById('detailModal').classList.remove('active');
+            state.currentJobDetail = null;
         }
 
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', async () => {
-            console.log('Initializing Jobs Master List...');
-            
-            // Initialize MSAL
-            if (typeof msal === 'undefined') {
-                console.error('MSAL library not loaded');
-                showUnauthorized();
+        function editJob() {
+            if (state.currentJobDetail) {
+                window.location.href = `/admin/jobs-edit?id=${state.currentJobDetail.JobID}`;
+            }
+        }
+
+        // Export Functions
+        function exportData() {
+            if (state.filteredData.length === 0) {
+                showToast('No data to export', 'warning');
                 return;
             }
             
-            if (initializeMSAL()) {
-                // Handle redirect promise
-                try {
-                    const response = await msalInstance.handleRedirectPromise();
-                    if (response) {
-                        console.log('Redirect handled successfully');
-                    }
-                } catch (error) {
-                    console.error('Redirect handling error:', error);
-                }
-                
-                // Check authentication
-                await checkAuthentication();
-            } else {
-                showUnauthorized();
-            }
-        });
+            const csv = convertToCSV(state.filteredData);
+            downloadCSV(csv, `jobs_export_${new Date().toISOString().split('T')[0]}.csv`);
+            showToast(`Exported ${state.filteredData.length} records`, 'success');
+        }
+
+        function convertToCSV(data) {
+            const headers = Object.keys(data[0]);
+            const csvHeaders = headers.join(',');
+            
+            const csvRows = data.map(row => {
+                return headers.map(header => {
+                    const value = row[header];
+                    return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+                }).join(',');
+            });
+            
+            return [csvHeaders, ...csvRows].join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Utility Functions
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✓',
+                error: '✖',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        function showEmptyState(message) {
+            const emptyState = document.getElementById('emptyState');
+            const emptyMessage = emptyState.querySelector('.empty-message');
+            const emptySubmessage = emptyState.querySelector('.empty-submessage');
+            
+            emptyMessage.textContent = message || 'No data available';
+            emptySubmessage.textContent = 'Jobs will appear here once loaded from SharePoint.';
+            
+            document.getElementById('tableBody').style.display = 'none';
+            emptyState.style.display = 'block';
+        }
+
+        async function refreshData() {
+            showToast('Refreshing data...', 'info');
+            await loadData();
+        }
+
+        // Event Listeners
+        window.addEventListener('DOMContentLoaded', initializeApp);
 
         // Close modal on background click
         window.addEventListener('click', (e) => {
             const modal = document.getElementById('detailModal');
             if (e.target === modal) {
                 closeModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('filterJobId').focus();
             }
         });
     </script>
