@@ -785,6 +785,26 @@
             console.log('Jobs Master List loaded');
             // In production, this would fetch initial data from SharePoint
         });
+
+        // Initialize authentication check on page load
+        window.addEventListener('load', () => {
+            checkAuthentication();
+        });
+
+        // Handle redirect from login
+        msalInstance.handleRedirectPromise()
+            .then(response => {
+                if (response) {
+                    // User successfully logged in via redirect
+                    sessionStorage.setItem('msalAccount', JSON.stringify(response.account));
+                    checkAuthentication();
+                }
+            })
+            .catch(error => {
+                console.error('Redirect error:', error);
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('unauthorizedScreen').style.display = 'flex';
+            });
     </script>
 </body>
 </html>
