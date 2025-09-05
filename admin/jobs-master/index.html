@@ -821,8 +821,9 @@
             try {
                 const accounts = msalInstance.getAllAccounts();
                 if (accounts.length > 0) {
+                    // Try Graph API scope instead of SharePoint
                     const request = {
-                        scopes: ["https://roadandrescue.sharepoint.com/.default"],
+                        scopes: ["https://graph.microsoft.com/Sites.Read.All"],
                         account: accounts[0]
                     };
                     
@@ -834,7 +835,7 @@
                 // Try interactive
                 try {
                     const request = {
-                        scopes: ["https://roadandrescue.sharepoint.com/.default"]
+                        scopes: ["https://graph.microsoft.com/Sites.Read.All"]
                     };
                     const response = await msalInstance.acquireTokenPopup(request);
                     return response.accessToken;
@@ -846,10 +847,10 @@
             return null;
         }
 
-        // Fetch SharePoint data
+        // Fetch SharePoint data using Graph API
         async function fetchSharePointData() {
             try {
-                console.log('Fetching SharePoint data...');
+                console.log('Fetching SharePoint data via Graph API...');
                 const token = await getSharePointToken();
                 
                 if (!token) {
@@ -858,21 +859,39 @@
                     return;
                 }
 
-                const endpoint = `${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listName}')/items?${SHAREPOINT_CONFIG.selectFields}&${SHAREPOINT_CONFIG.orderBy}&${SHAREPOINT_CONFIG.top}`;
-                
-                const response = await fetch(endpoint, {
+                // First, get the site ID
+                const siteResponse = await fetch('https://graph.microsoft.com/v1.0/sites/roadandrescue.sharepoint.com:/sites/rar', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json;odata=nometadata'
+                        'Accept': 'application/json'
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error(`SharePoint API error: ${response.status}`);
+                if (!siteResponse.ok) {
+                    throw new Error(`Failed to get site: ${siteResponse.status}`);
                 }
 
-                const data = await response.json();
-                processSharePointData(data.value || []);
+                const site = await siteResponse.json();
+                console.log('Site ID:', site.id);
+
+                // Then get the list
+                const listResponse = await fetch(`https://graph.microsoft.com/v1.0/sites/${site.id}/lists/BookAJobMaster/items?$expand=fields&$top=5000`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!listResponse.ok) {
+                    throw new Error(`Failed to get list items: ${listResponse.status}`);
+                }
+
+                const listData = await listResponse.json();
+                console.log('List data received:', listData);
+                
+                // Process the data
+                const items = listData.value.map(item => item.fields);
+                processSharePointData(items);
                 
             } catch (error) {
                 console.error('Failed to fetch SharePoint data:', error);
