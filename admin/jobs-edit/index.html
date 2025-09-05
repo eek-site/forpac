@@ -203,6 +203,7 @@
             <input type="text" id="quickSearch" class="search-input" placeholder="Quick search..."/>
             <span class="search-icon">🔍</span>
           </div>
+
           <select id="viewPicker" class="pill"><option>Default View</option></select>
 
           <div class="column-config">
@@ -351,7 +352,8 @@
         enableCellChangeFlash: true,
         undoRedoCellEditing: true,
         undoRedoCellEditingLimit: 20,
-        stopEditingWhenCellsLoseFocus: true
+        stopEditingWhenCellsLoseFocus: true,
+        rowHeight: 54
       }
     };
 
@@ -394,7 +396,7 @@
       if(!state.gridApi) return;
       $('#rowCount').textContent = state.gridApi.getDisplayedRowCount();
       $('#selectedCount').textContent = state.gridApi.getSelectedRows().length;
-      const model = state.gridApi.getModel?.(); // safeguard
+      const model = state.gridApi.getModel?.();
       const filtered = model?.getRowCount ? model.getRowCount() : state.gridApi.getDisplayedRowCount();
       $('#filteredCount').textContent = filtered;
     }
@@ -444,7 +446,10 @@
           ...options.headers
         }
       });
-      if(!r.ok) throw new Error(`SharePoint API error: ${r.status} ${r.statusText}`);
+      if(!r.ok){
+        const t = await r.text().catch(()=> '');
+        throw new Error(`SharePoint API error: ${r.status} ${r.statusText} ${t}`);
+      }
       return r.status===204 ? null : r.json();
     }
 
@@ -452,7 +457,16 @@
     async function loadListData(){
       setStatus('Loading data...','info');
       const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
-      const body = { parameters: { RenderOptions: 570, ViewXml: '<View><RowLimit>5000</RowLimit></View>' } };
+      const body = {
+        parameters: {
+          RenderOptions: 570,
+          ViewXml:
+            '<View>' +
+              '<RowLimit>5000</RowLimit>' +
+              '<Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query>' +
+            '</View>'
+        }
+      };
       return spRequest(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(body) });
     }
 
@@ -506,7 +520,7 @@
 
     /* =================== GRID =================== */
     function buildColumnDefs(schemaFields){
-      const visible = schemaFields.filter(f => !f.Hidden);
+      const visible = (schemaFields || []).filter(f => !f.Hidden);
       state.viewFields = visible.map(f => f.Name);
 
       const defs = [
@@ -516,33 +530,65 @@
 
       visible.forEach(field => {
         if(field.Name === 'ID') return;
-        const type = String(field.Type || '');
+
+        const typeStr = String(field.Type || field.TypeAsString || '').toLowerCase();
         const col = {
-          headerName: field.DisplayName || field.Name,
+          headerName: field.DisplayName || field.Title || field.Name,
           field: field.Name,
           editable: !field.ReadOnlyField && !field.Sealed,
           sortable: true, filter: true, resizable: true,
           minWidth: 100, flex: 1
         };
-        if(/(Number|Currency)/i.test(type)){
+
+        // Numbers / Currency
+        if(typeStr.includes('number') || typeStr.includes('currency')){
           col.filter = 'agNumberColumnFilter';
           col.valueParser = p => { const v=p.newValue; return v===''||v==null?null:Number(v); };
         }
-        if(/DateTime/i.test(type)){
+
+        // DateTime
+        if(typeStr.includes('datetime')){
           col.filter = 'agDateColumnFilter';
+          col.valueFormatter = p => {
+            if (!p.value) return '';
+            const d = new Date(p.value);
+            return isNaN(d) ? p.value : d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+          };
+          col.minWidth = Math.max(col.minWidth, 160);
         }
-        if(/Boolean/i.test(type)){
+
+        // Boolean
+        if(typeStr.includes('boolean')){
           col.cellRenderer = p => (p.value ? '✓' : '✗');
           col.cellEditor = 'agSelectCellEditor';
           col.cellEditorParams = { values:[true,false] };
+          col.minWidth = Math.max(col.minWidth, 110);
         }
-        if(/Choice/i.test(type) && field.Choices){
-          const choices = Array.isArray(field.Choices?.results) ? field.Choices.results : field.Choices;
-          if(Array.isArray(choices) && choices.length){
-            col.cellEditor = 'agSelectCellEditor';
-            col.cellEditorParams = { values: choices };
-          }
+
+        // Choice values (normalize)
+        const rawChoices = field.Choices?.results || field.Choices || field.Choice || [];
+        if((typeStr.includes('choice') || Array.isArray(rawChoices)) && rawChoices.length){
+          col.cellEditor = 'agSelectCellEditor';
+          col.cellEditorParams = { values: rawChoices };
         }
+
+        // Notes/Description auto-height
+        const lname = String(field.Name || '').toLowerCase();
+        if (/notes?|description|comment|details?/.test(lname)){
+          col.autoHeight = true; col.wrapText = true; col.minWidth = 240; col.flex = Math.max(col.flex, 2);
+        }
+
+        // Job identifiers styling
+        if (/job.?id|jobref|jobreference|rego/.test(lname)){
+          col.cellStyle = { color:'var(--primary)', fontWeight:'600' };
+          col.minWidth = Math.max(col.minWidth, 150);
+        }
+
+        // Status helper (only if no explicit choices)
+        if (!col.cellEditor && /status/.test(lname)){
+          // leave as free text unless list provided choices
+        }
+
         defs.push(col);
       });
       return defs;
@@ -559,7 +605,8 @@
         onSelectionChanged: updateGridStats,
         onFilterChanged: updateGridStats,
         onSortChanged: updateGridStats,
-        onGridReady: p => { state.gridApi = p.api; state.columnApi = p.columnApi; updateGridStats(); }
+        onGridReady: p => { state.gridApi = p.api; state.columnApi = p.columnApi; updateGridStats(); populateColumnMenu(); },
+        onColumnVisible: populateColumnMenu
       };
       new agGrid.Grid(document.getElementById('grid'), gridOptions);
     }
@@ -574,6 +621,26 @@
         state.pendingChanges.updates.set(id, updates);
       }
       updateChangeCount();
+    }
+
+    function populateColumnMenu(){
+      const list = document.getElementById('columnList');
+      if (!state.columnApi || !list) return;
+      list.innerHTML = '';
+      state.columnDefs.forEach(cd=>{
+        if (!cd.field || cd.field === '__selection__') return;
+        const colState = state.columnApi.getColumn(cd.field);
+        const visible = colState ? colState.isVisible() !== false : true;
+        const row = document.createElement('label');
+        row.className = 'column-item';
+        row.style.cursor = 'pointer';
+        row.innerHTML = `
+          <input type="checkbox" class="column-checkbox" ${visible ? 'checked' : ''} />
+          <span>${cd.headerName}</span>
+        `;
+        row.querySelector('input').onchange = (e)=> state.columnApi.setColumnVisible(cd.field, e.target.checked);
+        list.appendChild(row);
+      });
     }
 
     /* =================== APP =================== */
@@ -661,7 +728,8 @@
       $('#btnExportSelected').onclick = () => {
         const sel = state.gridApi.getSelectedRows();
         if(sel.length===0){ showToast('No rows selected','warning'); return; }
-        exportToCSV(sel); $('#bulkMenu').classList.remove('show');
+        exportToCSV(sel);
+        $('#bulkMenu').classList.remove('show');
       };
       $('#btnSave').onclick = saveChanges;
       $('#btnDiscard').onclick = () => {
@@ -691,24 +759,46 @@
         $('#btnSave').disabled = true;
         let ok=0, err=0;
 
+        const idMap = new Map(); // temp -> real
+
+        // CREATES
         for(const newRow of state.pendingChanges.creates){
           try{
-            const payload = {...newRow}; delete payload.ID; delete payload.__selection__;
+            const payload = {...newRow}; const tempId = payload.ID;
+            delete payload.ID; delete payload.__selection__;
             const created = await createItem(payload);
-            newRow.ID = created.ID || created.Id; ok++;
+            const realId = created.ID || created.Id;
+
+            // update node with real ID
+            let targetNode = null;
+            state.gridApi.forEachNode(n => { if (n.data.ID === tempId) targetNode = n; });
+            if (targetNode){
+              targetNode.setData({ ...targetNode.data, ID: realId, Created: created.Created || targetNode.data.Created, Modified: created.Modified || targetNode.data.Modified });
+            }
+            idMap.set(tempId, realId);
+            ok++;
           }catch(e){ console.error('Create failed',e); err++; }
         }
+
+        // UPDATES
         for(const [id, updates] of state.pendingChanges.updates.entries()){
-          try{ await updateItem(id, updates); ok++; }catch(e){ console.error('Update failed',e); err++; }
+          try{
+            const realId = idMap.get(id) || id;
+            await updateItem(realId, updates); ok++;
+          }catch(e){ console.error('Update failed',e); err++; }
         }
+
+        // DELETES
         for(const id of state.pendingChanges.deletes){
-          try{ await deleteItem(id); ok++; }catch(e){ console.error('Delete failed',e); err++; }
+          try{
+            const realId = idMap.get(id) || id;
+            await deleteItem(realId); ok++;
+          }catch(e){ console.error('Delete failed',e); err++; }
         }
 
         state.pendingChanges.updates.clear(); state.pendingChanges.creates=[]; state.pendingChanges.deletes.clear();
 
-        const allRows=[];
-        state.gridApi.forEachNode(n => { if(!state.pendingChanges.deletes.has(n.data.ID)) allRows.push(n.data); });
+        const allRows=[]; state.gridApi.forEachNode(n => allRows.push(n.data));
         state.originalData = JSON.parse(JSON.stringify(allRows));
         updateChangeCount();
 
@@ -751,7 +841,9 @@
     function exportToCSV(rows){
       const headers = Object.keys(rows[0]).filter(k=>k!=='__selection__');
       const csv = [headers.join(','), ...rows.map(r => headers.map(h => {
-        const v = r[h]; return (typeof v==='string' && v.includes(',')) ? `"${v}"` : v;
+        let v = r[h]; if (v==null) v = '';
+        v = String(v).replace(/"/g,'""');
+        return (v.includes(',')||v.includes('"')||v.includes('\n')) ? `"${v}"` : v;
       }).join(','))].join('\n');
       const blob = new Blob([csv],{type:'text/csv'}), url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href=url; a.download=`jobs_export_${new Date().toISOString().split('T')[0]}.csv`;
