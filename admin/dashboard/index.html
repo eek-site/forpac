@@ -475,7 +475,7 @@
             margin-top: 20px;
         }
 
-        .action-btn {
+        .action-btn, .action-link {
             padding: 15px 20px;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
@@ -492,7 +492,7 @@
             gap: 10px;
         }
 
-        .action-btn:hover {
+        .action-btn:hover, .action-link:hover {
             background: #1e3c72;
             color: white;
             border-color: #1e3c72;
@@ -502,6 +502,17 @@
 
         .action-icon {
             font-size: 1.2em;
+        }
+
+        /* Highlight new action buttons */
+        .action-link.highlight {
+            border-color: #4299e1;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+        }
+
+        .action-link.highlight:hover {
+            background: #4299e1;
+            border-color: #4299e1;
         }
 
         /* Footer */
@@ -642,6 +653,14 @@
                         <span class="action-icon">🚀</span>
                         Dispatch Supplier
                     </button>
+                    <a href="/admin/jobs-master" class="action-link highlight">
+                        <span class="action-icon">📑</span>
+                        Jobs Master List
+                    </a>
+                    <a href="/admin/job-activity" class="action-link highlight">
+                        <span class="action-icon">📝</span>
+                        Job Activity Log
+                    </a>
                     <button class="action-btn" onclick="viewReports()">
                         <span class="action-icon">📊</span>
                         View Reports
@@ -667,7 +686,7 @@
                 <div class="service-panel">
                     <div class="panel-header">
                         <h2 class="panel-title">Active Claims</h2>
-                        <a href="#" class="view-all">View All →</a>
+                        <a href="/admin/jobs-master" class="view-all">View All →</a>
                     </div>
                     <ul class="job-list">
                         <li class="job-item urgent insurance">
@@ -944,14 +963,8 @@
             // Only start updates if authenticated
             const dashboardContainer = document.getElementById('dashboardContainer');
             if (dashboardContainer.classList.contains('authenticated')) {
-                // Check phone system status immediately
-                checkPhoneSystemStatus();
-                
                 // Update stats every 10 seconds
                 setInterval(updateStats, 10000);
-                
-                // Check phone system status every 30 seconds
-                setInterval(checkPhoneSystemStatus, 30000);
             }
         });
 
