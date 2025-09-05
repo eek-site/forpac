@@ -1,790 +1,635 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jobs Master List | FormanPacific Service Claims Management</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            color: #2c3e50;
-        }
-
-        /* Header */
-        .header {
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 24px;
-        }
-
-        .company-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .company-name {
-            font-size: 1.6em;
-            font-weight: 600;
-            color: #1e3c72;
-        }
-
-        .page-label {
-            font-size: 0.9em;
-            color: #718096;
-            font-weight: 500;
-        }
-
-        .nav-section {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn-nav {
-            background: #1e3c72;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-nav:hover {
-            background: #2a5298;
-            transform: translateY(-2px);
-        }
-
-        .btn-nav.secondary {
-            background: #718096;
-        }
-
-        .btn-nav.secondary:hover {
-            background: #4a5568;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Filter Section */
-        .filter-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-
-        .filter-row {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .filter-label {
-            font-size: 0.85em;
-            color: #718096;
-            font-weight: 500;
-        }
-
-        .filter-input, .filter-select {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-        }
-
-        .filter-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: #4299e1;
-            box-shadow: 0 0 0 3px rgba(66,153,225,0.1);
-        }
-
-        .btn-filter {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: auto;
-            border: none;
-        }
-
-        .btn-apply {
-            background: #48bb78;
-            color: white;
-        }
-
-        .btn-apply:hover {
-            background: #38a169;
-        }
-
-        .btn-clear {
-            background: #e2e8f0;
-            color: #2d3748;
-        }
-
-        .btn-clear:hover {
-            background: #cbd5e0;
-        }
-
-        .btn-export {
-            background: #4299e1;
-            color: white;
-        }
-
-        .btn-export:hover {
-            background: #3182ce;
-        }
-
-        /* Stats Summary */
-        .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-tile {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #1e3c72;
-            margin: 5px 0;
-        }
-
-        .stat-label {
-            font-size: 0.85em;
-            color: #718096;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Table Section */
-        .table-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .table-title {
-            font-size: 1.4em;
-            color: #2d3748;
-            font-weight: 600;
-        }
-
-        .table-info {
-            color: #718096;
-            font-size: 0.9em;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1200px;
-        }
-
-        thead {
-            background: #f7fafc;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #4a5568;
-            border-bottom: 2px solid #e2e8f0;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-        }
-
-        th:hover {
-            background: #edf2f7;
-        }
-
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.9em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 300px;
-        }
-
-        tbody tr {
-            transition: background 0.2s ease;
-            cursor: pointer;
-        }
-
-        tbody tr:hover {
-            background: #f8fafc;
-        }
-
-        tbody tr.selected {
-            background: #e6f4ff;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-billable {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-supplier {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        /* Price Highlight */
-        .price-cell {
-            font-weight: 600;
-            color: #1e3c72;
-        }
-
-        /* Row Detail Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 1.4em;
-            color: #2d3748;
-            font-weight: 600;
-        }
-
-        .btn-close {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #718096;
-        }
-
-        .btn-close:hover {
-            color: #2d3748;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #718096;
-        }
-
-        .detail-value {
-            color: #2d3748;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .page-btn {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .page-btn:hover {
-            background: #f7fafc;
-            border-color: #cbd5e0;
-        }
-
-        .page-btn.active {
-            background: #1e3c72;
-            color: white;
-            border-color: #1e3c72;
-        }
-
-        .page-info {
-            color: #718096;
-            font-size: 0.9em;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Build Notes | FormanPacific Service Claims Management</title>
+  <meta name="description" content="Read-only viewer for JobBuildNotes SharePoint list">
+  <meta name="robots" content="noindex, nofollow">
+  <!-- MSAL -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary-color:#1e3c72;--primary-dark:#152a52;--secondary-color:#2a5298;
+      --success-color:#10b981;--warning-color:#f59e0b;--error-color:#ef4444;--info-color:#3b82f6;
+      --text-primary:#1e293b;--text-secondary:#64748b;--border-color:#e2e8f0;
+      --bg-light:#f8fafc;--bg-white:#ffffff;--shadow-sm:0 1px 2px 0 rgba(0,0,0,.05);
+      --shadow-md:0 4px 6px -1px rgba(0,0,0,.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);
+      --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1)
+    }
+    body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:linear-gradient(135deg,#f0f4f8 0%,#d9e2ec 100%);min-height:100vh;color:var(--text-primary)}
+    .toast-container{position:fixed;top:20px;right:20px;z-index:9999}
+    .toast{background:var(--bg-white);padding:16px 20px;border-radius:10px;box-shadow:var(--shadow-lg);margin-bottom:10px;display:flex;align-items:center;gap:12px;min-width:300px;border-left:4px solid}
+    .toast.success{border-left-color:var(--success-color)}.toast.error{border-left-color:var(--error-color)}.toast.warning{border-left-color:var(--warning-color)}.toast.info{border-left-color:var(--info-color)}
+    .toast-message{flex:1}.toast-close{background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px}
+    .loading-screen{position:fixed;inset:0;background:var(--bg-white);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9998;transition:opacity .3s ease}
+    .loading-screen.hidden{opacity:0;pointer-events:none}
+    .spinner-container{position:relative;width:80px;height:80px}
+    .spinner{width:100%;height:100%;border:4px solid var(--border-color);border-top:4px solid var(--primary-color);border-radius:50%;animation:spin 1s cubic-bezier(.68,-.55,.265,1.55) infinite}
+    .spinner-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700;color:var(--primary-color);font-size:24px}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    .loading-text{color:var(--text-secondary);font-size:1.1em;margin-top:20px;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .main-container{opacity:0;transform:translateY(20px);transition:all .5s ease}
+    .main-container.authenticated{opacity:1;transform:translateY(0)}
+    .unauthorized-screen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-color) 0%,var(--secondary-color) 100%);align-items:center;justify-content:center;flex-direction:column;z-index:10000}
+    .unauthorized-screen.show{display:flex;animation:fadeIn .5s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .unauthorized-content{text-align:center;max-width:450px;padding:50px;background:var(--bg-white);border-radius:20px;box-shadow:var(--shadow-xl)}
+    .unauthorized-icon{width:100px;height:100px;margin:0 auto 20px;background:linear-gradient(135deg,#fecaca 0%,#ef4444 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px}
+    .btn-login{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:#fff;padding:14px 32px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+    .header{background:var(--bg-white);box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1000;border-bottom:2px solid var(--border-color)}
+    .header-content{max-width:1600px;margin:0 auto;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+    .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;box-shadow:var(--shadow-md)}
+    .company-info{display:flex;flex-direction:column}.company-name{font-size:1.6em;font-weight:700;color:var(--primary-color);letter-spacing:-.5px}.page-label{font-size:.9em;color:var(--text-secondary);font-weight:500}
+    .nav-section{display:flex;gap:12px;flex-wrap:wrap}
+    .btn-nav{background:var(--primary-color);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;font-size:14px}
+    .btn-nav:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+    .btn-nav.secondary{background:var(--text-secondary)}.btn-nav.success{background:var(--success-color)}
+    .container{max-width:1600px;margin:0 auto;padding:20px}
+    .filter-section{background:var(--bg-white);border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow-md);border:1px solid var(--border-color)}
+    .filter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    .filter-title{font-size:1.2em;font-weight:600;color:var(--text-primary)}
+    .filter-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+    .filter-label{font-size:.85em;color:var(--text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+    .filter-input,.filter-select{padding:10px 14px;border:2px solid var(--border-color);border-radius:8px;font-size:.95em;background:var(--bg-white)}
+    .filter-actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+    .btn-filter{padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;border:none;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+    .btn-apply{background:var(--success-color);color:#fff}.btn-clear{background:var(--bg-light);color:var(--text-primary);border:2px solid var(--border-color)}.btn-export{background:var(--info-color);color:#fff}
+    .stats-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
+    .stat-tile{background:var(--bg-white);padding:20px;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border-color);text-align:center;position:relative;overflow:hidden}
+    .stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color))}
+    .stat-value{font-size:2em;font-weight:700;margin:5px 0}
+    .table-section{background:var(--bg-white);border-radius:16px;padding:24px;box-shadow:var(--shadow-lg);border:1px solid var(--border-color)}
+    .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px}
+    .record-count{background:var(--bg-light);padding:4px 12px;border-radius:20px;font-weight:600}
+    .table-wrapper{overflow-x:auto;max-height:600px;overflow-y:auto;border:2px solid var(--border-color);border-radius:10px;position:relative}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1200px}
+    thead{background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);position:sticky;top:0;z-index:100}
+    th{padding:14px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--border-color);font-size:.85em;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none;white-space:nowrap;position:relative}
+    th:hover{background:var(--bg-light);color:var(--primary-color)}th.sorted{color:var(--primary-color)}
+    th::after{content:'⇅';position:absolute;right:8px;opacity:.3}th.sorted-asc::after{content:'↑';opacity:1;color:var(--primary-color)}th.sorted-desc::after{content:'↓';opacity:1;color:var(--primary-color)}
+    tbody tr{transition:all .2s ease;cursor:pointer;border-bottom:1px solid var(--border-color)}tbody tr:hover{background:linear-gradient(90deg,#f8fafc 0%,#f1f5f9 100%)}
+    td{padding:12px 16px;font-size:.9em;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+    .status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:.8em;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .status-active{background:#d1fae5;color:#065f46}.status-pending{background:#fed7aa;color:#92400e}.status-completed{background:#dbeafe;color:#1e40af}.status-cancelled{background:#fee2e2;color:#991b1b}
+    .empty-state{text-align:center;padding:80px 20px;color:var(--text-secondary)}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    .modal.active{display:flex}
+    .modal-content{background:var(--bg-white);border-radius:16px;padding:32px;max-width:900px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-xl)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--border-color)}
+    .detail-grid{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-top:20px}
+    .pagination{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:2px solid var(--border-color);flex-wrap:wrap;gap:16px}
+    .pagination-controls{display:flex;align-items:center;gap:10px}
+    .page-btn{padding:8px 16px;border:2px solid var(--border-color);background:var(--bg-white);border-radius:8px;cursor:pointer;font-weight:500}
+    .page-size-selector{display:flex;align-items:center;gap:10px}
+    @media (max-width:768px){.table-wrapper{max-height:400px}.detail-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-    <!-- Header -->
+  <!-- Toasts -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Loading -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="spinner-container">
+      <div class="spinner"></div><div class="spinner-logo">FP</div>
+    </div>
+    <div class="loading-text">Authenticating and loading data...</div>
+  </div>
+
+  <!-- Unauthorized -->
+  <div class="unauthorized-screen" id="unauthorizedScreen">
+    <div class="unauthorized-content">
+      <div class="unauthorized-icon">🔒</div>
+      <h1 class="unauthorized-title">Authentication Required</h1>
+      <p class="unauthorized-message">Please sign in with your Microsoft work account.</p>
+      <button onclick="window.location.href='/admin'" class="btn-login">Sign In</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-container" id="mainContainer">
     <header class="header">
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="logo">FP</div>
-                <div class="company-info">
-                    <div class="company-name">FormanPacific</div>
-                    <div class="page-label">Jobs Master List</div>
-                </div>
-            </div>
-            <div class="nav-section">
-                <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
-                    ← Back to Dashboard
-                </button>
-                <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
-                    Job Activity Log →
-                </button>
-            </div>
+      <div class="header-content">
+        <div style="display:flex;align-items:center;gap:15px">
+          <div class="logo">FP</div>
+          <div class="company-info">
+            <div class="company-name">FormanPacific</div>
+            <div class="page-label">Job Build Notes</div>
+          </div>
         </div>
+        <div class="nav-section">
+          <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">← Dashboard</button>
+          <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">Activity Log →</button>
+          <button class="btn-nav" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+      </div>
     </header>
 
     <div class="container">
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">Job ID (Rego2)</label>
-                    <input type="text" class="filter-input" id="filterJobId" placeholder="e.g. LZY696">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Supplier</label>
-                    <input type="text" class="filter-input" id="filterSupplier" placeholder="Supplier name">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Date Range</label>
-                    <input type="date" class="filter-input" id="filterDateFrom">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">To</label>
-                    <input type="date" class="filter-input" id="filterDateTo">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select class="filter-select" id="filterType">
-                        <option value="">All Types</option>
-                        <option value="billable">Billable</option>
-                        <option value="supplier">Supplier</option>
-                    </select>
-                </div>
-                <button class="btn-filter btn-apply" onclick="applyFilters()">Apply Filters</button>
-                <button class="btn-filter btn-clear" onclick="clearFilters()">Clear</button>
-                <button class="btn-filter btn-export" onclick="exportData()">Export CSV</button>
-            </div>
+      <!-- Filters -->
+      <div class="filter-section">
+        <div class="filter-header">
+          <div class="filter-title">🔍 Search & Filters</div>
+        </div>
+        <div class="filter-row">
+          <div>
+            <label class="filter-label">Job ID</label>
+            <input id="filterJobId" class="filter-input" placeholder="Search by Job ID...">
+          </div>
+          <div>
+            <label class="filter-label">Supplier</label>
+            <input id="filterSupplier" class="filter-input" placeholder="Supplier name...">
+          </div>
+          <div>
+            <label class="filter-label">Customer</label>
+            <input id="filterCustomer" class="filter-input" placeholder="Customer name...">
+          </div>
+          <div>
+            <label class="filter-label">Status</label>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div>
+            <label class="filter-label">Date From</label>
+            <input id="filterDateFrom" type="date" class="filter-input">
+          </div>
+          <div>
+            <label class="filter-label">Date To</label>
+            <input id="filterDateTo" type="date" class="filter-input">
+          </div>
+          <div>
+            <label class="filter-label">Type</label>
+            <select id="filterType" class="filter-select">
+              <option value="">All Types</option>
+              <option value="billable">Billable</option>
+              <option value="supplier">Supplier</option>
+              <option value="warranty">Warranty</option>
+            </select>
+          </div>
+          <div>
+            <label class="filter-label">Price Min</label>
+            <input id="filterPriceMin" type="number" class="filter-input" placeholder="Min price...">
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="btn-filter btn-clear" onclick="clearFilters()">✖ Clear</button>
+          <button class="btn-filter btn-apply" onclick="applyFilters()">✓ Apply Filters</button>
+          <button class="btn-filter btn-export" onclick="exportData()">📥 Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-summary">
+        <div class="stat-tile">
+          <div class="stat-label">Total Notes</div>
+          <div id="statTotal" class="stat-value">0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">This Month</div>
+          <div id="statMonth" class="stat-value">0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Avg Value</div>
+          <div id="statAvgPrice" class="stat-value">$0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Total Value</div>
+          <div id="statRevenue" class="stat-value">$0</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Active Suppliers</div>
+          <div id="statSuppliers" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-section">
+        <div class="table-header">
+          <h2>📋 Job Build Notes</h2>
+          <div class="record-count">Showing <span id="recordCount">0</span> of <span id="totalRecords">0</span> records</div>
         </div>
 
-        <!-- Stats Summary -->
-        <div class="stats-summary">
-            <div class="stat-tile">
-                <div class="stat-label">Total Jobs</div>
-                <div class="stat-value" id="statTotal">1,872</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">This Month</div>
-                <div class="stat-value" id="statMonth">47</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">Avg Price</div>
-                <div class="stat-value" id="statAvgPrice">$289</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">Total Revenue</div>
-                <div class="stat-value" id="statRevenue">$541K</div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-label">Active Suppliers</div>
-                <div class="stat-value" id="statSuppliers">23</div>
-            </div>
+        <div class="table-wrapper">
+          <table id="jobsTable">
+            <thead><tr id="tableHeaders"></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty-state" style="display:none">
+            <div style="font-size:48px">🗒️</div>
+            <div class="empty-message">No Notes Found</div>
+            <div class="empty-submessage">Try refreshing the page or checking your filters.</div>
+          </div>
         </div>
 
-        <!-- Table Section -->
-        <div class="table-section">
-            <div class="table-header">
-                <h2 class="table-title">Complete Jobs Register</h2>
-                <span class="table-info">Showing <span id="recordCount">50</span> of <span id="totalRecords">1,872</span> records</span>
-            </div>
-            
-            <div class="table-wrapper">
-                <table id="jobsTable">
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable(0)">ID ↕</th>
-                            <th onclick="sortTable(1)">Job ID ↕</th>
-                            <th onclick="sortTable(2)">Date/Time ↕</th>
-                            <th onclick="sortTable(3)">Price ↕</th>
-                            <th onclick="sortTable(4)">Supplier ↕</th>
-                            <th onclick="sortTable(5)">Type ↕</th>
-                            <th onclick="sortTable(6)">Email ↕</th>
-                            <th onclick="sortTable(7)">Description ↕</th>
-                            <th onclick="sortTable(8)">Reimbursement ↕</th>
-                            <th onclick="sortTable(9)">Charges ↕</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Sample data - this would be populated from SharePoint -->
-                        <tr onclick="showDetails(this)">
-                            <td>3432</td>
-                            <td><strong>LZY696</strong></td>
-                            <td>09/05/2025 08:51:53 AM</td>
-                            <td class="price-cell">$369.00</td>
-                            <td>A&J's Automotive, Kaiapoi Automotive Services</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>Joegunnz@gmail.com</td>
-                            <td>Joseph gunn 64 275243930 Pre-Purchase Inspection</td>
-                            <td>Services Rendered</td>
-                            <td>$369</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>3433</td>
-                            <td><strong>LZY696</strong></td>
-                            <td>09/05/2025 08:52:00 AM</td>
-                            <td class="price-cell">$0.00</td>
-                            <td>Kaiapoi Automotive Services</td>
-                            <td><span class="status-badge status-supplier">Supplier</span></td>
-                            <td>zx@roadandrescue.com</td>
-                            <td>Additional supplier allocation</td>
-                            <td>Services Rendered</td>
-                            <td>$0</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>3434</td>
-                            <td><strong>KDH557</strong></td>
-                            <td>04/09/2025 02:14:11 PM</td>
-                            <td class="price-cell">$250.00</td>
-                            <td>Rust Alley Ltd</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>james.bristow@example.com</td>
-                            <td>James Bristow 64 224886199 Mechanical Breakdown</td>
-                            <td>Services Rendered</td>
-                            <td>$250</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1869</td>
-                            <td><strong>RDF234</strong></td>
-                            <td>01/09/2025 02:27:38 PM</td>
-                            <td class="price-cell">$289.00</td>
-                            <td>Pit Stop Levin</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>tristin.carey@example.com</td>
-                            <td>Tristin Carey-Bailey 64 273729169 1996 Mitsubishi</td>
-                            <td>Services Rendered</td>
-                            <td>$289</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1867</td>
-                            <td><strong>LGU541</strong></td>
-                            <td>01/09/2025 08:09:39 AM</td>
-                            <td class="price-cell">$249.00</td>
-                            <td>Motavation</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>david.herring@example.com</td>
-                            <td>David herring 64 273844124 Engine won't start all</td>
-                            <td>Services Rendered</td>
-                            <td>$249</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1868</td>
-                            <td><strong>MUC820</strong></td>
-                            <td>01/09/2025 08:22:37 AM</td>
-                            <td class="price-cell">$249.00</td>
-                            <td>Pit Stop Levin</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>rod.johnston@example.com</td>
-                            <td>ROD Johnston 64 21364887 Engine won't start.pc</td>
-                            <td>Services Rendered</td>
-                            <td>$249</td>
-                        </tr>
-                        <tr onclick="showDetails(this)">
-                            <td>1870</td>
-                            <td><strong>NWK954</strong></td>
-                            <td>04/09/2025 12:18:03 PM</td>
-                            <td class="price-cell">$149.00</td>
-                            <td>Omokoroa Automotive</td>
-                            <td><span class="status-badge status-billable">Billable</span></td>
-                            <td>karmin.selwyn@example.com</td>
-                            <td>Karmin Selwyn 64 223933274 There were no lights</td>
-                            <td>Services Rendered</td>
-                            <td>$149</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination">
-                <button class="page-btn" onclick="previousPage()">Previous</button>
-                <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">38</span></span>
-                <button class="page-btn" onclick="nextPage()">Next</button>
-            </div>
+        <div class="pagination">
+          <div class="pagination-controls">
+            <button class="page-btn" id="btnFirst" onclick="firstPage()">First</button>
+            <button class="page-btn" id="btnPrev" onclick="previousPage()">Previous</button>
+            <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+            <button class="page-btn" id="btnNext" onclick="nextPage()">Next</button>
+            <button class="page-btn" id="btnLast" onclick="lastPage()">Last</button>
+          </div>
+          <div class="page-size-selector">
+            Show
+            <select id="pageSizeSelect" onchange="changePageSize()">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+            </select>
+            records per page
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Detail Modal -->
     <div class="modal" id="detailModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Job Details</h2>
-                <button class="btn-close" onclick="closeModal()">×</button>
-            </div>
-            <div class="detail-grid" id="modalDetails">
-                <!-- Details will be populated here -->
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Note Details</h2>
+          <button class="btn-close" onclick="closeModal()">×</button>
         </div>
+        <div class="detail-grid" id="modalDetails"></div>
+        <div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end">
+          <button class="btn-filter btn-clear" onclick="closeModal()">Close</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Sample data management
-        let currentPage = 1;
-        let pageSize = 50;
-        let sortColumn = -1;
-        let sortDirection = 1;
+  <script>
+    'use strict';
 
-        // Apply filters
-        function applyFilters() {
-            const jobId = document.getElementById('filterJobId').value;
-            const supplier = document.getElementById('filterSupplier').value;
-            const dateFrom = document.getElementById('filterDateFrom').value;
-            const dateTo = document.getElementById('filterDateTo').value;
-            const type = document.getElementById('filterType').value;
+    // ---------- CONFIG ----------
+    const SPO_HOST       = 'roadandrescue.sharepoint.com';
+    const SPO_SITE_PATH  = '/sites/rar';
+    const SPO_LIST_TITLE = 'JobBuildNotes'; // <-- target list
 
-            console.log('Applying filters:', { jobId, supplier, dateFrom, dateTo, type });
-            // In production, this would fetch filtered data from SharePoint
-            alert('Filters applied! (This would fetch filtered data from SharePoint)');
-        }
+    const MSAL_CONFIG = {
+      auth: {
+        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+        // auto-use current path to avoid mismatch
+        redirectUri: window.location.origin + window.location.pathname
+      },
+      cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: true }
+    };
+    // Read-only Graph permission (app must be consented in tenant)
+    const GRAPH_SCOPE_READ = 'https://graph.microsoft.com/Sites.Read.All';
 
-        // Clear filters
-        function clearFilters() {
-            document.getElementById('filterJobId').value = '';
-            document.getElementById('filterSupplier').value = '';
-            document.getElementById('filterDateFrom').value = '';
-            document.getElementById('filterDateTo').value = '';
-            document.getElementById('filterType').value = '';
-            applyFilters();
-        }
+    // ---------- STATE ----------
+    const state = {
+      msalInstance: null,
+      isAuthenticated: false,
+      allJobsData: [],
+      filteredData: [],
+      sortColumn: null,
+      sortDirection: 'asc',
+      currentPage: 1,
+      pageSize: 50,
+      currentRecord: null,
+      filters: { jobId:'', supplier:'', customer:'', status:'', dateFrom:'', dateTo:'', type:'', priceMin:'' }
+    };
 
-        // Export data
-        function exportData() {
-            alert('Exporting data to CSV... (This would export the current filtered view)');
-        }
+    // ---------- AUTH ----------
+    async function initializeApp(){
+      try{
+        state.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
+        await state.msalInstance.initialize();
+        await state.msalInstance.handleRedirectPromise();
+        await checkAuthentication();
+      }catch(e){
+        console.error('Initialization failed', e);
+        showUnauthorized();
+      }
+    }
 
-        // Sort table
-        function sortTable(column) {
-            if (sortColumn === column) {
-                sortDirection *= -1;
-            } else {
-                sortColumn = column;
-                sortDirection = 1;
-            }
-            console.log('Sorting by column', column, 'direction', sortDirection);
-            // In production, this would sort the data
-        }
+    async function getGraphToken(){
+      const accounts = state.msalInstance.getAllAccounts();
+      if (!accounts.length) throw new Error('No signed-in account');
+      const request = { scopes: [GRAPH_SCOPE_READ], account: accounts[0] };
+      try{
+        const { accessToken } = await state.msalInstance.acquireTokenSilent(request);
+        return accessToken;
+      }catch{
+        const { accessToken } = await state.msalInstance.acquireTokenPopup(request);
+        return accessToken;
+      }
+    }
 
-        // Show job details
-        function showDetails(row) {
-            const modal = document.getElementById('detailModal');
-            const details = document.getElementById('modalDetails');
-            
-            // Extract data from row
-            const cells = row.getElementsByTagName('td');
-            
-            // Build detail HTML
-            details.innerHTML = `
-                <div class="detail-label">Record ID:</div>
-                <div class="detail-value">${cells[0].textContent}</div>
-                
-                <div class="detail-label">Job ID (Rego2):</div>
-                <div class="detail-value">${cells[1].textContent}</div>
-                
-                <div class="detail-label">Date/Time:</div>
-                <div class="detail-value">${cells[2].textContent}</div>
-                
-                <div class="detail-label">Price:</div>
-                <div class="detail-value"><strong>${cells[3].textContent}</strong></div>
-                
-                <div class="detail-label">Supplier(s):</div>
-                <div class="detail-value">${cells[4].textContent}</div>
-                
-                <div class="detail-label">Type:</div>
-                <div class="detail-value">${cells[5].innerHTML}</div>
-                
-                <div class="detail-label">Contact Email:</div>
-                <div class="detail-value">${cells[6].textContent}</div>
-                
-                <div class="detail-label">Description:</div>
-                <div class="detail-value">${cells[7].textContent}</div>
-                
-                <div class="detail-label">Reimbursement:</div>
-                <div class="detail-value">${cells[8].textContent}</div>
-                
-                <div class="detail-label">Total Charges:</div>
-                <div class="detail-value"><strong>${cells[9].textContent}</strong></div>
-            `;
-            
-            modal.classList.add('active');
-        }
+    async function checkAuthentication(){
+      const accounts = state.msalInstance.getAllAccounts();
+      if (accounts.length){
+        state.isAuthenticated = true;
+        document.getElementById('loadingScreen').classList.add('hidden');
+        document.getElementById('mainContainer').classList.add('authenticated');
+        await loadData();
+      }else{
+        showUnauthorized();
+      }
+    }
 
-        // Close modal
-        function closeModal() {
-            document.getElementById('detailModal').classList.remove('active');
-        }
+    function showUnauthorized(){
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('unauthorizedScreen').classList.add('show');
+      document.getElementById('mainContainer').classList.remove('authenticated');
+    }
 
-        // Pagination
-        function previousPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                document.getElementById('currentPage').textContent = currentPage;
-                // In production, fetch new page data
-            }
-        }
+    // ---------- GRAPH FETCH ----------
+    async function fetchJson(url, token){
+      const r = await fetch(url, { headers:{ Authorization:`Bearer ${token}` }});
+      if (!r.ok){
+        const text = await r.text().catch(()=> '');
+        throw new Error(`${r.status} ${r.statusText}: ${text}`);
+      }
+      return r.json();
+    }
 
-        function nextPage() {
-            const totalPages = parseInt(document.getElementById('totalPages').textContent);
-            if (currentPage < totalPages) {
-                currentPage++;
-                document.getElementById('currentPage').textContent = currentPage;
-                // In production, fetch new page data
-            }
-        }
+    async function fetchSharePointRows(){
+      const token = await getGraphToken();
+      const site = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:/sites${SPO_SITE_PATH}`, token);
 
-        // Close modal on background click
-        document.getElementById('detailModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+      // Get the list by displayName (exact match)
+      const lists = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${encodeURIComponent(SPO_LIST_TITLE)}'`, token);
+      if (!lists.value?.length) throw new Error(`List not found: ${SPO_LIST_TITLE}`);
+      const listId = lists.value[0].id;
+
+      // Pull up to 5000 items with expanded fields
+      const url = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5000`;
+      const items = await fetchJson(url, token);
+
+      // Return just the fields bag (flattened list item)
+      return items.value.map(v => v.fields);
+    }
+
+    // ---------- LOADING + RENDER ----------
+    async function loadData(){
+      try{
+        showToast('Loading data from SharePoint...', 'info');
+        const rows = await fetchSharePointRows();
+        state.allJobsData = rows;
+        state.filteredData = [...rows];
+        generateTableHeaders();
+        updateStatistics();
+        renderTable();
+        showToast(`Loaded ${rows.length} rows.`, 'success');
+      }catch(err){
+        console.error('Failed to load SharePoint data', err);
+        showToast('Failed to load SharePoint data. Check permissions.', 'error');
+        showEmptyState('Failed to connect to SharePoint');
+      }
+    }
+
+    function generateTableHeaders(){
+      const tableHeaders = document.getElementById('tableHeaders');
+      tableHeaders.innerHTML = '';
+      if (!state.allJobsData.length) return;
+
+      // Use all field keys except internal Graph metadata
+      const headers = Object.keys(state.allJobsData[0]).filter(h => !h.startsWith('@'));
+      headers.forEach(h=>{
+        const th = document.createElement('th');
+        th.textContent = h.replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').trim();
+        th.className = (state.sortColumn === h) ? `sorted sorted-${state.sortDirection}` : '';
+        th.onclick = ()=> sortTable(h);
+        tableHeaders.appendChild(th);
+      });
+    }
+
+    function renderTable(){
+      const body = document.getElementById('tableBody');
+      const empty = document.getElementById('emptyState');
+
+      if (!state.filteredData.length){
+        body.style.display = 'none'; empty.style.display = 'block';
+        updatePagination();
+        return;
+      }
+      body.style.display = ''; empty.style.display = 'none';
+
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end   = Math.min(start + state.pageSize, state.filteredData.length);
+      const rows  = state.filteredData.slice(start, end);
+
+      body.innerHTML = '';
+      rows.forEach(rec=>{
+        const tr = document.createElement('tr');
+        tr.onclick = ()=> showDetails(rec);
+
+        Object.keys(rec).forEach(k=>{
+          if (k.startsWith('@')) return;
+          const td = document.createElement('td');
+
+          if (k.toLowerCase().includes('status')){
+            const val = String(rec[k] ?? '').toLowerCase();
+            td.innerHTML = `<span class="status-badge status-${val}">${rec[k] ?? '-'}</span>`;
+          } else if (/price|amount|total/i.test(k) && typeof rec[k] === 'number'){
+            td.innerHTML = `<strong>$${rec[k].toLocaleString()}</strong>`;
+          } else {
+            td.textContent = (rec[k] ?? '').toString();
+          }
+          tr.appendChild(td);
         });
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Jobs Master List loaded');
-            // In production, this would fetch initial data from SharePoint
-        });
-    </script>
+        body.appendChild(tr);
+      });
+
+      updatePagination();
+    }
+
+    // ---------- STATS ----------
+    function updateStatistics(){
+      const total = state.allJobsData.length;
+      const now = new Date();
+      const thisMonth = state.allJobsData.filter(j=>{
+        const d = new Date(j.Created || j.CreatedDate || j.createdDateTime || j.Modified || 0);
+        return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+      }).length;
+
+      // Guess a numeric value column if present (not all note lists will have prices)
+      const numericKey = Object.keys(state.allJobsData[0] || {}).find(k=>/price|amount|total|value/i.test(k)) || null;
+      const nums = numericKey ? state.allJobsData.map(r=> Number(r[numericKey]) || 0) : [];
+      const avg = nums.length ? nums.reduce((a,b)=>a+b,0)/nums.length : 0;
+      const totalVal = nums.reduce((a,b)=>a+b,0);
+
+      const supplierKey = Object.keys(state.allJobsData[0] || {}).find(k=>/supplier/i.test(k)) || null;
+      const suppliers = supplierKey ? new Set(state.allJobsData.map(r=> r[supplierKey])).size : 0;
+
+      document.getElementById('statTotal').textContent = total.toLocaleString();
+      document.getElementById('statMonth').textContent = thisMonth.toLocaleString();
+      document.getElementById('statAvgPrice').textContent = `$${Math.round(avg).toLocaleString()}`;
+      document.getElementById('statRevenue').textContent = `$${Math.round(totalVal).toLocaleString()}`;
+      document.getElementById('statSuppliers').textContent = suppliers.toLocaleString();
+    }
+
+    // ---------- FILTERS ----------
+    function applyFilters(){
+      const f = state.filters;
+      f.jobId     = document.getElementById('filterJobId').value.toLowerCase();
+      f.supplier  = document.getElementById('filterSupplier').value.toLowerCase();
+      f.customer  = document.getElementById('filterCustomer').value.toLowerCase();
+      f.status    = document.getElementById('filterStatus').value;
+      f.dateFrom  = document.getElementById('filterDateFrom').value;
+      f.dateTo    = document.getElementById('filterDateTo').value;
+      f.type      = document.getElementById('filterType').value;
+      f.priceMin  = document.getElementById('filterPriceMin').value;
+
+      state.filteredData = state.allJobsData.filter(item=>{
+        const jobIdKey = Object.keys(item).find(k=>/job.?id|rego/i.test(k));
+        const supplierKey = Object.keys(item).find(k=>/supplier/i.test(k));
+        const customerKey = Object.keys(item).find(k=>/customer|name|contact/i.test(k));
+        const statusKey = Object.keys(item).find(k=>/status/i.test(k));
+        const typeKey = Object.keys(item).find(k=>/type/i.test(k));
+        const dateKey = Object.keys(item).find(k=>/created|date/i.test(k));
+        const priceKey = Object.keys(item).find(k=>/price|amount|total|value/i.test(k));
+
+        if (f.jobId && jobIdKey && !String(item[jobIdKey]||'').toLowerCase().includes(f.jobId)) return false;
+        if (f.supplier && supplierKey && !String(item[supplierKey]||'').toLowerCase().includes(f.supplier)) return false;
+        if (f.customer && customerKey && !String(item[customerKey]||'').toLowerCase().includes(f.customer)) return false;
+        if (f.status && statusKey && String(item[statusKey]||'') !== f.status) return false;
+        if (f.type && typeKey && String(item[typeKey]||'') !== f.type) return false;
+
+        if (f.dateFrom && dateKey && String(item[dateKey]||'').slice(0,10) < f.dateFrom) return false;
+        if (f.dateTo && dateKey && String(item[dateKey]||'').slice(0,10) > f.dateTo) return false;
+
+        if (f.priceMin && priceKey && Number(item[priceKey]||0) < Number(f.priceMin)) return false;
+        return true;
+      });
+
+      state.currentPage = 1;
+      renderTable();
+      showToast(`Filters applied: ${state.filteredData.length} records`, 'info');
+    }
+
+    function clearFilters(){
+      ['filterJobId','filterSupplier','filterCustomer','filterStatus','filterDateFrom','filterDateTo','filterType','filterPriceMin']
+        .forEach(id=> document.getElementById(id).value = '');
+      Object.keys(state.filters).forEach(k=> state.filters[k]='');
+      state.filteredData = [...state.allJobsData];
+      state.currentPage = 1;
+      renderTable();
+      showToast('Filters cleared', 'info');
+    }
+
+    // ---------- SORT ----------
+    function sortTable(column){
+      if (state.sortColumn === column){
+        state.sortDirection = (state.sortDirection === 'asc') ? 'desc' : 'asc';
+      } else {
+        state.sortColumn = column; state.sortDirection = 'asc';
+      }
+      const dir = state.sortDirection === 'asc' ? 1 : -1;
+
+      state.filteredData.sort((a,b)=>{
+        const va = a[column], vb = b[column];
+        if (typeof va === 'number' && typeof vb === 'number') return (va - vb)*dir;
+        const sa = String(va ?? '').toLowerCase(), sb = String(vb ?? '').toLowerCase();
+        if (sa < sb) return -1*dir; if (sa > sb) return 1*dir; return 0;
+      });
+
+      generateTableHeaders();
+      renderTable();
+    }
+
+    // ---------- PAGINATION ----------
+    function updatePagination(){
+      const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = Math.min(start + state.pageSize, state.filteredData.length);
+      const shown = Math.max(0, end - start);
+
+      document.getElementById('recordCount').textContent = shown;
+      document.getElementById('totalRecords').textContent = state.filteredData.length;
+      document.getElementById('currentPage').textContent = state.currentPage;
+      document.getElementById('totalPages').textContent = totalPages || 1;
+
+      document.getElementById('btnFirst').disabled = state.currentPage === 1;
+      document.getElementById('btnPrev').disabled  = state.currentPage === 1;
+      document.getElementById('btnNext').disabled  = state.currentPage >= totalPages;
+      document.getElementById('btnLast').disabled  = state.currentPage >= totalPages;
+    }
+    function firstPage(){ state.currentPage = 1; renderTable(); }
+    function previousPage(){ if (state.currentPage>1){ state.currentPage--; renderTable(); } }
+    function nextPage(){ const t = Math.ceil(state.filteredData.length/state.pageSize); if (state.currentPage<t){ state.currentPage++; renderTable(); } }
+    function lastPage(){ state.currentPage = Math.ceil(state.filteredData.length/state.pageSize)||1; renderTable(); }
+    function changePageSize(){ state.pageSize = parseInt(document.getElementById('pageSizeSelect').value,10)||50; state.currentPage=1; renderTable(); }
+
+    // ---------- MODAL ----------
+    function showDetails(record){
+      state.currentRecord = record;
+      const details = document.getElementById('modalDetails');
+      details.innerHTML = '';
+      Object.keys(record).forEach(k=>{
+        if (k.startsWith('@')) return;
+        const label = document.createElement('div');
+        label.className='detail-label';
+        label.textContent = k.replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').trim();
+        const value = document.createElement('div');
+        value.className='detail-value';
+        if (/status/i.test(k)){
+          value.innerHTML = `<span class="status-badge status-${String(record[k]??'').toLowerCase()}">${record[k]??'-'}</span>`;
+        }else if (/price|amount|total|value/i.test(k) && typeof record[k]==='number'){
+          value.innerHTML = `<strong>$${record[k].toLocaleString()}</strong>`;
+        }else{
+          value.textContent = record[k] ?? '-';
+        }
+        details.appendChild(label); details.appendChild(value);
+      });
+      document.getElementById('detailModal').classList.add('active');
+    }
+    function closeModal(){ document.getElementById('detailModal').classList.remove('active'); state.currentRecord=null; }
+
+    // ---------- EXPORT ----------
+    function exportData(){
+      if (!state.filteredData.length) return showToast('No data to export','warning');
+      const headers = Object.keys(state.filteredData[0]).filter(h=>!h.startsWith('@'));
+      const lines = [headers.join(',')];
+      state.filteredData.forEach(r=>{
+        const row = headers.map(h=>{
+          let v = r[h]; if (v==null) v = '';
+          v = String(v).replace(/"/g,'""');
+          return (v.includes(',')||v.includes('"')||v.includes('\n')) ? `"${v}"` : v;
+        }).join(',');
+        lines.push(row);
+      });
+      const blob = new Blob([lines.join('\n')],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `jobbuildnotes_export_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      showToast(`Exported ${state.filteredData.length} records`, 'success');
+    }
+
+    // ---------- UTILS ----------
+    function showToast(message,type='info'){
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div'); el.className = `toast ${type}`;
+      const icons = {success:'✓',error:'✖',warning:'⚠',info:'ℹ'};
+      el.innerHTML = `<span>${icons[type]}</span><span class="toast-message">${message}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+      container.appendChild(el); setTimeout(()=> el.remove(), 5000);
+    }
+    function showEmptyState(msg){
+      const empty = document.getElementById('emptyState');
+      empty.querySelector('.empty-message').textContent = msg || 'No data available';
+      document.getElementById('tableBody').style.display='none';
+      empty.style.display='block';
+    }
+    async function refreshData(){ showToast('Refreshing data...','info'); await loadData(); }
+
+    // ---------- EVENTS ----------
+    window.addEventListener('DOMContentLoaded', initializeApp);
+    window.addEventListener('click', e=>{ if (e.target === document.getElementById('detailModal')) closeModal(); });
+    document.addEventListener('keydown', e=>{ if (e.key==='Escape') closeModal(); if (e.ctrlKey && e.key==='f'){ e.preventDefault(); document.getElementById('filterJobId').focus(); }});
+  </script>
 </body>
 </html>
