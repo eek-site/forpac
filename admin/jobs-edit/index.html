@@ -1,156 +1,984 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Edit Jobs | FormanPacific Service Claims</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Jobs | FormanPacific Service Claims Management</title>
+  <meta name="description" content="Edit and manage jobs in SharePoint BookAJobMaster list">
+  <meta name="robots" content="noindex, nofollow">
 
-  <!-- MSAL (Microsoft Authentication Library) -->
+  <!-- Microsoft Authentication Library -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- AG Grid (Community) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css">
-  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+  <!-- AG Grid Community Edition -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
 
   <style>
     :root {
-      --brand1: #1e3c72;
-      --brand2: #2a5298;
-      --text: #2d3748;
-      --muted: #718096;
-      --bg: #f5f7fa;
-      --card: #ffffff;
-      --ok: #48bb78;
-      --warn: #ed8936;
-      --danger: #e53e3e;
+      --primary: #1e3c72;
+      --primary-dark: #152a52;
+      --secondary: #2a5298;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --bg-light: #f8fafc;
+      --bg-white: #ffffff;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
-    * { box-sizing: border-box; }
-    body {
+
+    * {
       margin: 0;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text);
-      background: linear-gradient(135deg, var(--bg) 0%, #c3cfe2 100%);
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
       min-height: 100vh;
+      line-height: 1.6;
     }
+
+    /* Header */
     header {
-      position: sticky; top: 0; z-index: 10;
-      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-white);
+      box-shadow: var(--shadow-md);
+      border-bottom: 2px solid var(--border);
     }
-    .header-inner { max-width: 1600px; margin: 0 auto; padding: 16px 24px; display:flex; align-items:center; justify-content:space-between; }
-    .brand { display:flex; align-items:center; gap:12px; }
-    .logo { width:44px; height:44px; border-radius:10px; display:grid; place-items:center; font-weight:800; color:#fff; background: linear-gradient(135deg, var(--brand1), var(--brand2)); }
-    .brand h1 { font-size: 20px; margin:0; color: var(--brand1); }
-    .brand small { display:block; color: var(--muted); margin-top:2px; }
-    .actions { display:flex; gap:10px; }
-    .btn { border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
-    .btn.primary { background: var(--brand1); color: #fff; }
-    .btn.secondary { background: #e2e8f0; color: #1a202c; }
-    .btn.ok { background: var(--ok); color: #fff; }
-    .btn.warn { background: var(--warn); color: #fff; }
-    .btn.danger { background: var(--danger); color: #fff; }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .container { max-width: 1600px; margin: 18px auto; padding: 0 20px 30px; }
+    .header-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
 
-    .panel { background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 16px; }
-    .toolbar { display:flex; flex-wrap: wrap; gap:10px; align-items:center; margin-bottom: 12px; }
-    .toolbar .spacer { flex:1; }
-    .pill { background:#edf2f7; color:#2d3748; padding:8px 12px; border-radius:999px; font-size: 12px; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-    .statusbar { display:flex; gap:10px; align-items:center; margin-top: 10px; }
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: var(--shadow-md);
+    }
 
+    .brand-text h1 {
+      font-size: 24px;
+      color: var(--primary);
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .brand-text small {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.secondary {
+      background: var(--bg-light);
+      color: var(--text-primary);
+      border: 2px solid var(--border);
+    }
+
+    .btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .btn.success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn.success:hover {
+      background: #059669;
+    }
+
+    .btn.warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn.warning:hover {
+      background: #d97706;
+    }
+
+    .btn.danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn.danger:hover {
+      background: #dc2626;
+    }
+
+    .btn.info {
+      background: var(--info);
+      color: white;
+    }
+
+    .btn.info:hover {
+      background: #2563eb;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1600px;
+      margin: 24px auto;
+      padding: 0 24px 40px;
+    }
+
+    /* Panel */
+    .panel {
+      background: var(--bg-white);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar .spacer {
+      flex: 1;
+    }
+
+    /* Pills/Badges */
+    .pill {
+      background: var(--bg-light);
+      color: var(--text-primary);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .pill.success {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #6ee7b7;
+    }
+
+    .pill.warning {
+      background: #fed7aa;
+      color: #92400e;
+      border-color: #fb923c;
+    }
+
+    .pill.danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    .pill.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #93c5fd;
+    }
+
+    /* Status Bar */
+    .statusbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    /* Grid Container */
     #grid {
-      height: auto;
-      min-height: 400px; /* keep some height when empty */
+      height: 600px;
       width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
     }
 
-    .login-screen, .loading-screen { position: fixed; inset: 0; background: #fff; display: grid; place-items: center; }
-    .hidden { display:none !important; }
+    /* Search Box */
+    .search-box {
+      position: relative;
+      flex: 0 1 300px;
+    }
 
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index: 20; }
-    .modal.active { display:flex; }
-    .modal .card { background:#fff; border-radius: 14px; width: 480px; max-width: 92vw; padding: 18px; box-shadow: 0 14px 60px rgba(0,0,0,0.35); }
-    .modal h3 { margin: 0 0 12px; }
-    .row { display:flex; flex-direction: column; gap:6px; margin-bottom:10px; }
-    input[type="text"], select { border:1px solid #e2e8f0; border-radius:10px; padding:10px; font-size:14px; }
+    .search-input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 36px 8px 12px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+    }
+
+    /* Select Dropdown */
+    select {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      background: var(--bg-white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    /* Loading & Login Screens */
+    .overlay-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .overlay-content {
+      text-align: center;
+      max-width: 480px;
+      padding: 40px;
+      background: var(--bg-white);
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: var(--bg-white);
+      border-radius: 16px;
+      width: 520px;
+      max-width: 92vw;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: var(--shadow-xl);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--bg-light);
+      color: var(--text-primary);
+    }
+
+    .form-row {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    .form-help {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: var(--bg-white);
+      padding: 14px 18px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      animation: slideInRight 0.3s ease;
+      border-left: 4px solid;
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning);
+    }
+
+    .toast.info {
+      border-left-color: var(--info);
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Bulk Actions Menu */
+    .bulk-actions {
+      position: relative;
+      display: inline-block;
+    }
+
+    .bulk-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 8px;
+      background: var(--bg-white);
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      padding: 8px;
+      min-width: 200px;
+      display: none;
+      z-index: 50;
+    }
+
+    .bulk-menu.show {
+      display: block;
+    }
+
+    .bulk-menu-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bulk-menu-item:hover {
+      background: var(--bg-light);
+    }
+
+    .bulk-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0;
+    }
+
+    /* Grid Stats */
+    .grid-stats {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .grid-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .grid-stat strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Column Config Button */
+    .column-config {
+      position: relative;
+    }
+
+    .column-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: var(--bg-white);
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      padding: 12px;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+      z-index: 50;
+    }
+
+    .column-menu.show {
+      display: block;
+    }
+
+    .column-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .column-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .column-item:hover {
+      background: var(--bg-light);
+    }
+
+    .column-checkbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-inner {
+        padding: 12px 16px;
+      }
+
+      .brand-text h1 {
+        font-size: 20px;
+      }
+
+      .container {
+        padding: 0 16px 24px;
+        margin: 16px auto;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .toolbar {
+        gap: 8px;
+      }
+
+      #grid {
+        height: 400px;
+      }
+
+      .modal-card {
+        width: 95vw;
+        padding: 20px;
+      }
+
+      .search-box {
+        flex: 1 1 100%;
+      }
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-white: #0f172a;
+        --bg-light: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border: #334155;
+      }
+
+      body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+
+      .ag-theme-alpine {
+        --ag-background-color: var(--bg-white);
+        --ag-header-background-color: var(--bg-light);
+        --ag-odd-row-background-color: var(--bg-light);
+        --ag-border-color: var(--border);
+      }
+
+      .form-input, .form-select, select {
+        background: var(--bg-light);
+        color: var(--text-primary);
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      header, .toolbar, .statusbar {
+        display: none;
+      }
+
+      .panel {
+        box-shadow: none;
+        border: 1px solid #000;
+      }
+
+      #grid {
+        height: auto;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- Login / Loading overlays -->
-  <div id="loginScreen" class="login-screen">
-    <div style="text-align:center; max-width: 420px; padding: 18px;">
-      <div class="logo" style="margin:0 auto 10px;">FP</div>
-      <h2>Sign in to edit Jobs</h2>
-      <p class="pill" style="margin: 10px auto 18px;">SharePoint permissions are respected</p>
-      <button id="btnLogin" class="btn primary">Sign in</button>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="overlay-screen">
+    <div class="overlay-content">
+      <div class="logo" style="margin: 0 auto 20px; width: 80px; height: 80px; font-size: 32px;">FP</div>
+      <h2 style="margin-bottom: 12px; color: var(--text-primary);">Sign In Required</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 24px;">
+        Access the Jobs Editor with your Microsoft work account. SharePoint permissions are enforced.
+      </p>
+      <div class="pill info" style="margin: 0 auto 24px; display: inline-flex;">
+        <span>🔒</span> Secure SharePoint Integration
+      </div>
+      <button id="btnLogin" class="btn primary" style="font-size: 16px; padding: 12px 24px;">
+        Sign in with Microsoft
+      </button>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-top: 16px;">
+        You'll be redirected to Microsoft's secure login
+      </p>
     </div>
   </div>
-  <div id="loadingScreen" class="loading-screen hidden"><div>Loading…</div></div>
 
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="overlay-screen hidden">
+    <div class="overlay-content">
+      <div class="spinner"></div>
+      <h3 style="color: var(--text-primary);">Loading Jobs Editor</h3>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Connecting to SharePoint...</p>
+    </div>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="header-inner">
       <div class="brand">
         <div class="logo">FP</div>
-        <div>
-          <h1>FormanPacific <small>Edit Jobs</small></h1>
-          <small>BookAJobMaster (SharePoint)</small>
+        <div class="brand-text">
+          <h1>FormanPacific <small>Jobs Editor</small></h1>
+          <small>📊 BookAJobMaster (SharePoint Live)</small>
         </div>
       </div>
-      <div class="actions">
-        <button class="btn secondary" onclick="location.href='/admin/dashboard'">← Back to Dashboard</button>
-        <button class="btn secondary" onclick="location.href='/admin/jobs-master'">View Mode</button>
+      <div class="header-actions">
+        <button class="btn secondary" onclick="location.href='/admin/dashboard'">
+          ← Dashboard
+        </button>
+        <button class="btn secondary" onclick="location.href='/admin/jobs-master'">
+          👁️ View Only
+        </button>
+        <button class="btn info" id="btnRefresh">
+          🔄 Refresh
+        </button>
       </div>
     </div>
   </header>
 
+  <!-- Main Container -->
   <div class="container">
     <div class="panel">
+      <!-- Toolbar -->
       <div class="toolbar">
-        <button id="btnAddRow" class="btn">Add Row</button>
-        <button id="btnDelete" class="btn danger">Delete Selected</button>
-        <button id="btnSave" class="btn ok" disabled>Save Changes</button>
+        <div class="toolbar-group">
+          <button id="btnAddRow" class="btn success">
+            ➕ Add Row
+          </button>
+          <div class="bulk-actions">
+            <button id="btnBulkActions" class="btn secondary">
+              Bulk Actions ▼
+            </button>
+            <div id="bulkMenu" class="bulk-menu">
+              <div class="bulk-menu-item" id="btnDeleteSelected">
+                🗑️ Delete Selected
+              </div>
+              <div class="bulk-menu-item" id="btnDuplicateSelected">
+                📋 Duplicate Selected
+              </div>
+              <div class="bulk-menu-divider"></div>
+              <div class="bulk-menu-item" id="btnExportSelected">
+                📥 Export Selected
+              </div>
+            </div>
+          </div>
+          <button id="btnSave" class="btn primary" disabled>
+            💾 Save Changes
+          </button>
+          <button id="btnDiscard" class="btn secondary" disabled>
+            ❌ Discard Changes
+          </button>
+        </div>
+        
         <div class="spacer"></div>
-        <button id="btnAddColumn" class="btn warn">Add Column</button>
-        <select id="viewPicker" class="pill"></select>
-        <span id="userPill" class="pill"></span>
+        
+        <div class="toolbar-group">
+          <div class="search-box">
+            <input type="text" id="quickSearch" class="search-input" placeholder="Quick search...">
+            <span class="search-icon">🔍</span>
+          </div>
+          <select id="viewPicker" class="pill">
+            <option>Default View</option>
+          </select>
+          <div class="column-config">
+            <button id="btnColumnConfig" class="btn secondary">
+              ⚙️ Columns
+            </button>
+            <div id="columnMenu" class="column-menu">
+              <h4 style="margin: 0 0 12px; font-size: 14px;">Visible Columns</h4>
+              <div id="columnList" class="column-list">
+                <!-- Column checkboxes will be populated here -->
+              </div>
+            </div>
+          </div>
+          <button id="btnAddColumn" class="btn warning">
+            ➕ Add Column
+          </button>
+        </div>
       </div>
 
+      <!-- AG Grid -->
       <div id="grid" class="ag-theme-alpine"></div>
+
+      <!-- Status Bar -->
       <div class="statusbar">
-        <span id="chgPill" class="pill">0 pending changes</span>
-        <span id="infoPill" class="pill">Ready</span>
+        <div class="grid-stats">
+          <div class="grid-stat">
+            <span>Rows:</span> <strong id="rowCount">0</strong>
+          </div>
+          <div class="grid-stat">
+            <span>Selected:</span> <strong id="selectedCount">0</strong>
+          </div>
+          <div class="grid-stat">
+            <span>Filtered:</span> <strong id="filteredCount">0</strong>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <span id="userPill" class="pill">Not signed in</span>
+        <span id="changesPill" class="pill">0 pending changes</span>
+        <span id="statusPill" class="pill info">Ready</span>
       </div>
     </div>
   </div>
 
   <!-- Add Column Modal -->
-  <div id="colModal" class="modal">
-    <div class="card">
-      <h3>Add Column</h3>
-      <div class="row">
-        <label>Display name</label>
-        <input id="colDisplay" type="text" placeholder="e.g. Unit Price" />
+  <div id="columnModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Column</h3>
+        <button class="modal-close" onclick="closeColumnModal()">×</button>
       </div>
-      <div class="row">
-        <label>Type</label>
-        <select id="colType">
-          <option value="Text">Text</option>
+      
+      <div class="form-row">
+        <label class="form-label">Display Name</label>
+        <input id="colDisplay" type="text" class="form-input" placeholder="e.g., Unit Price, Status, Due Date">
+        <div class="form-help">This is how the column will appear in the grid</div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Internal Name</label>
+        <input id="colInternal" type="text" class="form-input" placeholder="Auto-generated from display name" disabled>
+        <div class="form-help">SharePoint internal field name (auto-generated)</div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Column Type</label>
+        <select id="colType" class="form-select">
+          <option value="Text">Single line of text</option>
+          <option value="Note">Multiple lines of text</option>
           <option value="Number">Number</option>
-          <option value="Currency">Currency</option>
-          <option value="DateTime">Date & Time</option>
-          <option value="Boolean">Yes/No</option>
-          <option value="Choice">Choice</option>
+          <option value="Currency">Currency ($)</option>
+          <option value="DateTime">Date and Time</option>
+          <option value="Boolean">Yes/No (checkbox)</option>
+          <option value="Choice">Choice (dropdown)</option>
+          <option value="MultiChoice">Multiple choice (checkboxes)</option>
+          <option value="Lookup">Lookup (from another list)</option>
+          <option value="User">Person or Group</option>
+          <option value="URL">Hyperlink</option>
         </select>
       </div>
-      <div class="row" id="choiceRow" style="display:none;">
-        <label>Choices (comma separated)</label>
-        <input id="colChoices" type="text" placeholder="Open, Closed, Void" />
+      
+      <div class="form-row" id="choiceRow" style="display:none;">
+        <label class="form-label">Choices</label>
+        <textarea id="colChoices" class="form-input" rows="4" placeholder="Enter each choice on a new line:&#10;Open&#10;In Progress&#10;Closed"></textarea>
+        <div class="form-help">Enter one choice per line</div>
       </div>
-      <div style="display:flex; gap:10px; justify-content:flex-end;">
-        <button class="btn secondary" onclick="closeColModal()">Cancel</button>
-        <button id="colCreateBtn" class="btn primary">Create</button>
+      
+      <div class="form-row" id="defaultRow">
+        <label class="form-label">Default Value (optional)</label>
+        <input id="colDefault" type="text" class="form-input" placeholder="Leave blank for no default">
+      </div>
+      
+      <div class="form-row">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="colRequired" style="width: 18px; height: 18px;">
+          <span class="form-label" style="margin: 0;">Require that this column contains information</span>
+        </label>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn secondary" onclick="closeColumnModal()">Cancel</button>
+        <button id="btnCreateColumn" class="btn primary">Create Column</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Data Modal -->
+  <div id="importModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Import Data</h3>
+        <button class="modal-close" onclick="closeImportModal()">×</button>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Select CSV or Excel file</label>
+        <input type="file" id="importFile" accept=".csv,.xlsx,.xls" class="form-input">
+        <div class="form-help">First row should contain column headers matching SharePoint fields</div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">Import Options</label>
+        <label style="display: flex; align-items: center; gap: 8px; margin: 8px 0;">
+          <input type="checkbox" id="importAppend" checked>
+          <span>Append to existing data (unchecked will replace all data)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="importValidate" checked>
+          <span>Validate data before import</span>
+        </label>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn secondary" onclick="closeImportModal()">Cancel</button>
+        <button id="btnImportData" class="btn primary">Import</button>
       </div>
     </div>
   </div>
@@ -158,308 +986,772 @@
   <script>
     'use strict';
 
-    // ===== Config =====
-    const SPO_TENANT = 'roadandrescue.sharepoint.com';
-    const SITE_REL = '/sites/rar';
-    const LIST_TITLE = 'BookAJobMaster';
-
-    // MSAL config — same tenant as your app registration
-    const msalConfig = {
-      auth: {
-        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
-        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
-        redirectUri: window.location.origin + '/admin/jobs-edit'
+    // ===== Configuration =====
+    const CONFIG = {
+      sharepoint: {
+        tenant: 'roadandrescue.sharepoint.com',
+        siteRelative: '/sites/rar',
+        listTitle: 'BookAJobMaster'
       },
-      cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
+      msal: {
+        auth: {
+          clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+          authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+          redirectUri: window.location.origin + '/admin/jobs-edit'
+        },
+        cache: {
+          cacheLocation: 'sessionStorage',
+          storeAuthStateInCookie: true
+        }
+      },
+      grid: {
+        pagination: true,
+        paginationPageSize: 100,
+        animateRows: true,
+        enableRangeSelection: true,
+        enableCellChangeFlash: true,
+        undoRedoCellEditing: true,
+        undoRedoCellEditingLimit: 20,
+        stopEditingWhenCellsLoseFocus: true
+      }
     };
 
-    const SPO_SCOPE_READ = `https://${SPO_TENANT}/AllSites.Read`;
-    const SPO_SCOPE_FULL = `https://${SPO_TENANT}/AllSites.FullControl`;
+    // ===== State Management =====
+    const state = {
+      msalInstance: null,
+      account: null,
+      accessToken: null,
+      gridApi: null,
+      columnApi: null,
+      originalData: [],
+      pendingChanges: {
+        updates: new Map(),
+        creates: [],
+        deletes: new Set()
+      },
+      columnDefs: [],
+      viewFields: [],
+      isDirty: false
+    };
 
-    let msalInstance, account, accessToken;
-    let gridOptions;
-    let columnDefs = [];
-    let pending = { updates: new Map(), creates: [], deletes: [] };
-    let viewFieldsOrder = [];
-
-    // ===== UI helpers =====
+    // ===== Utility Functions =====
     const $ = sel => document.querySelector(sel);
-    const setInfo = (t) => $('#infoPill').textContent = t;
-    const setChanges = () => {
-      const n = pending.updates.size + pending.creates.length + pending.deletes.length;
-      $('#chgPill').textContent = `${n} pending changes`;
-      $('#btnSave').disabled = n === 0;
-    };
+    const $$ = sel => document.querySelectorAll(sel);
 
-    // ===== Auth =====
-    async function initAuth() {
-      msalInstance = new msal.PublicClientApplication(msalConfig);
-      await msalInstance.initialize();
-      try { await msalInstance.handleRedirectPromise(); } catch(e) {}
-      const accounts = msalInstance.getAllAccounts();
-      if (accounts.length) {
-        account = accounts[0];
-        $('#loginScreen').classList.add('hidden');
-        $('#loadingScreen').classList.remove('hidden');
-        $('#userPill').textContent = account.username;
-        accessToken = await getToken([SPO_SCOPE_FULL]);
-        await bootstrap();
-        $('#loadingScreen').classList.add('hidden');
-      } else {
-        $('#loginScreen').classList.remove('hidden');
-      }
-      $('#btnLogin').onclick = async () => {
-        await msalInstance.loginRedirect({ scopes: [SPO_SCOPE_FULL] });
+    function showToast(message, type = 'info') {
+      const container = $('#toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icons = {
+        success: '✓',
+        error: '✖',
+        warning: '⚠',
+        info: 'ℹ'
       };
+      
+      toast.innerHTML = `
+        <span style="font-size: 18px;">${icons[type]}</span>
+        <span style="flex: 1;">${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; font-size: 18px;">×</button>
+      `;
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
     }
 
-    async function getToken(scopes) {
+    function setStatus(text, type = 'info') {
+      const pill = $('#statusPill');
+      pill.textContent = text;
+      pill.className = `pill ${type}`;
+    }
+
+    function updateChangeCount() {
+      const count = state.pendingChanges.updates.size + 
+                   state.pendingChanges.creates.length + 
+                   state.pendingChanges.deletes.size;
+      
+      $('#changesPill').textContent = `${count} pending changes`;
+      $('#changesPill').className = count > 0 ? 'pill warning' : 'pill';
+      $('#btnSave').disabled = count === 0;
+      $('#btnDiscard').disabled = count === 0;
+      state.isDirty = count > 0;
+      
+      // Update grid stats
+      updateGridStats();
+    }
+
+    function updateGridStats() {
+      if (!state.gridApi) return;
+      
+      $('#rowCount').textContent = state.gridApi.getDisplayedRowCount();
+      $('#selectedCount').textContent = state.gridApi.getSelectedRows().length;
+      
+      const model = state.gridApi.getModel();
+      const filteredCount = model.getRowCount ? model.getRowCount() : state.gridApi.getDisplayedRowCount();
+      $('#filteredCount').textContent = filteredCount;
+    }
+
+    function generateInternalName(displayName) {
+      return displayName.replace(/[^a-zA-Z0-9]/g, '');
+    }
+
+    // ===== Authentication =====
+    async function initAuth() {
       try {
-        const res = await msalInstance.acquireTokenSilent({ scopes, account: msalInstance.getAllAccounts()[0] });
-        return res.accessToken;
-      } catch (e) {
-        const res = await msalInstance.acquireTokenPopup({ scopes });
-        return res.accessToken;
+        state.msalInstance = new msal.PublicClientApplication(CONFIG.msal);
+        await state.msalInstance.initialize();
+        
+        // Handle redirect
+        const response = await state.msalInstance.handleRedirectPromise();
+        if (response) {
+          console.log('Redirect handled successfully');
+        }
+        
+        const accounts = state.msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+          state.account = accounts[0];
+          $('#loginScreen').classList.add('hidden');
+          $('#loadingScreen').classList.remove('hidden');
+          $('#userPill').textContent = state.account.username;
+          
+          // Get token and initialize
+          await getAccessToken();
+          await initializeApp();
+          
+          $('#loadingScreen').classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Auth initialization failed:', error);
+        showToast('Authentication failed. Please refresh and try again.', 'error');
       }
     }
 
-    // ===== SharePoint REST helpers =====
-    async function sp(url, opt={}) {
-      const res = await fetch(url, {
-        ...opt,
+    async function getAccessToken() {
+      const scopes = [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`];
+      
+      try {
+        const response = await state.msalInstance.acquireTokenSilent({
+          scopes,
+          account: state.account
+        });
+        state.accessToken = response.accessToken;
+        return response.accessToken;
+      } catch (error) {
+        // Fall back to interactive
+        try {
+          const response = await state.msalInstance.acquireTokenPopup({ scopes });
+          state.accessToken = response.accessToken;
+          return response.accessToken;
+        } catch (popupError) {
+          console.error('Token acquisition failed:', popupError);
+          throw popupError;
+        }
+      }
+    }
+
+    // ===== SharePoint API =====
+    async function spRequest(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${state.accessToken}`,
           'Accept': 'application/json;odata=nometadata',
-          ...(opt.headers || {})
+          ...options.headers
         }
       });
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${url}`);
-      if (res.status === 204) return null;
-      return res.json();
+      
+      if (!response.ok) {
+        throw new Error(`SharePoint API error: ${response.status} ${response.statusText}`);
+      }
+      
+      if (response.status === 204) return null;
+      return response.json();
     }
 
-    function siteUrl(path='') { return `https://${SPO_TENANT}${SITE_REL}${path}`; }
-
-    // Get views for picker (optional)
-    async function getViews() {
-      const j = await sp(siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/views?$select=Id,Title,DefaultView`));
-      return j.value || [];
+    function getSiteUrl(path = '') {
+      return `https://${CONFIG.sharepoint.tenant}${CONFIG.sharepoint.siteRelative}${path}`;
     }
 
-    // RenderListDataAsStream loads schema + rows for a view
-    async function loadViewData(viewXml='<View/>') {
-      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/RenderListDataAsStream`);
-      const body = { parameters: { RenderOptions: 570, ViewXml: viewXml } };
-      return sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(body) });
+    async function loadListData() {
+      setStatus('Loading data...', 'info');
+      
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
+      const body = {
+        parameters: {
+          RenderOptions: 570,
+          ViewXml: '<View><RowLimit>5000</RowLimit></View>'
+        }
+      };
+      
+      const data = await spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(body)
+      });
+      
+      return data;
     }
 
-    // CRUD
-    async function createItem(payload) {
-      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/items`);
-      return sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(payload) });
+    async function createItem(item) {
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
+      
+      return spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(item)
+      });
     }
-    async function updateItem(id, patch) {
-      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/items(${id})`);
-      await sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose', 'IF-MATCH':'*', 'X-HTTP-Method':'MERGE' }, body: JSON.stringify(patch) });
+
+    async function updateItem(id, updates) {
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+      
+      await spRequest(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;odata=verbose',
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'MERGE'
+        },
+        body: JSON.stringify(updates)
+      });
     }
+
     async function deleteItem(id) {
-      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/items(${id})`);
-      await sp(url, { method:'POST', headers:{ 'IF-MATCH':'*', 'X-HTTP-Method':'DELETE' } });
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+      
+      await spRequest(url, {
+        method: 'POST',
+        headers: {
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'DELETE'
+        }
+      });
     }
 
-    // Add field/column
-    async function addField({ displayName, type, choices }) {
-      const url = siteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(LIST_TITLE)}')/fields`);
+    async function addField(fieldConfig) {
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
+      
       let body;
-      switch (type) {
+      const baseField = {
+        '__metadata': { 'type': 'SP.Field' },
+        Title: fieldConfig.displayName,
+        Required: fieldConfig.required || false
+      };
+      
+      switch (fieldConfig.type) {
         case 'Number':
-          body = { '__metadata': { 'type': 'SP.FieldNumber' }, Title: displayName, FieldTypeKind: 9 };
+          body = { ...baseField, '__metadata': { 'type': 'SP.FieldNumber' }, FieldTypeKind: 9 };
           break;
         case 'Currency':
-          body = { '__metadata': { 'type': 'SP.FieldCurrency' }, Title: displayName, FieldTypeKind: 10, CurrencyLocaleId: 5129 };// NZD locale
+          body = { ...baseField, '__metadata': { 'type': 'SP.FieldCurrency' }, FieldTypeKind: 10, CurrencyLocaleId: 1033 };
           break;
         case 'DateTime':
-          body = { '__metadata': { 'type': 'SP.FieldDateTime' }, Title: displayName, FieldTypeKind: 4, DisplayFormat: 1 };
+          body = { ...baseField, '__metadata': { 'type': 'SP.FieldDateTime' }, FieldTypeKind: 4, DisplayFormat: 1 };
           break;
         case 'Boolean':
-          body = { '__metadata': { 'type': 'SP.Field' }, Title: displayName, FieldTypeKind: 8 };
+          body = { ...baseField, FieldTypeKind: 8 };
           break;
         case 'Choice':
-          body = { '__metadata': { 'type': 'SP.FieldChoice' }, Title: displayName, FieldTypeKind: 6, Choices: { results: choices || [] } };
+          body = {
+            ...baseField,
+            '__metadata': { 'type': 'SP.FieldChoice' },
+            FieldTypeKind: 6,
+            Choices: { results: fieldConfig.choices || [] }
+          };
+          break;
+        case 'Note':
+          body = { ...baseField, '__metadata': { 'type': 'SP.FieldMultiLineText' }, FieldTypeKind: 3 };
           break;
         default:
-          body = { '__metadata': { 'type': 'SP.FieldText' }, Title: displayName, FieldTypeKind: 2 };
+          body = { ...baseField, '__metadata': { 'type': 'SP.FieldText' }, FieldTypeKind: 2 };
       }
-      return sp(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(body) });
+      
+      if (fieldConfig.defaultValue) {
+        body.DefaultValue = fieldConfig.defaultValue;
+      }
+      
+      return spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(body)
+      });
     }
 
-    // ===== Grid setup =====
-    function schemaToColumnDefs(schemaFields) {
-      const visible = schemaFields.filter(f => !f.Hidden);
-      viewFieldsOrder = visible.map(f => f.Name);
-      const defs = visible.map(f => ({
-        headerName: f.DisplayName || f.Name,
-        field: f.Name,
-        editable: !f.ReadOnlyField && !f.Sealed,
-        sortable: true, filter: true, resizable: true,
-        minWidth: 120,
-        valueParser: params => {
-          // Basic coercion by type
-          if (['Number','Currency'].includes(f.Type)) {
-            const v = params.newValue; return (v === '' || v == null) ? null : Number(v);
-          }
-          if (f.Type === 'Boolean') {
-            const s = String(params.newValue).toLowerCase();
-            return ['true','1','yes','y'].includes(s);
-          }
-          return params.newValue;
+    // ===== Grid Configuration =====
+    function buildColumnDefs(schemaFields) {
+      const visibleFields = schemaFields.filter(f => !f.Hidden);
+      state.viewFields = visibleFields.map(f => f.Name);
+      
+      const defs = [
+        {
+          headerName: '',
+          field: '__selection__',
+          checkboxSelection: true,
+          headerCheckboxSelection: true,
+          width: 50,
+          pinned: 'left',
+          lockPosition: true,
+          suppressMenu: true
+        },
+        {
+          headerName: 'ID',
+          field: 'ID',
+          width: 80,
+          pinned: 'left',
+          editable: false,
+          cellStyle: { fontWeight: 'bold' }
         }
-      }));
-      // Always ensure ID column exists (not editable)
-      defs.unshift({ headerName: 'ID', field: 'ID', editable: false, width: 90, pinned: 'left' });
+      ];
+      
+      visibleFields.forEach(field => {
+        if (field.Name === 'ID') return;
+        
+        const colDef = {
+          headerName: field.DisplayName || field.Name,
+          field: field.Name,
+          editable: !field.ReadOnlyField && !field.Sealed,
+          sortable: true,
+          filter: true,
+          resizable: true,
+          minWidth: 100,
+          flex: 1
+        };
+        
+        // Add type-specific configurations
+        if (field.Type === 'Number' || field.Type === 'Currency') {
+          colDef.filter = 'agNumberColumnFilter';
+          colDef.valueParser = params => {
+            const val = params.newValue;
+            return val === '' || val == null ? null : Number(val);
+          };
+        }
+        
+        if (field.Type === 'DateTime') {
+          colDef.filter = 'agDateColumnFilter';
+        }
+        
+        if (field.Type === 'Boolean') {
+          colDef.cellRenderer = params => {
+            return params.value ? '✓' : '✗';
+          };
+          colDef.cellEditor = 'agSelectCellEditor';
+          colDef.cellEditorParams = {
+            values: [true, false]
+          };
+        }
+        
+        if (field.Type === 'Choice' && field.Choices) {
+          colDef.cellEditor = 'agSelectCellEditor';
+          colDef.cellEditorParams = {
+            values: field.Choices
+          };
+        }
+        
+        defs.push(colDef);
+      });
+      
       return defs;
     }
 
-    function buildGrid(rows, defs) {
-      const container = document.getElementById('grid');
-      gridOptions = {$1rowSelection: 'multiple',
-        domLayout: 'autoHeight',
-        defaultColDef: { flex: 1 },
-        animateRows: true,
-        enableRangeSelection: true,
-        onCellValueChanged: (p) => {
-          const id = p.data.ID;
-          if (String(id).startsWith('new_')) {
-            // It is a client-only new row, collect updated fields on that object
-            p.data[p.colDef.field] = p.newValue;
-          } else {
-            const curr = pending.updates.get(id) || {}; curr[p.colDef.field] = p.newValue; pending.updates.set(id, curr);
-          }
-          setChanges();
+    function initGrid(columnDefs, rowData) {
+      const gridContainer = $('#grid');
+      
+      const gridOptions = {
+        ...CONFIG.grid,
+        columnDefs,
+        rowData,
+        defaultColDef: {
+          flex: 1,
+          minWidth: 100,
+          resizable: true,
+          sortable: true,
+          filter: true
+        },
+        onCellValueChanged: onCellValueChanged,
+        onSelectionChanged: updateGridStats,
+        onFilterChanged: updateGridStats,
+        onSortChanged: updateGridStats,
+        onGridReady: params => {
+          state.gridApi = params.api;
+          state.columnApi = params.columnApi;
+          updateGridStats();
         }
       };
-      new agGrid.Grid(container, gridOptions);
-      // Fit columns to full width and keep them fit on resize
-      if (gridOptions && gridOptions.api) {
-        gridOptions.api.sizeColumnsToFit();
-        window.addEventListener('resize', () => {
-          if (gridOptions && gridOptions.api) gridOptions.api.sizeColumnsToFit();
-        });
-      }
+      
+      new agGrid.Grid(gridContainer, gridOptions);
     }
 
-    // ===== Bootstrap flow =====
-    async function bootstrap() {
-      setInfo('Loading views…');
-      const views = await getViews();
-      const pick = $('#viewPicker');
-      pick.innerHTML = '';
-      for (const v of views) {
-        const opt = document.createElement('option');
-        opt.value = v.Id; opt.textContent = v.Title + (v.DefaultView ? ' (default)' : '');
-        pick.appendChild(opt);
+    function onCellValueChanged(params) {
+      const id = params.data.ID;
+      
+      if (String(id).startsWith('NEW_')) {
+        // This is a new row
+        params.data[params.colDef.field] = params.newValue;
+      } else {
+        // Existing row
+        const updates = state.pendingChanges.updates.get(id) || {};
+        updates[params.colDef.field] = params.newValue;
+        state.pendingChanges.updates.set(id, updates);
       }
-
-      setInfo('Loading schema & rows…');
-      const data = await loadViewData('<View/>');
-      const defs = schemaToColumnDefs(data.ListSchema.Field);
-      const rows = data.Row.map(r => ({ ...r }));
-      columnDefs = defs;
-      buildGrid(rows, defs);
-      setInfo(`Loaded ${rows.length} rows`);
-
-      // Hook buttons
-      $('#btnAddRow').onclick = () => {
-        const tempId = `new_${Date.now()}`;
-        const obj = { ID: tempId };
-        pending.creates.push(obj);
-        gridOptions.api.applyTransaction({ add: [obj], addIndex: 0 });
-        setChanges();
-      };
-      $('#btnDelete').onclick = () => {
-        const sel = gridOptions.api.getSelectedRows();
-        if (!sel.length) return;
-        sel.forEach(r => {
-          if (String(r.ID).startsWith('new_')) {
-            pending.creates = pending.creates.filter(c => c !== r);
-          } else {
-            pending.deletes.push(Number(r.ID));
-          }
-        });
-        gridOptions.api.applyTransaction({ remove: sel });
-        setChanges();
-      };
-      $('#btnSave').onclick = saveAll;
-
-      // Add Column modal
-      $('#btnAddColumn').onclick = () => { openColModal(); };
-      $('#colType').onchange = () => {
-        $('#choiceRow').style.display = $('#colType').value === 'Choice' ? 'block' : 'none';
-      };
-      $('#colCreateBtn').onclick = createColumnFromModal;
+      
+      updateChangeCount();
     }
 
-    // ===== Save logic =====
-    async function saveAll() {
+    // ===== Main Application =====
+    async function initializeApp() {
       try {
-        setInfo('Saving…');
+        setStatus('Loading list data...', 'info');
+        
+        // Load data
+        const listData = await loadListData();
+        const columnDefs = buildColumnDefs(listData.ListSchema.Field);
+        const rowData = listData.Row.map(row => ({ ...row }));
+        
+        state.columnDefs = columnDefs;
+        state.originalData = JSON.parse(JSON.stringify(rowData));
+        
+        // Initialize grid
+        initGrid(columnDefs, rowData);
+        
+        // Setup event handlers
+        setupEventHandlers();
+        
+        setStatus(`Loaded ${rowData.length} rows`, 'success');
+        showToast(`Successfully loaded ${rowData.length} rows from SharePoint`, 'success');
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+        setStatus('Failed to load data', 'error');
+        showToast('Failed to load data from SharePoint. Please refresh.', 'error');
+      }
+    }
+
+    function setupEventHandlers() {
+      // Login button
+      $('#btnLogin').onclick = async () => {
+        await state.msalInstance.loginRedirect({
+          scopes: [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`]
+        });
+      };
+      
+      // Refresh button
+      $('#btnRefresh').onclick = async () => {
+        if (state.isDirty) {
+          if (!confirm('You have unsaved changes. Refresh anyway?')) return;
+        }
+        window.location.reload();
+      };
+      
+      // Add row
+      $('#btnAddRow').onclick = () => {
+        const newRow = {
+          ID: `NEW_${Date.now()}`,
+          Title: 'New Job'
+        };
+        
+        state.pendingChanges.creates.push(newRow);
+        state.gridApi.applyTransaction({
+          add: [newRow],
+          addIndex: 0
+        });
+        
+        updateChangeCount();
+        showToast('New row added', 'info');
+      };
+      
+      // Bulk actions menu
+      $('#btnBulkActions').onclick = () => {
+        $('#bulkMenu').classList.toggle('show');
+      };
+      
+      // Delete selected
+      $('#btnDeleteSelected').onclick = () => {
+        const selected = state.gridApi.getSelectedRows();
+        if (selected.length === 0) {
+          showToast('No rows selected', 'warning');
+          return;
+        }
+        
+        if (!confirm(`Delete ${selected.length} selected rows?`)) return;
+        
+        selected.forEach(row => {
+          if (String(row.ID).startsWith('NEW_')) {
+            // Remove from creates
+            state.pendingChanges.creates = state.pendingChanges.creates.filter(r => r.ID !== row.ID);
+          } else {
+            // Add to deletes
+            state.pendingChanges.deletes.add(row.ID);
+          }
+        });
+        
+        state.gridApi.applyTransaction({ remove: selected });
+        updateChangeCount();
+        showToast(`${selected.length} rows marked for deletion`, 'warning');
+        
+        $('#bulkMenu').classList.remove('show');
+      };
+      
+      // Duplicate selected
+      $('#btnDuplicateSelected').onclick = () => {
+        const selected = state.gridApi.getSelectedRows();
+        if (selected.length === 0) {
+          showToast('No rows selected', 'warning');
+          return;
+        }
+        
+        const duplicates = selected.map(row => {
+          const copy = { ...row };
+          copy.ID = `NEW_${Date.now()}_${Math.random()}`;
+          delete copy.__selection__;
+          state.pendingChanges.creates.push(copy);
+          return copy;
+        });
+        
+        state.gridApi.applyTransaction({ add: duplicates });
+        updateChangeCount();
+        showToast(`${duplicates.length} rows duplicated`, 'success');
+        
+        $('#bulkMenu').classList.remove('show');
+      };
+      
+      // Export selected
+      $('#btnExportSelected').onclick = () => {
+        const selected = state.gridApi.getSelectedRows();
+        if (selected.length === 0) {
+          showToast('No rows selected', 'warning');
+          return;
+        }
+        
+        exportToCSV(selected);
+        $('#bulkMenu').classList.remove('show');
+      };
+      
+      // Save changes
+      $('#btnSave').onclick = saveChanges;
+      
+      // Discard changes
+      $('#btnDiscard').onclick = () => {
+        if (!confirm('Discard all pending changes?')) return;
+        
+        state.pendingChanges.updates.clear();
+        state.pendingChanges.creates = [];
+        state.pendingChanges.deletes.clear();
+        
+        // Reload original data
+        state.gridApi.setRowData(JSON.parse(JSON.stringify(state.originalData)));
+        
+        updateChangeCount();
+        showToast('Changes discarded', 'info');
+      };
+      
+      // Quick search
+      $('#quickSearch').oninput = (e) => {
+        state.gridApi.setQuickFilter(e.target.value);
+      };
+      
+      // Column configuration
+      $('#btnColumnConfig').onclick = () => {
+        $('#columnMenu').classList.toggle('show');
+      };
+      
+      // Add column
+      $('#btnAddColumn').onclick = () => {
+        $('#columnModal').classList.add('active');
+      };
+      
+      // Column modal events
+      $('#colDisplay').oninput = (e) => {
+        $('#colInternal').value = generateInternalName(e.target.value);
+      };
+      
+      $('#colType').onchange = (e) => {
+        const isChoice = e.target.value === 'Choice' || e.target.value === 'MultiChoice';
+        $('#choiceRow').style.display = isChoice ? 'block' : 'none';
+      };
+      
+      $('#btnCreateColumn').onclick = createColumn;
+      
+      // Close modals on background click
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.onclick = (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('active');
+          }
+        };
+      });
+      
+      // Close dropdown menus on outside click
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.bulk-actions')) {
+          $('#bulkMenu').classList.remove('show');
+        }
+        if (!e.target.closest('.column-config')) {
+          $('#columnMenu').classList.remove('show');
+        }
+      });
+      
+      // Prevent navigation if there are unsaved changes
+      window.addEventListener('beforeunload', (e) => {
+        if (state.isDirty) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+    }
+
+    async function saveChanges() {
+      try {
+        setStatus('Saving changes...', 'info');
         $('#btnSave').disabled = true;
-
-        // 1) Creates
-        const allData = []; gridOptions.api.forEachNode(n => allData.push(n.data));
-        const newRows = allData.filter(r => String(r.ID).startsWith('new_'));
-        for (const r of newRows) {
-          const copy = { ...r }; delete copy.ID; // SharePoint assigns ID
-          const created = await createItem(copy);
-          // Replace temp row with real ID
-          r.ID = created.Id || created.ID;
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Process creates
+        for (const newRow of state.pendingChanges.creates) {
+          try {
+            const copy = { ...newRow };
+            delete copy.ID;
+            delete copy.__selection__;
+            
+            const created = await createItem(copy);
+            newRow.ID = created.ID || created.Id;
+            successCount++;
+          } catch (error) {
+            console.error('Failed to create row:', error);
+            errorCount++;
+          }
         }
-
-        // 2) Updates
-        for (const [id, patch] of pending.updates.entries()) {
-          await updateItem(id, patch);
+        
+        // Process updates
+        for (const [id, updates] of state.pendingChanges.updates.entries()) {
+          try {
+            await updateItem(id, updates);
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to update row ${id}:`, error);
+            errorCount++;
+          }
         }
-
-        // 3) Deletes
-        for (const id of pending.deletes) { await deleteItem(id); }
-
-        // Reset state
-        pending.updates.clear(); pending.creates = []; pending.deletes = [];
-        setChanges();
-        setInfo('Saved');
-      } catch (e) {
-        console.error(e);
-        alert('Save failed: ' + e.message);
+        
+        // Process deletes
+        for (const id of state.pendingChanges.deletes) {
+          try {
+            await deleteItem(id);
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to delete row ${id}:`, error);
+            errorCount++;
+          }
+        }
+        
+        // Clear pending changes
+        state.pendingChanges.updates.clear();
+        state.pendingChanges.creates = [];
+        state.pendingChanges.deletes.clear();
+        
+        // Update original data
+        const allRows = [];
+        state.gridApi.forEachNode(node => {
+          if (!state.pendingChanges.deletes.has(node.data.ID)) {
+            allRows.push(node.data);
+          }
+        });
+        state.originalData = JSON.parse(JSON.stringify(allRows));
+        
+        updateChangeCount();
+        
+        if (errorCount > 0) {
+          setStatus(`Saved with ${errorCount} errors`, 'warning');
+          showToast(`Saved ${successCount} changes, ${errorCount} failed`, 'warning');
+        } else {
+          setStatus('All changes saved', 'success');
+          showToast(`Successfully saved ${successCount} changes`, 'success');
+        }
+      } catch (error) {
+        console.error('Save failed:', error);
+        setStatus('Save failed', 'error');
+        showToast('Failed to save changes. Please try again.', 'error');
       } finally {
         $('#btnSave').disabled = false;
       }
     }
 
-    // ===== Column modal =====
-    function openColModal() { $('#colModal').classList.add('active'); }
-    function closeColModal() { $('#colModal').classList.remove('active'); }
-    async function createColumnFromModal() {
+    async function createColumn() {
       const displayName = $('#colDisplay').value.trim();
       const type = $('#colType').value;
-      const choices = $('#colChoices').value.split(',').map(s => s.trim()).filter(Boolean);
-      if (!displayName) { alert('Enter a display name'); return; }
+      const required = $('#colRequired').checked;
+      const defaultValue = $('#colDefault').value.trim();
+      const choices = $('#colChoices').value.split('\n').map(s => s.trim()).filter(Boolean);
+      
+      if (!displayName) {
+        showToast('Please enter a display name', 'warning');
+        return;
+      }
+      
       try {
-        setInfo('Creating column…');
-        await addField({ displayName, type, choices });
-        closeColModal();
-        // Reload schema & refresh grid columns
-        const data = await loadViewData('<View/>');
-      const defs = schemaToColumnDefs(data.ListSchema.Field);
-        columnDefs = defs;
-        gridOptions.api.setColumnDefs(defs);
-        setInfo('Column added');
-      } catch (e) {
-        console.error(e);
-        alert('Add column failed: ' + e.message);
+        setStatus('Creating column...', 'info');
+        
+        await addField({
+          displayName,
+          type,
+          required,
+          defaultValue: defaultValue || undefined,
+          choices: choices.length > 0 ? choices : undefined
+        });
+        
+        closeColumnModal();
+        showToast(`Column "${displayName}" created successfully`, 'success');
+        
+        // Reload to get updated schema
+        setTimeout(() => {
+          if (confirm('Reload page to see the new column?')) {
+            window.location.reload();
+          }
+        }, 1000);
+      } catch (error) {
+        console.error('Failed to create column:', error);
+        showToast('Failed to create column. Please try again.', 'error');
       }
     }
 
-    // ===== Start =====
+    function closeColumnModal() {
+      $('#columnModal').classList.remove('active');
+      $('#colDisplay').value = '';
+      $('#colInternal').value = '';
+      $('#colType').value = 'Text';
+      $('#colRequired').checked = false;
+      $('#colDefault').value = '';
+      $('#colChoices').value = '';
+      $('#choiceRow').style.display = 'none';
+    }
+
+    function exportToCSV(data) {
+      const headers = Object.keys(data[0]).filter(k => k !== '__selection__');
+      const csv = [
+        headers.join(','),
+        ...data.map(row => 
+          headers.map(h => {
+            const val = row[h];
+            return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+          }).join(',')
+        )
+      ].join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `jobs_export_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showToast(`Exported ${data.length} rows`, 'success');
+    }
+
+    // ===== Initialize on Load =====
     window.addEventListener('DOMContentLoaded', initAuth);
   </script>
 </body>
