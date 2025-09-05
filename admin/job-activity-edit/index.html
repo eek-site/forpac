@@ -192,7 +192,7 @@
             <span class="search-icon">🔍</span>
           </div>
 
-          <div class="column-config">
+          <div class="column-config" style="position:relative">
             <button id="btnColumnConfig" class="btn secondary">⚙️ Columns</button>
             <div id="columnMenu" class="bulk-menu" style="right:0;left:auto;width:320px;max-height:400px;overflow:auto">
               <h4 style="margin:8px 8px 12px;font-size:14px">Visible Columns</h4>
@@ -355,7 +355,7 @@
       sharepoint: {
         tenant: 'roadandrescue.sharepoint.com',
         siteRelative: '/sites/rar',
-        listTitle: 'JobActivityLog' // Change if your list name is different
+        listTitle: 'JobActivityLog' // ensure this matches your list
       },
       msal: {
         auth: {
@@ -551,18 +551,33 @@
 
     async function addField(fieldConfig){
       const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
+
+      const common = { Title: fieldConfig.displayName, Required: !!fieldConfig.required };
       let body;
-      const base = { '__metadata':{ 'type':'SP.Field' }, Title: fieldConfig.displayName, Required: !!fieldConfig.required };
       switch(fieldConfig.type){
-        case 'Number':   body = { ...base, '__metadata':{ 'type':'SP.FieldNumber' }, FieldTypeKind:9 }; break;
-        case 'Currency': body = { ...base, '__metadata':{ 'type':'SP.FieldCurrency' }, FieldTypeKind:10, CurrencyLocaleId:1033 }; break;
-        case 'DateTime': body = { ...base, '__metadata':{ 'type':'SP.FieldDateTime' }, FieldTypeKind:4, DisplayFormat:1 }; break;
-        case 'Boolean':  body = { ...base, FieldTypeKind:8 }; break;
-        case 'Choice':   body = { ...base, '__metadata':{ 'type':'SP.FieldChoice' }, FieldTypeKind:6, Choices:{ results: fieldConfig.choices || [] } }; break;
-        case 'Note':     body = { ...base, '__metadata':{ 'type':'SP.FieldMultiLineText' }, FieldTypeKind:3 }; break;
-        default:         body = { ...base, '__metadata':{ 'type':'SP.FieldText' }, FieldTypeKind:2 };
+        case 'Number':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldNumber' },   FieldTypeKind: 9 };
+          break;
+        case 'Currency':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldCurrency' }, FieldTypeKind:10, CurrencyLocaleId:1033 };
+          break;
+        case 'DateTime':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldDateTime' }, FieldTypeKind: 4, DisplayFormat: 1 };
+          break;
+        case 'Boolean':
+          body = { ...common, '__metadata':{ 'type':'SP.Field' },         FieldTypeKind: 8 };
+          break;
+        case 'Choice':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldChoice' },   FieldTypeKind: 6, Choices:{ results: fieldConfig.choices || [] } };
+          break;
+        case 'Note':
+          body = { ...common, '__metadata':{ 'type':'SP.FieldMultiLineText' }, FieldTypeKind: 3 };
+          break;
+        default: // Text
+          body = { ...common, '__metadata':{ 'type':'SP.FieldText' },     FieldTypeKind: 2 };
       }
       if (fieldConfig.defaultValue) body.DefaultValue = fieldConfig.defaultValue;
+
       return spRequest(url, {
         method:'POST',
         headers:{ 'Content-Type':'application/json;odata=verbose' },
@@ -572,8 +587,14 @@
 
     // ===== GRID =====
     function buildColumnDefs(schemaFields){
-      const visible = (schemaFields || []).filter(f => !f.Hidden);
+      const fields = Array.isArray(schemaFields) ? schemaFields : [];
+      const visible = fields.filter(f => !f.Hidden);
       state.viewFields = visible.map(f => f.Name);
+
+      const getType = (f) => String(f.TypeAsString || f.Type || '').toLowerCase();
+      const getChoices = (f) => Array.isArray(f.Choices) ? f.Choices
+                           : Array.isArray(f.Choice)   ? f.Choice
+                           : [];
 
       const defs = [
         { headerName:'', field:'__selection__', checkboxSelection:true, headerCheckboxSelection:true, width:50, pinned:'left', lockPosition:true, suppressMenu:true },
@@ -582,56 +603,63 @@
 
       visible.forEach(field=>{
         if (field.Name === 'ID') return;
+
+        const type = getType(field);
         const cd = {
-          headerName: field.DisplayName || field.Name,
-          field: field.Name,
+          headerName: field.Title || field.DisplayName || field.Name,
+          field: field.InternalName || field.Name,
           editable: !field.ReadOnlyField && !field.Sealed,
           sortable:true, filter:true, resizable:true, minWidth:110, flex:1
         };
 
-        // Type-specific tweaks
-        if (field.Type === 'Number' || field.Type === 'Currency'){
+        if (type === 'number' || type === 'currency'){
           cd.filter = 'agNumberColumnFilter';
           cd.valueParser = p => {
             const v = p.newValue;
             return (v==='' || v==null) ? null : Number(v);
           };
         }
-        if (field.Type === 'DateTime'){
+
+        if (type === 'datetime'){
           cd.filter = 'agDateColumnFilter';
           cd.valueFormatter = p => {
             if (!p.value) return '';
             const d = new Date(p.value);
             return isNaN(d) ? p.value : d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
           };
+          cd.width = Math.max(cd.width, 160);
         }
-        if (field.Type === 'Boolean'){
+
+        if (type === 'boolean'){
           cd.cellRenderer = p => p.value ? '✓' : '✗';
           cd.cellEditor = 'agSelectCellEditor';
           cd.cellEditorParams = { values:[true,false] };
           cd.width = Math.max(cd.width, 110);
         }
-        if (field.Type === 'Choice' && field.Choices){
-          cd.cellEditor = 'agSelectCellEditor';
-          cd.cellEditorParams = { values: field.Choices };
+
+        if (type === 'choice'){
+          const values = getChoices(field);
+          if (values.length){
+            cd.cellEditor = 'agSelectCellEditor';
+            cd.cellEditorParams = { values };
+          }
         }
 
-        // Friendly formatting by name hints
-        const lname = (field.InternalName || field.Name || '').toLowerCase();
-        if (/activity|type/.test(lname) && field.Type === 'Text'){
-          cd.cellEditor = 'agSelectCellEditor';
-          cd.cellEditorParams = { values:['Update','Call','Email','Assignment','Follow-up','Onsite','Resolution'] };
-        }
-        if (/status/.test(lname) && field.Type === 'Text'){
-          cd.cellEditor = 'agSelectCellEditor';
-          cd.cellEditorParams = { values:['Open','In Progress','Completed','Blocked','Cancelled'] };
-        }
-        if (/notes?|description|comment/.test(lname)){
+        const lname = String(field.InternalName || field.Name || '').toLowerCase();
+        if (/notes?|description|comment|details?/.test(lname)){
           cd.autoHeight = true; cd.wrapText = true; cd.minWidth = 240; cd.flex = Math.max(cd.flex, 2);
         }
         if (/job(id|reference)|rego/.test(lname)){
           cd.cellStyle = { color:'var(--primary)', fontWeight:'600' };
           cd.width = Math.max(cd.width, 150);
+        }
+        if (type === 'text' && /activity|type/.test(lname)){
+          cd.cellEditor = 'agSelectCellEditor';
+          cd.cellEditorParams = { values:['Update','Call','Email','Assignment','Follow-up','Onsite','Resolution'] };
+        }
+        if (type === 'text' && /status/.test(lname)){
+          cd.cellEditor = 'agSelectCellEditor';
+          cd.cellEditorParams = { values:['Open','In Progress','Completed','Blocked','Cancelled'] };
         }
 
         defs.push(cd);
@@ -649,7 +677,12 @@
         onSelectionChanged: updateGridStats,
         onFilterChanged: updateGridStats,
         onSortChanged: updateGridStats,
-        onGridReady: p => { state.gridApi = p.api; state.columnApi = p.columnApi; updateGridStats(); }
+        onGridReady: p => {
+          state.gridApi = p.api; state.columnApi = p.columnApi;
+          updateGridStats();
+          populateColumnMenu();
+        },
+        onColumnVisible: populateColumnMenu
       };
       new agGrid.Grid(document.getElementById('grid'), gridOptions);
     }
@@ -672,18 +705,19 @@
         setStatus('Loading activity...', 'info');
         const listData = await loadListData();
 
-        const columnDefs = buildColumnDefs(listData.ListSchema?.Field || []);
-        const rowData = (listData.Row || []).map(r => ({ ...r }));
+        const schemaFields = Array.isArray(listData.ListSchema?.Field) ? listData.ListSchema.Field : [];
+        const rowDataRaw = Array.isArray(listData.Row) ? listData.Row.map(r => ({ ...r })) : [];
+        const columnDefs = schemaFields.length ? buildColumnDefs(schemaFields)
+          : buildColumnDefs((Object.keys(rowDataRaw[0]||{})).map(k=>({ Name:k, Title:k, Type:'Text', Hidden:false })));
 
         state.columnDefs = columnDefs;
-        state.originalData = JSON.parse(JSON.stringify(rowData));
+        state.originalData = JSON.parse(JSON.stringify(rowDataRaw));
 
-        initGrid(columnDefs, rowData);
+        initGrid(columnDefs, rowDataRaw);
         setupEvents();
 
-        setStatus(`Loaded ${rowData.length} rows`, 'success');
-        showToast(`Loaded ${rowData.length} activities from SharePoint`,'success');
-        populateColumnMenu();
+        setStatus(`Loaded ${rowDataRaw.length} rows`, 'success');
+        showToast(`Loaded ${rowDataRaw.length} activities from SharePoint`,'success');
       }catch(err){
         console.error('Init failed', err);
         setStatus('Failed to load data','error');
@@ -703,8 +737,11 @@
         window.location.reload();
       };
 
-      // Add activity (blank row + modal)
+      // Add activity (modal)
       $('#btnAddRow').onclick = ()=>{
+        // default the datetime-local to now
+        const now = new Date(Date.now() - (new Date()).getTimezoneOffset()*60000).toISOString().slice(0,16);
+        $('#actWhen').value = now;
         openActivityModal();
       };
 
@@ -800,19 +837,26 @@
       window.addEventListener('beforeunload', e=>{
         if (state.isDirty){ e.preventDefault(); e.returnValue = ''; }
       });
+
+      // Open column modal
+      $('#btnAddColumn').addEventListener('click', openColumnModal);
     }
 
     function populateColumnMenu(){
       const list = $('#columnList');
+      if (!state.columnApi) return;
       list.innerHTML = '';
       state.columnDefs.forEach(cd=>{
         if (!cd.field || cd.field === '__selection__') return;
         const id = `colvis_${cd.field}`;
+        const colState = state.columnApi.getColumn(cd.field);
+        const visible = colState ? colState.isVisible() !== false : true;
+
         const row = document.createElement('label');
         row.className = 'bulk-menu-item';
         row.style.cursor = 'pointer';
         row.innerHTML = `
-          <input type="checkbox" id="${id}" class="column-checkbox" ${state.columnApi.getColumn(cd.field)?.isVisible() !== false ? 'checked' : ''} />
+          <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
           <span>${cd.headerName}</span>
         `;
         row.querySelector('input').onchange = (e)=>{
@@ -830,9 +874,9 @@
       $('#actType').value   = activity?.ActivityType || 'Update';
       $('#actStatus').value = activity?.Status || 'Open';
       $('#actUser').value   = activity?.PerformedBy || activity?.Author || '';
-      $('#actWhen').value   = activity?.When ? toLocalInput(activity.When) : '';
-      $('#actDuration').value = activity?.Duration || '';
-      $('#actCost').value     = activity?.Cost || '';
+      $('#actWhen').value   = activity?.When ? toLocalInput(activity.When) : $('#actWhen').value || '';
+      $('#actDuration').value = activity?.Duration ?? '';
+      $('#actCost').value     = activity?.Cost ?? '';
       $('#actNotes').value    = activity?.Notes || activity?.Description || '';
 
       $('#activityModal').classList.add('active');
@@ -840,7 +884,6 @@
     function closeActivityModal(){ $('#activityModal').classList.remove('active'); state.currentActivity = null; }
 
     function toLocalInput(dt){
-      // Accepts ISO/string; returns yyyy-MM-ddThh:mm for input[type=datetime-local]
       const d = new Date(dt);
       if (isNaN(d)) return '';
       const pad = n => String(n).padStart(2,'0');
@@ -898,42 +941,66 @@
         $('#btnSave').disabled = true;
 
         let ok = 0, fail = 0;
+        const idMap = new Map(); // tempId -> realId
 
-        // Creates
+        // CREATES
         for (const row of state.pendingChanges.creates){
           try{
             const copy = { ...row };
+            const tempId = copy.ID;
             delete copy.ID; delete copy.__selection__;
             delete copy.Created; delete copy.Modified; delete copy.Author;
-            await createItem(copy);
+
+            const created = await createItem(copy);
+            const realId = created.ID ?? created.Id;
+
+            if (realId){
+              idMap.set(tempId, realId);
+
+              // locate node with tempId and update
+              let targetNode = null;
+              state.gridApi.forEachNode(n => { if (n.data.ID === tempId) targetNode = n; });
+              if (targetNode){
+                targetNode.setData({
+                  ...targetNode.data,
+                  ID: realId,
+                  Created: created.Created || targetNode.data.Created,
+                  Modified: created.Modified || targetNode.data.Modified,
+                });
+              }
+            }
+
             ok++;
           }catch(e){ console.error('Create failed', e); fail++; }
         }
 
-        // Updates
+        // UPDATES
         for (const [id, updates] of state.pendingChanges.updates.entries()){
           try{
-            await updateItem(id, updates);
+            const realId = idMap.get(id) || id;
+            await updateItem(realId, updates);
             ok++;
           }catch(e){ console.error('Update failed', id, e); fail++; }
         }
 
-        // Deletes
+        // DELETES
         for (const id of state.pendingChanges.deletes){
           try{
-            await deleteItem(id);
+            const realId = idMap.get(id) || id;
+            await deleteItem(realId);
             ok++;
           }catch(e){ console.error('Delete failed', id, e); fail++; }
         }
 
-        // Clear state + reset originals from grid (minus deletions)
+        // Clear pending
         state.pendingChanges.updates.clear();
         state.pendingChanges.creates = [];
         state.pendingChanges.deletes.clear();
 
-        const rows = [];
-        state.gridApi.forEachNode(n => rows.push(n.data));
-        state.originalData = JSON.parse(JSON.stringify(rows));
+        // Refresh originals from current grid
+        const rowsNow = [];
+        state.gridApi.forEachNode(n => rowsNow.push(n.data));
+        state.originalData = JSON.parse(JSON.stringify(rowsNow));
 
         updateChangeCount();
 
@@ -985,10 +1052,10 @@
       $('#colDefault').value = ''; $('#colChoices').value = '';
       $('#choiceRow').style.display = 'none';
     }
+    function openColumnModal(){ $('#columnModal').classList.add('active'); }
 
     // ===== IMPORT / EXPORT =====
     function openImport(){
-      // Simple, lightweight CSV import (header names = field internal names)
       const input = document.createElement('input');
       input.type = 'file'; input.accept = '.csv';
       input.onchange = async (e)=>{
@@ -1039,14 +1106,6 @@
       document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
       showToast(`Exported ${data.length} rows`,'success');
     }
-
-    // ===== MISC =====
-    function openColumnModal(){ $('#columnModal').classList.add('active'); }
-
-    // Hook up column modal open
-    document.addEventListener('DOMContentLoaded', ()=>{
-      $('#btnAddColumn').addEventListener('click', openColumnModal);
-    });
 
     // ===== INIT =====
     window.addEventListener('DOMContentLoaded', initAuth);
