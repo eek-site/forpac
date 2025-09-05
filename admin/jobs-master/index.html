@@ -614,13 +614,18 @@
                     </div>
                 </div>
                 <div class="nav-section">
-                    <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
-                        ← Back to Dashboard
-                    </button>
-                    <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
-                        Job Activity Log →
-                    </button>
-                </div>
+  <button class="btn-nav secondary" onclick="window.location.href='/admin/dashboard'">
+    ← Back to Dashboard
+  </button>
+  <button class="btn-nav" onclick="window.location.href='/admin/job-activity'">
+    Job Activity Log →
+  </button>
+  <!-- NEW: go to editable grid page -->
+  <button class="btn-nav" onclick="window.location.href='/admin/jobs-edit/'" aria-label="Go to Edit Jobs">
+    Edit Jobs →
+  </button>
+</div>
+
             </div>
         </header>
 
