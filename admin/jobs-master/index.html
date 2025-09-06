@@ -345,7 +345,16 @@
       const token = await getGraphToken();
 
       // Get site
-      const site = await fetchJson(`const site = await fetchJson(   `https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:${normalizePath(SPO_SITE_PATH)}`,   token );  // tiny helper so '/sites/rar' and 'sites/rar' both work function normalizePath(p){ return p.startsWith('/') ? p : `/${p}`; }
+      // tiny helper so '/sites/rar' and 'sites/rar' both work
+function normalizePath(p) {
+  return p.startsWith('/') ? p : `/${p}`;
+}
+
+const site = await fetchJson(
+  `https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:${normalizePath(SPO_SITE_PATH)}`,
+  token
+);
+
 
       // Get the list by exact displayName (NO encodeURIComponent)
       // If your list has a single quote, escape it for OData: O'Brien => O''Brien
