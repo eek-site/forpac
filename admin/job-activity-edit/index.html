@@ -10,7 +10,7 @@
   <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- AG Grid Community -->
+  <!-- AG Grid Community v31 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
   <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
@@ -358,7 +358,7 @@
       sharepoint: {
         tenant: 'roadandrescue.sharepoint.com',
         siteRelative: '/sites/rar',
-        listTitle: 'JobBuildNotes'
+        listTitle: 'JobBuildNotes' // exact SharePoint list Title
       },
       msal: {
         auth: {
@@ -372,7 +372,7 @@
         pagination: true,
         paginationPageSize: 100,
         animateRows: true,
-        enableRangeSelection: true,
+        // No enterprise-only options here
         enableCellChangeFlash: true,
         undoRedoCellEditing: true,
         undoRedoCellEditingLimit: 20,
@@ -386,8 +386,7 @@
       msalInstance: null,
       account: null,
       accessToken: null,
-      gridApi: null,
-      columnApi: null,
+      gridApi: null,            // v31: unified API
       originalData: [],
       pendingChanges: { updates:new Map(), creates:[], deletes:new Set() },
       columnDefs: [],
@@ -554,7 +553,6 @@
 
     async function addField(fieldConfig){
       const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
-
       const common = { Title: fieldConfig.displayName, Required: !!fieldConfig.required };
       let body;
       switch(fieldConfig.type){
@@ -681,20 +679,38 @@
     function initGrid(columnDefs, rowData){
       const gridOptions = {
         ...CONFIG.grid,
-        columnDefs, rowData,
-        defaultColDef:{ flex:1, minWidth:100, resizable:true, sortable:true, filter:true },
+        rowSelection: 'multiple',            // v31: needed for headerCheckboxSelection
+        columnDefs,
+        rowData,
+        defaultColDef:{
+          flex:1, minWidth:100, resizable:true, sortable:true, filter:true,
+          valueFormatter: (p) => {
+            const v = p.value;
+            if (v == null) return '';
+            if (typeof v === 'object') {
+              if (v.Url) return v.Url;                    // SP URL field
+              if (v.Title) return v.Title;                // SP Lookup/User
+              if (Array.isArray(v.results)) return v.results.join(', ');
+              try { return JSON.stringify(v); } catch { return String(v); }
+            }
+            return v;
+          },
+          valueParser: (p) => p.newValue
+        },
         onCellValueChanged,
         onSelectionChanged: updateGridStats,
         onFilterChanged: updateGridStats,
         onSortChanged: updateGridStats,
-        onGridReady: p => {
-          state.gridApi = p.api; state.columnApi = p.columnApi;
+        onGridReady: () => {            // v31: no need to grab p.api/columnApi here
           updateGridStats();
           populateColumnMenu();
         },
         onColumnVisible: populateColumnMenu
       };
-      new agGrid.Grid(document.getElementById('grid'), gridOptions);
+
+      // v31 API creation
+      const api = agGrid.createGrid(document.getElementById('grid'), gridOptions);
+      state.gridApi = api; // unified API
     }
 
     function onCellValueChanged(params){
@@ -717,7 +733,8 @@
 
         const schemaFields = Array.isArray(listData.ListSchema?.Field) ? listData.ListSchema.Field : [];
         const rowDataRaw = Array.isArray(listData.Row) ? listData.Row.map(r => ({ ...r })) : [];
-        const columnDefs = schemaFields.length ? buildColumnDefs(schemaFields)
+        const columnDefs = schemaFields.length
+          ? buildColumnDefs(schemaFields)
           : buildColumnDefs((Object.keys(rowDataRaw[0]||{})).map(k=>({ Name:k, Title:k, Type:'Text', Hidden:false })));
 
         state.columnDefs = columnDefs;
@@ -737,12 +754,12 @@
 
     function populateColumnMenu(){
       const list = $('#columnList');
-      if (!state.columnApi) return;
+      if (!state.gridApi) return;
       list.innerHTML = '';
       state.columnDefs.forEach(cd=>{
         if (!cd.field || cd.field === '__selection__') return;
         const id = `colvis_${cd.field}`;
-        const colState = state.columnApi.getColumn(cd.field);
+        const colState = state.gridApi.getColumn(cd.field);
         const visible = colState ? colState.isVisible() !== false : true;
 
         const row = document.createElement('label');
@@ -752,17 +769,22 @@
           <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
           <span>${cd.headerName}</span>
         `;
-        row.querySelector('input').onchange = (e)=> state.columnApi.setColumnVisible(cd.field, e.target.checked);
+        row.querySelector('input').onchange = (e)=> state.gridApi.setColumnVisible(cd.field, e.target.checked);
         list.appendChild(row);
       });
     }
 
     function setupEvents(){
       // Sign-in
-      $('#btnLogin').onclick = async ()=>{ await state.msalInstance.loginRedirect({ scopes:[`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`] }); };
+      $('#btnLogin').onclick = async ()=>{
+        await state.msalInstance.loginRedirect({ scopes:[`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`] });
+      };
 
       // Refresh
-      $('#btnRefresh').onclick = ()=>{ if (state.isDirty && !confirm('You have unsaved changes. Refresh anyway?')) return; window.location.reload(); };
+      $('#btnRefresh').onclick = ()=>{
+        if (state.isDirty && !confirm('You have unsaved changes. Refresh anyway?')) return;
+        window.location.reload();
+      };
 
       // Add activity (modal)
       $('#btnAddRow').onclick = ()=>{
