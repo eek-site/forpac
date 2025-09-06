@@ -14,11 +14,11 @@
 
   <!-- Security Headers -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self';
-  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com;
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: https:;
-  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
-  frame-src 'self';
+  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
+  frame-src 'self' https://www.googletagmanager.com;
   font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
@@ -56,25 +56,66 @@
     body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;color:#2c3e50;}
 
     /* After Hours Banner */
-    .after-hours-banner{background:linear-gradient(135deg,#666,#888);color:#fff;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.2);display:none;position:sticky;top:0;z-index:1001;}
-    .after-hours-banner h3{margin:0 0 10px 0;font-size:1.4em;}
-    .after-hours-banner p{margin:5px 0;}
+    .after-hours-banner{background:linear-gradient(135deg,#666,#888);color:#fff;padding:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.2);display:none;position:sticky;top:0;z-index:1001;}
+    .after-hours-banner h3{margin:0 0 10px 0;font-size:1.2em;}
+    .after-hours-banner p{margin:5px 0;font-size:0.9em;}
     .after-hours-banner a{color:#fff;text-decoration:underline;font-weight:700;}
 
     /* Header */
     .header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000;}
-    .header-content{max-width:1200px;margin:0 auto;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;}
-    .logo-section{display:flex;align-items:center;gap:15px;}
-    .logo{width:50px;height:50px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;}
-    .company-name{font-size:1.8em;font-weight:600;color:#1e3c72;}
-    .tagline{font-size:.9em;color:#718096;margin-top:2px;}
-    .header-nav{display:flex;gap:30px;align-items:center;}
-    .nav-link{color:#4a5568;text-decoration:none;font-weight:500;}
+    .header-content{max-width:1200px;margin:0 auto;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:relative;}
+    .logo-section{display:flex;align-items:center;gap:12px;}
+    .logo{width:40px;height:40px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;flex-shrink:0;}
+    .company-info{display:flex;flex-direction:column;}
+    .company-name{font-size:1.4em;font-weight:600;color:#1e3c72;line-height:1.1;}
+    .tagline{font-size:.75em;color:#718096;margin-top:2px;}
+    
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle{display:none;background:none;border:none;padding:8px;cursor:pointer;color:#2c3e50;}
+    .mobile-menu-toggle svg{width:28px;height:28px;}
+    
+    /* Desktop Nav */
+    .header-nav{display:flex;gap:25px;align-items:center;}
+    .nav-link{color:#4a5568;text-decoration:none;font-weight:500;white-space:nowrap;}
     .nav-link:hover{color:#1e3c72;}
-    .phone-button{background:#1e3c72;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;}
+    .phone-button{background:#1e3c72;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
     .phone-button:hover{background:#2a5298;transform:translateY(-2px);box-shadow:0 5px 15px rgba(30,60,114,.3);}
-    .admin-link{color:#a0aec0;font-size:.85em;text-decoration:none;margin-left:20px;}
+    .admin-link{color:#a0aec0;font-size:.85em;text-decoration:none;margin-left:15px;white-space:nowrap;}
     .admin-link:hover{color:#718096;}
+    
+    /* Mobile Nav Overlay */
+    .mobile-nav-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;}
+    .mobile-nav{position:fixed;top:0;right:-100%;width:80%;max-width:320px;height:100%;background:#fff;box-shadow:-5px 0 20px rgba(0,0,0,0.1);transition:right 0.3s ease;z-index:1000;overflow-y:auto;}
+    .mobile-nav.active{right:0;}
+    .mobile-nav-header{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;}
+    .mobile-nav-close{background:none;border:none;padding:8px;cursor:pointer;color:#4a5568;}
+    .mobile-nav-close svg{width:24px;height:24px;}
+    .mobile-nav-links{padding:20px;}
+    .mobile-nav-links a{display:block;padding:12px 0;color:#4a5568;text-decoration:none;font-weight:500;border-bottom:1px solid #f7fafc;}
+    .mobile-nav-links a:hover{color:#1e3c72;}
+    .mobile-nav-links .phone-button{margin-top:15px;text-align:center;width:100%;justify-content:center;}
+    .mobile-nav-links .admin-link{margin:15px 0 0 0;padding:12px 0;border-bottom:1px solid #f7fafc;}
+    
+    /* Touch Screen Styles - Applied via JavaScript */
+    body.touch-device .header-nav{display:none;}
+    body.touch-device .mobile-menu-toggle{display:block;}
+    body.touch-device.mobile-nav-overlay.active{display:block;}
+    
+    /* Small Screen Overrides */
+    @media (max-width: 768px) {
+      .after-hours-banner p{font-size:0.8em;line-height:1.4;}
+      .after-hours-banner h3{font-size:1.1em;}
+      
+      .header-content{padding:12px 15px;}
+      .logo{width:36px;height:36px;font-size:18px;}
+      .company-name{font-size:1.2em;}
+      .tagline{display:none;}
+    }
+    
+    @media (max-width: 480px) {
+      .company-name{font-size:1.1em;}
+      .logo-section{gap:10px;}
+    }
 
     /* Hero */
     .hero{padding:56px 30px 30px;margin:40px auto;max-width:1200px;border-radius:24px;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.08);}
@@ -164,11 +205,20 @@
     <div class="header-content">
       <div class="logo-section">
         <div class="logo">FP</div>
-        <div>
+        <div class="company-info">
           <div class="company-name">FormanPacific</div>
           <div class="tagline">Service Claims Management Platform</div>
         </div>
       </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round"/>
+        </svg>
+      </button>
+      
+      <!-- Desktop Nav -->
       <nav class="header-nav">
         <a href="#services" class="nav-link">Services</a>
         <a href="#network" class="nav-link">Network</a>
@@ -179,6 +229,27 @@
       </nav>
     </div>
   </header>
+  
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav-overlay" onclick="closeMobileMenu()"></div>
+  <nav class="mobile-nav">
+    <div class="mobile-nav-header">
+      <div class="company-name" style="font-size:1.2em;">FormanPacific</div>
+      <button class="mobile-nav-close" onclick="closeMobileMenu()" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="mobile-nav-links">
+      <a href="#services" onclick="closeMobileMenu()">Services</a>
+      <a href="#network" onclick="closeMobileMenu()">Network</a>
+      <a href="#resources" onclick="closeMobileMenu()">Resources</a>
+      <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+      <a href="tel:048873337" class="phone-button" onclick="track('mobile_call'); closeMobileMenu();">📞 04 887 3337</a>
+      <a href="/admin" class="admin-link" onclick="closeMobileMenu()">Sign In</a>
+    </div>
+  </nav>
 
   <!-- Hero -->
   <section class="hero">
