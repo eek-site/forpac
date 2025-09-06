@@ -145,35 +145,7 @@
     .footer-bottom{border-top:1px solid #4a5568;padding-top:20px;text-align:center;color:#a0aec0;}
     .contact-link{display:flex;align-items:center;gap:8px;}
   </style>
-
-  <style>
-/* Collapse header on touch devices and smaller screens */
-@media (hover: none) and (pointer: coarse), (max-width: 1024px){
-  .header-content{padding:14px 16px}
-  .company-name{font-size:1.35em}
-  .tagline{display:none}
-
-  .menu-btn{
-    display:inline-flex;align-items:center;gap:8px;
-    border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;
-    background:#fff;color:#1e3c72;font-weight:700;cursor:pointer
-  }
-
-  .header-nav{
-    position:fixed;top:64px;left:0;right:0;background:#fff;
-    border-top:1px solid #e2e8f0;box-shadow:0 8px 20px rgba(0,0,0,.08);
-    display:none;flex-direction:column;gap:0;padding:8px 12px;z-index:1000
-  }
-  .header-nav a{padding:12px 10px;border-radius:8px}
-  .header-nav.show{display:flex}
-  .phone-button{display:block;width:100%;text-align:center;margin-top:6px}
-}
-
-/* Always hide the hamburger on desktop pointers */
-.menu-btn{display:none}
-</style>
 </head>
-
 <body>
   <!-- After Hours Banner -->
   <div id="closedBanner" class="after-hours-banner" style="display: none;">
@@ -197,10 +169,7 @@
           <div class="tagline">Service Claims Management Platform</div>
         </div>
       </div>
-      <button class="menu-btn" aria-label="Open menu" aria-controls="site-nav" aria-expanded="false" onclick="toggleMenu(this)">
-        ☰ Menu
-      </button>
-      <nav id="site-nav" class="header-nav">
+      <nav class="header-nav">
         <a href="#services" class="nav-link">Services</a>
         <a href="#network" class="nav-link">Network</a>
         <a href="#resources" class="nav-link">Resources</a>
@@ -429,18 +398,37 @@
     </div>
   </footer>
 
-  <!-- Main site logic -->
   <script>
+    // Mobile menu functions
+    function toggleMobileMenu() {
+      const overlay = document.querySelector('.mobile-nav-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      overlay.classList.toggle('active');
+      mobileNav.classList.toggle('active');
+      document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+    }
+    
+    function closeMobileMenu() {
+      const overlay = document.querySelector('.mobile-nav-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      overlay.classList.remove('active');
+      mobileNav.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
     // Check system availability status
     async function checkSystemStatus() {
       try {
         // Direct API call to check phone system status - shared backend with Eek
         const response = await fetch("https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/17b1d2990e6f4082a2b0d9c2f1a29025/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bPyoxJ24kuxJZOyLGAclGaEuH6BHwUTFaGmYOwHofa8", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({}),
           cache: "no-store"
         });
+        
         if (response.ok) {
           const data = await response.json();
           return data.state === 'Active';
@@ -458,8 +446,12 @@
       const hour = now.getHours();
       const minutes = now.getMinutes();
       const time = hour + minutes / 60;
+      
       // Monday-Friday: 8:30 AM - 5:00 PM (NZ Time)
-      if (day >= 1 && day <= 5) return time >= 8.5 && time < 17;
+      if (day >= 1 && day <= 5) {
+        return time >= 8.5 && time < 17;
+      }
+      
       // Saturday-Sunday: Closed
       return false;
     }
@@ -468,22 +460,25 @@
     async function updateHoursDisplay() {
       const systemActive = await checkSystemStatus();
       const duringBusinessHours = isWithinBusinessHours();
-
+      
       // Update closed banner
       const closedBanner = document.getElementById('closedBanner');
       const closedTitle = document.getElementById('closedTitle');
       const afterHoursMessage = document.getElementById('afterHoursMessage');
       const tempUnavailableMessage = document.getElementById('tempUnavailableMessage');
-
+      
       if (closedBanner) {
         if (!systemActive) {
           closedBanner.style.display = 'block';
+          
           if (duringBusinessHours) {
+            // During business hours but phones off - operational reasons
             closedTitle.innerHTML = '🚧 PHONE LINES CURRENTLY BUSY';
             closedBanner.style.background = 'linear-gradient(135deg, #ff8c00, #ff6b00)';
             afterHoursMessage.style.display = 'none';
             tempUnavailableMessage.style.display = 'block';
           } else {
+            // Outside business hours
             closedTitle.innerHTML = '🕐 OFFICE CURRENTLY CLOSED';
             closedBanner.style.background = 'linear-gradient(135deg, #666, #888)';
             afterHoursMessage.style.display = 'block';
@@ -493,7 +488,7 @@
           closedBanner.style.display = 'none';
         }
       }
-
+      
       // Update phone buttons visibility based on system status
       const phoneButtons = document.querySelectorAll('.phone-button, a[href^="tel:"]');
       phoneButtons.forEach(btn => {
@@ -511,7 +506,7 @@
           }
         }
       });
-
+      
       // Update admin link visibility
       const adminLink = document.querySelector('.admin-link');
       if (adminLink && !systemActive && !duringBusinessHours) {
@@ -521,63 +516,52 @@
 
     // Enhanced tracking function
     function track(label, value){
-      if(typeof gtag!=='undefined'){
-        gtag('event', 'click', {
+      if(typeof gtag!=='undefined'){ 
+        gtag('event', 'click', { 
           'event_category': 'engagement',
           'event_label': label,
           'value': value || 1
         });
+        
+        // Fire conversion events for key actions
         if(label.includes('call')){
-          gtag('event', 'conversion', { 'send_to': 'AW-17529704008/phone_click' });
+          gtag('event', 'conversion', {
+            'send_to': 'AW-17529704008/phone_click'
+          });
         }
       }
     }
 
     // Admin login redirect
-    function adminLogin(){ window.location.href='/admin'; }
+    function adminLogin(){ 
+      window.location.href='/admin'; 
+    }
 
     // Smooth scroll for hash links
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click',e=>{
-        const id=a.getAttribute('href');
-        if(id.length>1){
-          e.preventDefault();
-          const t=document.querySelector(id);
-          if(t){ t.scrollIntoView({behavior:'smooth'}); }
+        const id=a.getAttribute('href'); 
+        if(id.length>1){ 
+          e.preventDefault(); 
+          const t=document.querySelector(id); 
+          if(t){ 
+            t.scrollIntoView({behavior:'smooth'}); 
+          } 
         }
       });
     });
 
     // Initialize on page load
     window.addEventListener('load', function() {
+      detectTouchDevice(); // Detect touch screens first
       updateHoursDisplay();
       // Check status every 5 minutes
       setInterval(updateHoursDisplay, 5 * 60 * 1000);
     });
-  </script>
-
-  <!-- Mobile menu logic -->
-  <script>
-    function toggleMenu(btn){
-      const nav = document.getElementById('site-nav');
-      const open = nav.classList.toggle('show');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-
-    // Close menu when a nav link is tapped
-    document.addEventListener('click', (e)=>{
-      if(e.target.closest('.header-nav a')){
-        document.getElementById('site-nav')?.classList.remove('show');
-        document.querySelector('.menu-btn')?.setAttribute('aria-expanded','false');
-      }
-    });
-
-    // Close menu if resizing back to desktop
-    window.addEventListener('resize', ()=>{
-      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth > 1024){
-        document.getElementById('site-nav')?.classList.remove('show');
-        document.querySelector('.menu-btn')?.setAttribute('aria-expanded','false');
-      }
+    
+    // Also check on resize in case device orientation changes
+    window.addEventListener('resize', function() {
+      detectTouchDevice();
     });
   </script>
 </body>
