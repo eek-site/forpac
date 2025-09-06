@@ -677,7 +677,7 @@
         } else {
           // Phones off → show hours (or link to form)
           stickyFab.style.display = 'inline-block';
-          stickyFab.textContent = duringBusinessHours ? '📅 Phones Busy – View Options' : '🕐 View Hours';
+          stickyFab.textContent = duringBusinessHours ? '📅 Phones Busy – View Options' : '🕐 Office Closed';
           stickyFab.setAttribute('href','#closedBanner'); // change to '/contact-form' if you prefer
           stickyFab.style.background = duringBusinessHours ? '#ff8c00' : '#666';
           stickyFab.setAttribute('aria-label', duringBusinessHours ? 'Phones busy – view options' : 'View office hours');
