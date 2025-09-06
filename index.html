@@ -145,6 +145,26 @@
     .footer-bottom{border-top:1px solid #4a5568;padding-top:20px;text-align:center;color:#a0aec0;}
     .contact-link{display:flex;align-items:center;gap:8px;}
   </style>
+
+  <style>
+  /* Mobile header */
+  @media (max-width: 768px){
+    .header-content{padding:14px 16px}
+    .company-name{font-size:1.35em}
+    .tagline{display:none}
+    .header-nav{position:fixed;top:64px;left:0;right:0;background:#fff;
+      border-top:1px solid #e2e8f0;box-shadow:0 8px 20px rgba(0,0,0,.08);
+      display:none;flex-direction:column;gap:0;padding:8px 12px;z-index:1000}
+    .header-nav a{padding:12px 10px;border-radius:8px}
+    .header-nav.show{display:flex}
+    .phone-button{display:block;width:100%;text-align:center;margin-top:6px}
+    .menu-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2e8f0;
+      padding:8px 12px;border-radius:10px;background:#fff;color:#1e3c72;font-weight:700}
+  }
+  /* Desktop button stays hidden on wide screens */
+  .menu-btn{display:none}
+</style>
+
 </head>
 <body>
   <!-- After Hours Banner -->
@@ -169,14 +189,18 @@
           <div class="tagline">Service Claims Management Platform</div>
         </div>
       </div>
-      <nav class="header-nav">
-        <a href="#services" class="nav-link">Services</a>
-        <a href="#network" class="nav-link">Network</a>
-        <a href="#resources" class="nav-link">Resources</a>
-        <a href="#contact" class="nav-link">Contact</a>
-        <a href="tel:048873337" class="phone-button" onclick="track('header_call')">📞 04 887 3337</a>
-        <a href="/admin" class="admin-link">Sign In</a>
-      </nav>
+      <button class="menu-btn" aria-label="Open menu" aria-controls="site-nav" aria-expanded="false" onclick="toggleMenu(this)">
+  ☰ Menu
+</button>
+<nav id="site-nav" class="header-nav">
+  <a href="#services" class="nav-link">Services</a>
+  <a href="#network" class="nav-link">Network</a>
+  <a href="#resources" class="nav-link">Resources</a>
+  <a href="#contact" class="nav-link">Contact</a>
+  <a href="tel:048873337" class="phone-button" onclick="track('header_call')">📞 04 887 3337</a>
+  <a href="/admin" class="admin-link">Sign In</a>
+</nav>
+
     </div>
   </header>
 
