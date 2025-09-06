@@ -211,6 +211,12 @@
             transform: translateY(-2px);
         }
         
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
         .microsoft-logo {
             width: 20px;
             height: 20px;
@@ -252,6 +258,12 @@
             background: #fffbeb;
             border: 1px solid #fed7aa;
             color: #92400e;
+        }
+        
+        .info-message {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
         }
         
         .loading {
@@ -320,6 +332,21 @@
         
         .footer-links a:hover {
             color: var(--primary-color);
+        }
+        
+        /* Popup blocker notice */
+        .popup-notice {
+            background: var(--info-message);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            display: none;
+        }
+        
+        .popup-notice.show {
+            display: block;
         }
         
         /* Session timeout warning */
@@ -412,7 +439,7 @@
         </div>
         
         <div class="login-methods">
-            <button class="login-button primary" onclick="signIn()">
+            <button id="primaryLoginBtn" class="login-button primary" onclick="signIn()">
                 <svg class="microsoft-logo" viewBox="0 0 21 21">
                     <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
                     <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
@@ -422,7 +449,7 @@
                 Microsoft Work Account
             </button>
             
-            <button class="login-button" onclick="alternativeLogin()">
+            <button id="alternativeLoginBtn" class="login-button" onclick="alternativeLogin()">
                 <svg class="microsoft-logo" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 11H3v2h6v-2zm0-4H3v2h6V7zm0 8H3v2h6v-2zm12-8h-6v2h6V7zm0 4h-6v2h6v-2zm0 4h-6v2h6v-2z"/>
                 </svg>
@@ -430,9 +457,14 @@
             </button>
         </div>
         
+        <div id="popupNotice" class="popup-notice">
+            <strong>Popup blocked?</strong> Please allow popups for this site or use the redirect method by clicking the button again.
+        </div>
+        
         <div id="errorMessage" class="message error-message"></div>
         <div id="successMessage" class="message success-message"></div>
         <div id="warningMessage" class="message warning-message"></div>
+        <div id="infoMessage" class="message info-message"></div>
         
         <div id="loadingIndicator" class="loading">
             <div class="spinner"></div>
@@ -479,6 +511,11 @@
     </div>
 
     <script>
+        // Enhanced error handling and browser compatibility checks
+        let msalInstance = null;
+        let authInProgress = false;
+        let popupBlocked = false;
+        
         // Microsoft Authentication Configuration
         const msalConfig = {
             auth: {
@@ -489,38 +526,71 @@
             },
             cache: {
                 cacheLocation: 'sessionStorage',
-                storeAuthStateInCookie: true // Better support for IE11
+                storeAuthStateInCookie: true
             },
             system: {
+                windowHashTimeout: 60000, // Increased timeout for slower connections
+                iframeHashTimeout: 60000,
+                loadFrameTimeout: 10000,
                 loggerOptions: {
                     loggerCallback: (level, message, containsPii) => {
                         if (containsPii) return;
+                        
+                        // Filter out non-critical errors
+                        if (message.includes('monitorPopupForHash') && message.includes('window closed')) {
+                            // User closed the popup - handle gracefully
+                            if (!popupBlocked) {
+                                showWarning('Sign-in window was closed. Please try again.');
+                            }
+                            authInProgress = false;
+                            enableButtons();
+                            return;
+                        }
+                        
                         switch (level) {
                             case msal.LogLevel.Error:
-                                console.error(message);
+                                console.error('[MSAL Error]', message);
                                 break;
                             case msal.LogLevel.Warning:
-                                console.warn(message);
+                                console.warn('[MSAL Warning]', message);
+                                break;
+                            case msal.LogLevel.Info:
+                                console.info('[MSAL Info]', message);
                                 break;
                         }
-                    }
+                    },
+                    logLevel: msal.LogLevel.Warning
                 }
             }
         };
 
-        // Create MSAL instance
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-        // Initialize MSAL
-        msalInstance.initialize().then(() => {
-            // Check if returning from redirect
-            msalInstance.handleRedirectPromise()
-                .then(handleResponse)
-                .catch(error => {
-                    console.error('Redirect error:', error);
-                    showError('Authentication failed. Please try again.');
-                });
-        });
+        // Initialize MSAL with error handling
+        async function initializeMsal() {
+            try {
+                msalInstance = new msal.PublicClientApplication(msalConfig);
+                await msalInstance.initialize();
+                
+                // Handle redirect response
+                try {
+                    const response = await msalInstance.handleRedirectPromise();
+                    if (response) {
+                        handleResponse(response);
+                    }
+                } catch (error) {
+                    console.error('Redirect handling error:', error);
+                    if (error.errorCode !== 'interaction_in_progress') {
+                        showError('Authentication failed. Please try again.');
+                    }
+                }
+                
+                // Check for existing session
+                checkExistingSession();
+                
+            } catch (error) {
+                console.error('MSAL initialization error:', error);
+                showError('Authentication system initialization failed. Please refresh the page.');
+            }
+        }
 
         // Login request configuration
         const loginRequest = {
@@ -533,16 +603,13 @@
         let warningTimer;
 
         function startSessionTimer() {
-            // Clear existing timers
             clearTimeout(sessionTimer);
             clearTimeout(warningTimer);
             
-            // Show warning after 25 minutes
             warningTimer = setTimeout(() => {
                 document.getElementById('sessionWarning').style.display = 'block';
             }, 25 * 60 * 1000);
             
-            // Auto logout after 30 minutes
             sessionTimer = setTimeout(() => {
                 signOut();
             }, 30 * 60 * 1000);
@@ -551,68 +618,105 @@
         // Handle authentication response
         function handleResponse(response) {
             if (response !== null) {
-                // User successfully logged in
                 const account = response.account;
                 sessionStorage.setItem('msalAccount', JSON.stringify(account));
                 showSuccess(`Welcome, ${account.name}! Redirecting to dashboard...`);
-                
-                // Start session timer
                 startSessionTimer();
                 
-                // Redirect to dashboard
                 setTimeout(() => {
                     window.location.href = '/admin/dashboard';
                 }, 1500);
             }
         }
 
-        // Sign in function
+        // Enhanced sign-in function with better error handling
         async function signIn() {
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
-            const loadingDiv = document.getElementById('loadingIndicator');
+            // Prevent multiple simultaneous authentication attempts
+            if (authInProgress) {
+                showInfo('Authentication already in progress. Please wait...');
+                return;
+            }
             
-            // Reset messages
+            // Reset states
             hideAllMessages();
+            document.getElementById('popupNotice').classList.remove('show');
+            authInProgress = true;
+            popupBlocked = false;
+            
+            // Disable buttons during authentication
+            disableButtons();
+            
+            const loadingDiv = document.getElementById('loadingIndicator');
             loadingDiv.classList.add('active');
             
             try {
-                // Check if popup is available
-                const popupWindow = window.open('', '_blank', 'width=1,height=1');
-                if (popupWindow && popupWindow.document) {
-                    popupWindow.close();
-                    // Use popup login
-                    const response = await msalInstance.loginPopup(loginRequest);
-                    handleResponse(response);
-                } else {
-                    // Popup blocked, use redirect
-                    await msalInstance.loginRedirect(loginRequest);
+                // First, try popup authentication
+                const popupResponse = await attemptPopupLogin();
+                if (popupResponse) {
+                    handleResponse(popupResponse);
                 }
             } catch (error) {
-                loadingDiv.classList.remove('active');
-                
-                if (error.errorCode === 'user_cancelled') {
-                    showWarning('Sign-in cancelled. Please try again when ready.');
-                } else if (error.errorCode === 'popup_window_error') {
-                    // Try redirect as fallback
+                // If popup fails, try redirect
+                if (error.errorCode === 'popup_window_error' || popupBlocked) {
+                    console.log('Popup blocked, attempting redirect login...');
                     try {
                         await msalInstance.loginRedirect(loginRequest);
                     } catch (redirectError) {
-                        showError('Unable to authenticate. Please check your popup blocker settings.');
+                        handleAuthError(redirectError);
                     }
-                } else if (error.errorCode === 'interaction_in_progress') {
-                    showWarning('Authentication already in progress. Please wait...');
                 } else {
-                    showError('Authentication failed. Please try again or contact support.');
-                    console.error('Authentication error:', error);
+                    handleAuthError(error);
                 }
+            } finally {
+                loadingDiv.classList.remove('active');
+                authInProgress = false;
+                enableButtons();
+            }
+        }
+
+        // Attempt popup login with popup blocker detection
+        async function attemptPopupLogin() {
+            // Test if popups are allowed
+            const testPopup = window.open('', '_blank', 'width=1,height=1,left=10000,top=10000');
+            
+            if (!testPopup || testPopup.closed || typeof testPopup.closed === 'undefined') {
+                popupBlocked = true;
+                document.getElementById('popupNotice').classList.add('show');
+                throw new Error('popup_window_error');
+            }
+            
+            testPopup.close();
+            
+            // Proceed with actual popup login
+            return await msalInstance.loginPopup(loginRequest);
+        }
+
+        // Centralized error handling
+        function handleAuthError(error) {
+            console.error('Authentication error:', error);
+            
+            if (error.errorCode === 'user_cancelled' || error.errorMessage?.includes('user_cancelled')) {
+                showWarning('Sign-in cancelled. Please try again when ready.');
+            } else if (error.errorCode === 'interaction_in_progress') {
+                showWarning('Another sign-in is in progress. Please wait...');
+            } else if (error.errorCode === 'popup_window_error' || popupBlocked) {
+                showInfo('Popup was blocked. Click the sign-in button again to use redirect method.');
+                document.getElementById('popupNotice').classList.add('show');
+            } else if (error.errorCode === 'network_error') {
+                showError('Network error. Please check your internet connection.');
+            } else if (error.errorCode === 'consent_required') {
+                showWarning('Additional permissions required. Please try again.');
+            } else if (error.errorCode === 'login_required') {
+                showWarning('Login required. Please sign in.');
+            } else {
+                showError('Authentication failed. Please try again or contact support.');
             }
         }
 
         // Sign out function
         function signOut() {
-            const accounts = msalInstance.getAllAccounts();
-            if (accounts.length > 0) {
+            const accounts = msalInstance?.getAllAccounts();
+            if (accounts && accounts.length > 0) {
                 const logoutRequest = {
                     account: accounts[0],
                     postLogoutRedirectUri: window.location.origin + '/admin'
@@ -622,12 +726,37 @@
             sessionStorage.clear();
         }
 
-        // Alternative login method (Microsoft Forms)
+        // Alternative login method
         function alternativeLogin() {
             showWarning('Redirecting to Microsoft Forms portal...');
             setTimeout(() => {
-                window.location.href = 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u';
+                // Redirect to Forms with login hint
+                window.location.href = 'https://forms.office.com/?login_hint=zx@roadandrescue.com';
             }, 1000);
+        }
+
+        // Check for existing session
+        function checkExistingSession() {
+            if (!msalInstance) return;
+            
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length > 0) {
+                showSuccess('You are already signed in. Redirecting...');
+                setTimeout(() => {
+                    window.location.href = '/admin/dashboard';
+                }, 1000);
+            }
+        }
+
+        // Button state management
+        function disableButtons() {
+            document.getElementById('primaryLoginBtn').disabled = true;
+            document.getElementById('alternativeLoginBtn').disabled = true;
+        }
+
+        function enableButtons() {
+            document.getElementById('primaryLoginBtn').disabled = false;
+            document.getElementById('alternativeLoginBtn').disabled = false;
         }
 
         // Message display functions
@@ -652,37 +781,61 @@
             warningDiv.style.display = 'block';
         }
 
+        function showInfo(message) {
+            hideAllMessages();
+            const infoDiv = document.getElementById('infoMessage');
+            infoDiv.textContent = message;
+            infoDiv.style.display = 'block';
+        }
+
         function hideAllMessages() {
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
             document.getElementById('warningMessage').style.display = 'none';
+            document.getElementById('infoMessage').style.display = 'none';
         }
 
-        // Check for existing session
-        window.addEventListener('load', () => {
-            const accounts = msalInstance.getAllAccounts();
-            if (accounts.length > 0) {
-                // User is already signed in
-                showSuccess('You are already signed in. Redirecting...');
-                setTimeout(() => {
-                    window.location.href = '/admin/dashboard';
-                }, 1000);
-            }
-        });
-
-        // Handle browser back button
-        window.addEventListener('popstate', (event) => {
-            // Clear any authentication in progress
-            sessionStorage.removeItem('msal.interaction.status');
-        });
-
-        // Detect and handle network issues
+        // Network status monitoring
         window.addEventListener('online', () => {
-            hideAllMessages();
+            if (authInProgress) {
+                showInfo('Connection restored. You can try signing in again.');
+            }
         });
 
         window.addEventListener('offline', () => {
             showError('No internet connection. Please check your network.');
+            authInProgress = false;
+            enableButtons();
+        });
+
+        // Handle browser back button
+        window.addEventListener('popstate', (event) => {
+            sessionStorage.removeItem('msal.interaction.status');
+            authInProgress = false;
+            enableButtons();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (authInProgress) {
+                sessionStorage.removeItem('msal.interaction.status');
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeMsal();
+        });
+
+        // Handle visibility change (tab switching)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && authInProgress) {
+                // User switched tabs during authentication
+                console.log('Tab hidden during authentication');
+            } else if (!document.hidden && authInProgress) {
+                // User returned to tab
+                console.log('Tab visible again');
+            }
         });
     </script>
 </body>
