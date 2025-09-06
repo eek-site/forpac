@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Activity — Edit | FormanPacific Service Claims Management</title>
-  <meta name="description" content="Edit and manage job activity in SharePoint JobActivityLog list">
+  <meta name="description" content="Edit and manage job activity in SharePoint JobBuildNotes list">
   <meta name="robots" content="noindex, nofollow">
 
   <!-- MSAL -->
@@ -130,7 +130,7 @@
       <div class="logo" style="margin:0 auto 20px;width:80px;height:80px;font-size:32px">FP</div>
       <h2 style="margin-bottom:12px;color:var(--text-primary)">Sign In Required</h2>
       <p style="color:var(--text-secondary);margin-bottom:24px">Access the Job Activity editor with your Microsoft work account.</p>
-      <div class="pill info" style="margin:0 auto 24px;display:inline-flex"><span>🛠️</span> JobActivityLog (SharePoint Live)</div>
+      <div class="pill info" style="margin:0 auto 24px;display:inline-flex"><span>🛠️</span> JobBuildNotes (SharePoint Live)</div>
       <button id="btnLogin" class="btn primary" style="font-size:16px;padding:12px 24px">Sign in with Microsoft</button>
       <p style="font-size:12px;color:var(--text-secondary);margin-top:16px">SharePoint permissions are enforced</p>
     </div>
@@ -152,7 +152,7 @@
         <div class="logo">FP</div>
         <div class="brand-text">
           <h1>FormanPacific <small>Activity Editor</small></h1>
-          <small>🛠️ JobActivityLog (SharePoint Live)</small>
+          <small>🛠️ JobBuildNotes (SharePoint Live)</small>
         </div>
       </div>
       <div class="header-actions">
@@ -358,7 +358,7 @@
       sharepoint: {
         tenant: 'roadandrescue.sharepoint.com',
         siteRelative: '/sites/rar',
-        listTitle: 'JobActivityLog'
+        listTitle: 'JobBuildNotes'
       },
       msal: {
         auth: {
