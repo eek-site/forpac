@@ -83,18 +83,91 @@
     .admin-link{color:#a0aec0;font-size:.85em;text-decoration:none;margin-left:15px;white-space:nowrap;}
     .admin-link:hover{color:#718096;}
     
-    /* Mobile Nav Overlay */
-    .mobile-nav-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;}
-    .mobile-nav{position:fixed;top:0;right:-100%;width:80%;max-width:320px;height:100%;background:#fff;box-shadow:-5px 0 20px rgba(0,0,0,0.1);transition:right 0.3s ease;z-index:1000;overflow-y:auto;}
-    .mobile-nav.active{right:0;}
-    .mobile-nav-header{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;}
-    .mobile-nav-close{background:none;border:none;padding:8px;cursor:pointer;color:#4a5568;}
-    .mobile-nav-close svg{width:24px;height:24px;}
-    .mobile-nav-links{padding:20px;}
-    .mobile-nav-links a{display:block;padding:12px 0;color:#4a5568;text-decoration:none;font-weight:500;border-bottom:1px solid #f7fafc;}
-    .mobile-nav-links a:hover{color:#1e3c72;}
-    .mobile-nav-links .phone-button{margin-top:15px;text-align:center;width:100%;justify-content:center;}
-    .mobile-nav-links .admin-link{margin:15px 0 0 0;padding:12px 0;border-bottom:1px solid #f7fafc;}
+   /* Mobile Nav Overlay — sits ABOVE the after-hours banner */
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1190; /* higher than banner (1001) */
+}
+
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 80%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+  transition: right 0.3s ease;
+  z-index: 1200; /* highest */
+  overflow-y: auto;
+}
+
+.mobile-nav.active {
+  right: 0;
+}
+
+.mobile-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mobile-nav-close {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #4a5568;
+}
+
+.mobile-nav-close svg {
+  width: 24px;
+  height: 24px;
+}
+
+.mobile-nav-links {
+  padding: 20px;
+}
+
+.mobile-nav-links a {
+  display: block;
+  padding: 12px 0;
+  color: #4a5568;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.mobile-nav-links a:hover {
+  color: #1e3c72;
+}
+
+.mobile-nav-links .phone-button {
+  margin-top: 15px;
+  text-align: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.mobile-nav-links .admin-link {
+  margin: 15px 0 0 0;
+  padding: 12px 0;
+  border-bottom: 1px solid #f7fafc;
+}
+
+/* Optional but nice: prevent banner catching taps while menu is open */
+body.menu-open .after-hours-banner {
+  pointer-events: none;
+}
     
     /* Touch Screen Styles - Applied via JavaScript */
     body.touch-device .header-nav{display:none;}
@@ -493,7 +566,7 @@
     }
 
     // Mobile menu functions
-    function toggleMobileMenu() {
+   function toggleMobileMenu() {
   const overlay = document.querySelector('.mobile-nav-overlay');
   const mobileNav = document.querySelector('.mobile-nav');
   const btn = document.querySelector('.mobile-menu-toggle');
@@ -502,16 +575,18 @@
   overlay.classList.toggle('active', isOpening);
   mobileNav.classList.toggle('active', isOpening);
   document.body.style.overflow = isOpening ? 'hidden' : '';
+  document.body.classList.toggle('menu-open', isOpening); // NEW
   if (btn) btn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
 }
     
     function closeMobileMenu() {
-      const overlay = document.querySelector('.mobile-nav-overlay');
-      const mobileNav = document.querySelector('.mobile-nav');
-      overlay.classList.remove('active');
-      mobileNav.classList.remove('active');
-      document.body.style.overflow = '';
-    }
+  const overlay = document.querySelector('.mobile-nav-overlay');
+  const mobileNav = document.querySelector('.mobile-nav');
+  overlay.classList.remove('active');
+  mobileNav.classList.remove('active');
+  document.body.style.overflow = '';
+  document.body.classList.remove('menu-open'); // NEW
+}
 
     // Close mobile menu on Escape
 document.addEventListener('keydown', (e) => {
