@@ -99,7 +99,7 @@
     /* Touch Screen Styles - Applied via JavaScript */
     body.touch-device .header-nav{display:none;}
     body.touch-device .mobile-menu-toggle{display:block;}
-    body.touch-device.mobile-nav-overlay.active{display:block;}
+    .mobile-nav-overlay.active{display:block;}
     
     /* Small Screen Overrides */
     @media (max-width: 768px) {
@@ -212,7 +212,7 @@
       </div>
       
       <!-- Mobile Menu Toggle -->
-      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-nav">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round"/>
         </svg>
@@ -232,7 +232,7 @@
   
   <!-- Mobile Nav Overlay -->
   <div class="mobile-nav-overlay" onclick="closeMobileMenu()"></div>
-  <nav class="mobile-nav">
+  <nav id="mobile-nav" class="mobile-nav">
     <div class="mobile-nav-header">
       <div class="company-name" style="font-size:1.2em;">FormanPacific</div>
       <button class="mobile-nav-close" onclick="closeMobileMenu()" aria-label="Close menu">
@@ -494,12 +494,16 @@
 
     // Mobile menu functions
     function toggleMobileMenu() {
-      const overlay = document.querySelector('.mobile-nav-overlay');
-      const mobileNav = document.querySelector('.mobile-nav');
-      overlay.classList.toggle('active');
-      mobileNav.classList.toggle('active');
-      document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
-    }
+  const overlay = document.querySelector('.mobile-nav-overlay');
+  const mobileNav = document.querySelector('.mobile-nav');
+  const btn = document.querySelector('.mobile-menu-toggle');
+  const isOpening = !mobileNav.classList.contains('active');
+
+  overlay.classList.toggle('active', isOpening);
+  mobileNav.classList.toggle('active', isOpening);
+  document.body.style.overflow = isOpening ? 'hidden' : '';
+  if (btn) btn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+}
     
     function closeMobileMenu() {
       const overlay = document.querySelector('.mobile-nav-overlay');
@@ -508,6 +512,13 @@
       mobileNav.classList.remove('active');
       document.body.style.overflow = '';
     }
+
+    // Close mobile menu on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.querySelector('.mobile-nav')?.classList.contains('active')) {
+    closeMobileMenu();
+  }
+});
 
     // Check system availability status
     async function checkSystemStatus() {
