@@ -258,6 +258,13 @@
   <script>
     'use strict';
 
+    function normalizePath(p){
+  p = (p ?? '').trim();
+  if (!p) return '';
+  return p.startsWith('/') ? p : `/${p}`;
+}
+
+
     // ---------- CONFIG (identical base; list/title differs) ----------
     const SPO_HOST       = 'roadandrescue.sharepoint.com';
     const SPO_SITE_PATH  = '/sites/rar';
