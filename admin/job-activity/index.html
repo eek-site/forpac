@@ -353,7 +353,7 @@
 
     async function fetchSharePointRows(){
       const token = await getGraphToken();
-      const site = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:/sites${SPO_SITE_PATH}`, token);
+      const site = await fetchJson(`https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:${normalizePath(SPO_SITE_PATH)}`,   token );  // tiny helper so '/sites/rar' and 'sites/rar' both work function normalizePath(p){ return p.startsWith('/') ? p : `/${p}`; }
 
       // Exact displayName match (no URL-encoding of the literal)
       const listNameOData = SPO_LIST_TITLE.replace(/'/g, "''");
