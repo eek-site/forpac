@@ -482,16 +482,43 @@
       }
     }
 
-    // ===== SP REST =====
-    async function spRequest(url, options = {}){
-      const r = await fetch(url, {
+   // ===== SP REST =====
+    async function spRequest(url, options = {}, _retried = false){
+      const resp = await fetch(url, {
         ...options,
         headers:{
           'Authorization': `Bearer ${state.accessToken}`,
           'Accept':'application/json;odata=nometadata',
-          ...options.headers
+          ...(options.headers || {})
         }
       });
+
+      // Retry once if token expired
+      if ((resp.status === 401 || resp.status === 403) && !_retried) {
+        try { await getAccessToken(); } catch {}
+        return spRequest(url, options, true);
+      }
+
+      if (!resp.ok){
+        const errText = await resp.text().catch(()=> '');
+        const e = new Error(`SharePoint API error: ${resp.status} ${resp.statusText} ${errText}`);
+        e.status = resp.status;
+        e.body = errText;
+        throw e;
+      }
+
+      if (resp.status === 204) return null; // no content is normal on DELETE/MERGE
+
+      const contentType = resp.headers.get('Content-Type') || '';
+      const text = await resp.text().catch(()=> '');
+      if (!text) return null;
+
+      if (contentType.includes('application/json')) {
+        try { return JSON.parse(text); } catch { return null; }
+      }
+      return text;
+    }
+
       if (!r.ok){
         const t = await r.text().catch(()=> '');
         throw new Error(`SharePoint API error: ${r.status} ${r.statusText} ${t}`);
@@ -505,56 +532,55 @@
     }
 
     async function loadListData(){
-      setStatus('Loading data...', 'info');
-      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
-      const body = {
-        parameters:{
-          RenderOptions:570,
-          ViewXml:'<View><RowLimit>5000</RowLimit><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query></View>'
-        }
-      };
-      const data = await spRequest(url, {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json;odata=verbose' },
-        body: JSON.stringify(body)
-      });
-      return data;
+  setStatus('Loading data...', 'info');
+  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
+  const body = {
+    parameters:{
+      RenderOptions: 570,
+      ViewXml: '<View><RowLimit>5000</RowLimit><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query></View>'
     }
+  };
+  return spRequest(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json;odata=nometadata' },
+    body: JSON.stringify(body)
+  });
+}
 
     async function createItem(item){
-      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
-      return spRequest(url, {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json;odata=verbose' },
-        body: JSON.stringify(item)
-      });
-    }
+  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
+  return spRequest(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json;odata=nometadata' },
+    body: JSON.stringify(item)
+  });
+}
 
     async function updateItem(id, updates){
-      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
-      await spRequest(url, {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json;odata=verbose',
-          'IF-MATCH':'*',
-          'X-HTTP-Method':'MERGE'
-        },
-        body: JSON.stringify(updates)
-      });
-    }
+  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+  await spRequest(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json;odata=nometadata',
+      'IF-MATCH': '*',
+      'X-HTTP-Method': 'MERGE'
+    },
+    body: JSON.stringify(updates)
+  });
+}
 
     async function deleteItem(id){
-      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
-      await spRequest(url, {
-        method:'POST',
-        headers:{ 'IF-MATCH':'*','X-HTTP-Method':'DELETE' }
-      });
-    }
+  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+  await spRequest(url, {
+    method: 'DELETE',
+    headers: { 'IF-MATCH': '*' }
+  });
+}
 
-    async function addField(fieldConfig){
-      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
-      const common = { Title: fieldConfig.displayName, Required: !!fieldConfig.required };
-      let body;
+   async function addField(fieldConfig){
+  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
+  const common = { Title: fieldConfig.displayName, Required: !!fieldConfig.required };
+  let body;
       switch(fieldConfig.type){
         case 'Number':
           body = { ...common, '__metadata':{ 'type':'SP.FieldNumber' },   FieldTypeKind: 9 };
@@ -585,12 +611,12 @@
       }
       if (fieldConfig.defaultValue) body.DefaultValue = fieldConfig.defaultValue;
 
-      return spRequest(url, {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json;odata=verbose' },
-        body: JSON.stringify(body)
-      });
-    }
+       return spRequest(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json;odata=nometadata' },
+    body: JSON.stringify(body)
+  });
+}
 
     // ===== GRID =====
     function buildColumnDefs(schemaFields){
@@ -959,8 +985,11 @@
 
     async function saveChanges(){
       try{
-        setStatus('Saving changes...','info');
-        $('#btnSave').disabled = true;
+  setStatus('Saving changes...','info');
+  $('#btnSave').disabled = true;
+
+  // Ensure fresh token for long sessions
+  try { await getAccessToken(); } catch {}
 
         let ok = 0, fail = 0;
         const idMap = new Map(); // tempId -> realId
@@ -1006,13 +1035,15 @@
 
         // DELETES
         for (const id of state.pendingChanges.deletes){
-          try{
-            const realId = idMap.get(id) || id;
-            await deleteItem(realId);
-            ok++;
-          }catch(e){ console.error('Delete failed', id, e); fail++; }
-        }
-
+  try{
+    const realId = idMap.get(id) || id;
+    await deleteItem(realId);
+    ok++;
+  }catch(e){
+    if (e?.status === 404) { ok++; /* already deleted elsewhere */ }
+    else { console.error('Delete failed', id, e); fail++; }
+  }
+}
         // Clear pending
         state.pendingChanges.updates.clear();
         state.pendingChanges.creates = [];
