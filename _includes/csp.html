@@ -1,6 +1,0 @@
-{%- assign name = page.csp_policy | default: 'default' -%}
-{%- assign policy = site.data.csp[name] -%}
-<meta http-equiv="Content-Security-Policy" content="{{ policy | strip_newlines }}">
-{%- if page.csp_report_only -%}
-<meta http-equiv="Content-Security-Policy-Report-Only" content="{{ policy | strip_newlines }}">
-{%- endif -%}
