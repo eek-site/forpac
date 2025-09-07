@@ -1,12 +1,17 @@
 title: FormanPacific
 csp: >-
   default-src 'self';
+  base-uri 'self';
+  form-action 'self';
+  object-src 'none';
+  worker-src 'self' blob:;
+  upgrade-insecure-requests;
   script-src 'self' 'unsafe-inline'
     https://alcdn.msauth.net
     https://cdn.jsdelivr.net
     https://www.googletagmanager.com
     https://www.google-analytics.com
-    https://googleads.g.doubleclick.net;
+    https://stats.g.doubleclick.net;
   style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
   img-src 'self' data: https:;
   font-src 'self' data: https://cdn.jsdelivr.net;
@@ -14,8 +19,8 @@ csp: >-
     https://roadandrescue.sharepoint.com
     https://login.microsoftonline.com
     https://www.googletagmanager.com
-    https://www.google-analytics.com;
+    https://www.google-analytics.com
+    https://region1.google-analytics.com
+    https://stats.g.doubleclick.net
+    https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
   frame-src 'self' https://login.microsoftonline.com https://www.googletagmanager.com;
-  base-uri 'self'; form-action 'self'; object-src 'none'; worker-src 'self' blob:;
-  upgrade-insecure-requests
-
