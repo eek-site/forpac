@@ -11,35 +11,17 @@
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
   <style>
+    /* (styles unchanged) */
     *{margin:0;padding:0;box-sizing:border-box}
-    :root{
-      --primary-color:#1e3c72;--primary-dark:#152a52;--secondary-color:#2a5298;
-      --success-color:#22c55e;--error-color:#ef4444;--warning-color:#f59e0b;
-      --text-primary:#1e293b;--text-secondary:#64748b;--border-color:#e2e8f0;--bg-light:#f8fafc
-    }
-    body{
-      font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-      background:linear-gradient(135deg,var(--primary-color) 0%,var(--secondary-color) 100%);
-      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden
-    }
-    .bg-pattern{position:absolute;width:100%;height:100%;opacity:.1;background-image:
-      radial-gradient(circle at 20% 80%,#fff 0%,transparent 50%),
-      radial-gradient(circle at 80% 20%,#fff 0%,transparent 50%),
-      radial-gradient(circle at 40% 40%,#fff 0%,transparent 50%);
-      animation:float 20s ease-in-out infinite}
+    :root{--primary-color:#1e3c72;--primary-dark:#152a52;--secondary-color:#2a5298;--success-color:#22c55e;--error-color:#ef4444;--warning-color:#f59e0b;--text-primary:#1e293b;--text-secondary:#64748b;--border-color:#e2e8f0;--bg-light:#f8fafc}
+    body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:linear-gradient(135deg,var(--primary-color) 0%,var(--secondary-color) 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+    .bg-pattern{position:absolute;width:100%;height:100%;opacity:.1;background-image:radial-gradient(circle at 20% 80%,#fff 0%,transparent 50%),radial-gradient(circle at 80% 20%,#fff 0%,transparent 50%),radial-gradient(circle at 40% 40%,#fff 0%,transparent 50%);animation:float 20s ease-in-out infinite}
     @keyframes float{0%,100%{transform:translate(0,0) rotate(0)}33%{transform:translate(-20px,-20px) rotate(1deg)}66%{transform:translate(20px,-10px) rotate(-1deg)}}
-    .login-container{
-      background:#fff;border-radius:24px;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);
-      width:100%;max-width:460px;padding:48px 40px;animation:slideUp .6s cubic-bezier(.34,1.56,.64,1);position:relative;z-index:1}
+    .login-container{background:#fff;border-radius:24px;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);width:100%;max-width:460px;padding:48px 40px;animation:slideUp .6s cubic-bezier(.34,1.56,.64,1);position:relative;z-index:1}
     @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
     .logo-section{text-align:center;margin-bottom:32px}
-    .logo{
-      width:90px;height:90px;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
-      border-radius:20px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:40px;
-      margin-bottom:24px;box-shadow:0 10px 25px -5px rgba(30,60,114,.3);position:relative;overflow:hidden}
-    .logo::after{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;
-      background:linear-gradient(45deg,transparent,rgba(255,255,255,.1),transparent);
-      transform:rotate(45deg);animation:shine 3s infinite}
+    .logo{width:90px;height:90px;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));border-radius:20px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:40px;margin-bottom:24px;box-shadow:0 10px 25px -5px rgba(30,60,114,.3);position:relative;overflow:hidden}
+    .logo::after{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,.1),transparent);transform:rotate(45deg);animation:shine 3s infinite}
     @keyframes shine{0%{transform:translateX(-100%) translateY(-100%) rotate(45deg)}100%{transform:translateX(100%) translateY(100%) rotate(45deg)}}
     h1{color:var(--text-primary);font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-.5px}
     .subtitle{color:var(--text-secondary);font-size:16px}
@@ -47,9 +29,7 @@
     .divider::before{content:"";position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border-color)}
     .divider span{background:#fff;padding:0 16px;color:var(--text-secondary);font-size:14px;position:relative}
     .login-methods{display:flex;flex-direction:column;gap:12px}
-    .login-button{
-      width:100%;padding:16px;background:#fff;border:2px solid var(--border-color);border-radius:12px;font-size:16px;font-weight:600;
-      color:var(--text-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all .2s ease;position:relative;overflow:hidden}
+    .login-button{width:100%;padding:16px;background:#fff;border:2px solid var(--border-color);border-radius:12px;font-size:16px;font-weight:600;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all .2s ease;position:relative;overflow:hidden}
     .login-button:hover{background:var(--bg-light);border-color:var(--primary-color);transform:translateY(-2px);box-shadow:0 8px 16px -4px rgba(30,60,114,.15)}
     .login-button:active{transform:translateY(0);box-shadow:0 2px 4px -1px rgba(30,60,114,.1)}
     .login-button.primary{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:#fff;border:none}
@@ -77,13 +57,7 @@
     .session-warning{position:fixed;top:20px;right:20px;background:var(--warning-color);color:#fff;padding:16px 20px;border-radius:10px;display:none;animation:slideInRight .3s ease;box-shadow:0 10px 25px -5px rgba(245,158,11,.3)}
     @keyframes slideInRight{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
     @media (max-width:480px){.login-container{padding:32px 24px}h1{font-size:28px}.security-features{grid-template-columns:1fr}.footer-links{flex-direction:column;align-items:center;gap:12px}}
-    @media (prefers-color-scheme:dark){
-      :root{--bg-light:#1e293b;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--border-color:#334155}
-      .login-container{background:#0f172a;box-shadow:0 20px 25px -5px rgba(0,0,0,.5)}
-      .login-button{background:#1e293b;border-color:#334155}
-      .login-button:hover{background:#334155}
-      .divider span{background:#0f172a}
-    }
+    @media (prefers-color-scheme:dark){:root{--bg-light:#1e293b;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--border-color:#334155}.login-container{background:#0f172a;box-shadow:0 20px 25px -5px rgba(0,0,0,.5)}.login-button{background:#1e293b;border-color:#334155}.login-button:hover{background:#334155}.divider span{background:#0f172a}}
   </style>
 </head>
 <body>
@@ -162,7 +136,12 @@
   </div>
 
   <script>
+    // --- Safety: work even if MSAL CDN fails ---
+    const LogLevel = (window.msal && window.msal.LogLevel) ? window.msal.LogLevel
+      : { Error: 0, Warning: 1, Info: 2, Verbose: 3 };
+
     let msalInstance=null, authInProgress=false, popupBlocked=false;
+    let sessionTimer, warningTimer;
 
     const msalConfig={
       auth:{
@@ -177,23 +156,20 @@
         loggerOptions:{
           loggerCallback:(level,message,containsPii)=>{
             if(containsPii) return;
-            if(message.includes('monitorPopupForHash') && message.includes('window closed')){
+            if(message?.includes('monitorPopupForHash') && message?.includes('window closed')){
               if(!popupBlocked){ showWarning('Sign-in window was closed. Please try again.'); }
               authInProgress=false; enableButtons(); return;
             }
-            switch(level){
-              case msal.LogLevel.Error: console.error('[MSAL Error]',message); break;
-              case msal.LogLevel.Warning: console.warn('[MSAL Warning]',message); break;
-              case msal.LogLevel.Info: console.info('[MSAL Info]',message); break;
-            }
+            if(level===LogLevel.Error) console.error('[MSAL Error]',message);
+            else if(level===LogLevel.Warning) console.warn('[MSAL Warning]',message);
+            else if(level===LogLevel.Info) console.info('[MSAL Info]',message);
           },
-          logLevel: msal.LogLevel.Warning
+          logLevel: LogLevel.Warning
         }
       }
     };
 
-    const loginRequest={scopes:['user.read','profile','openid'],prompt:'select_account'};
-    let sessionTimer, warningTimer;
+    const loginRequest={scopes:['openid','profile','user.read'],prompt:'select_account'};
 
     function startSessionTimer(){
       clearTimeout(sessionTimer); clearTimeout(warningTimer);
@@ -206,7 +182,7 @@
         const account=response.account;
         msalInstance.setActiveAccount(account);
         sessionStorage.setItem('msalAccount', JSON.stringify(account));
-        showSuccess(`Welcome, ${account.name}! Redirecting to dashboard...`);
+        showSuccess(`Welcome, ${account.name || 'user'}! Redirecting to dashboard...`);
         startSessionTimer();
         setTimeout(()=>{ window.location.href='/admin/dashboard'; },1500);
       }
@@ -214,12 +190,20 @@
 
     async function initializeMsal(){
       try{
+        if(!window.msal || !window.msal.PublicClientApplication){
+          showError('Microsoft sign-in library failed to load. Please check your connection or try again.');
+          return;
+        }
         msalInstance=new msal.PublicClientApplication(msalConfig);
-        await msalInstance.initialize();
+
+        // initialize() exists on newer versions; guard in case it’s undefined
+        if (typeof msalInstance.initialize === 'function') {
+          await msalInstance.initialize();
+        }
 
         // Complete redirect if returning from AAD
         const response = await msalInstance.handleRedirectPromise();
-        if(response){ handleResponse(response); return; } // important: stop here
+        if(response){ handleResponse(response); return; }
 
         checkExistingSession();
       }catch(error){
@@ -243,6 +227,12 @@
     async function signIn(){
       if(authInProgress){ showInfo('Authentication already in progress. Please wait...'); return; }
       hideAllMessages(); document.getElementById('popupNotice').classList.remove('show');
+
+      if(!window.msal || !msalInstance){
+        showError('Sign-in is unavailable (MSAL not loaded). Please refresh and try again.');
+        return;
+      }
+
       authInProgress=true; popupBlocked=false; disableButtons();
       const loadingDiv=document.getElementById('loadingIndicator'); loadingDiv.classList.add('active');
 
@@ -250,7 +240,7 @@
         const popupResponse=await attemptPopupLogin();
         if(popupResponse){ handleResponse(popupResponse); }
       }catch(error){
-        if(error.errorCode==='popup_window_error' || popupBlocked){
+        if(error?.errorCode==='popup_window_error' || popupBlocked){
           try{ await msalInstance.loginRedirect(loginRequest); }catch(re){ handleAuthError(re); }
         }else{
           handleAuthError(error);
@@ -262,10 +252,11 @@
     }
 
     async function attemptPopupLogin(){
+      // Test for popup blockers
       const testPopup=window.open('','_blank','width=1,height=1,left=10000,top=10000');
       if(!testPopup || testPopup.closed || typeof testPopup.closed==='undefined'){
         popupBlocked=true; document.getElementById('popupNotice').classList.add('show');
-        throw new Error('popup_window_error');
+        const err = new Error('popup_window_error'); err.errorCode='popup_window_error'; throw err;
       }
       testPopup.close();
       return await msalInstance.loginPopup(loginRequest);
@@ -273,18 +264,21 @@
 
     function handleAuthError(error){
       console.error('Authentication error:',error);
-      if(error.errorCode==='user_cancelled' || error.errorMessage?.includes('user_cancelled')){
+      const code = error?.errorCode || '';
+      const msg  = (error?.errorMessage || error?.message || '').toLowerCase();
+
+      if(code==='user_cancelled' || msg.includes('user_cancelled')){
         showWarning('Sign-in cancelled. Please try again when ready.');
-      }else if(error.errorCode==='interaction_in_progress'){
-        showWarning('Another sign-in is in progress. Please wait...');
-      }else if(error.errorCode==='popup_window_error' || popupBlocked){
+      }else if(code==='interaction_in_progress'){
+        showWarning('Another sign-in is in progress. Please wait…');
+      }else if(code==='popup_window_error' || popupBlocked){
         showInfo('Popup was blocked. Click the sign-in button again to use redirect method.');
         document.getElementById('popupNotice').classList.add('show');
-      }else if(error.errorCode==='network_error'){
+      }else if(code==='network_error' || msg.includes('network')){
         showError('Network error. Please check your internet connection.');
-      }else if(error.errorCode==='consent_required'){
+      }else if(code==='consent_required'){
         showWarning('Additional permissions required. Please try again.');
-      }else if(error.errorCode==='login_required'){
+      }else if(code==='login_required'){
         showWarning('Login required. Please sign in.');
       }else{
         showError('Authentication failed. Please try again or contact support.');
@@ -292,7 +286,7 @@
     }
 
     function signOut(){
-      const account = msalInstance?.getActiveAccount() || msalInstance?.getAllAccounts()[0];
+      const account = msalInstance?.getActiveAccount() || msalInstance?.getAllAccounts?.()[0];
       if(account){
         msalInstance.logoutRedirect({account, postLogoutRedirectUri: window.location.origin + '/admin'});
       }
@@ -304,32 +298,21 @@
       setTimeout(()=>{ window.location.href='https://forms.office.com/?login_hint=zx@roadandrescue.com'; },1000);
     }
 
-    function disableButtons(){
-      document.getElementById('primaryLoginBtn').disabled=true;
-      document.getElementById('alternativeLoginBtn').disabled=true;
-    }
-    function enableButtons(){
-      document.getElementById('primaryLoginBtn').disabled=false;
-      document.getElementById('alternativeLoginBtn').disabled=false;
-    }
+    function disableButtons(){document.getElementById('primaryLoginBtn').disabled=true;document.getElementById('alternativeLoginBtn').disabled=true;}
+    function enableButtons(){document.getElementById('primaryLoginBtn').disabled=false;document.getElementById('alternativeLoginBtn').disabled=false;}
 
     function showError(m){hideAllMessages();const d=document.getElementById('errorMessage');d.textContent=m;d.style.display='block'}
     function showSuccess(m){hideAllMessages();const d=document.getElementById('successMessage');d.textContent=m;d.style.display='block'}
     function showWarning(m){hideAllMessages();const d=document.getElementById('warningMessage');d.textContent=m;d.style.display='block'}
     function showInfo(m){hideAllMessages();const d=document.getElementById('infoMessage');d.textContent=m;d.style.display='block'}
-    function hideAllMessages(){
-      document.getElementById('errorMessage').style.display='none';
-      document.getElementById('successMessage').style.display='none';
-      document.getElementById('warningMessage').style.display='none';
-      document.getElementById('infoMessage').style.display='none';
-    }
+    function hideAllMessages(){['errorMessage','successMessage','warningMessage','infoMessage'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';});}
 
     window.addEventListener('online',()=>{ if(authInProgress){ showInfo('Connection restored. You can try signing in again.'); }});
     window.addEventListener('offline',()=>{ showError('No internet connection. Please check your network.'); authInProgress=false; enableButtons(); });
-    window.addEventListener('popstate',()=>{ sessionStorage.removeItem('msal.interaction.status'); authInProgress=false; enableButtons(); });
-    window.addEventListener('beforeunload',()=>{ if(authInProgress){ sessionStorage.removeItem('msal.interaction.status'); }});
+    window.addEventListener('popstate',()=>{ try{ sessionStorage.removeItem('msal.interaction.status'); }catch{} authInProgress=false; enableButtons(); });
+    window.addEventListener('beforeunload',()=>{ try{ sessionStorage.removeItem('msal.interaction.status'); }catch{} });
+
     window.addEventListener('DOMContentLoaded',()=>{ initializeMsal(); });
-    document.addEventListener('visibilitychange',()=>{ /* optional visibility hooks */ });
   </script>
 </body>
 </html>
