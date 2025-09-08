@@ -316,7 +316,7 @@
         pagination: true,
         paginationPageSize: 100,
         animateRows: true,
-        enableRangeSelection: true,
+        /* enableRangeSelection removed (Enterprise-only) */
         enableCellChangeFlash: true,
         undoRedoCellEditing: true,
         undoRedoCellEditingLimit: 20,
@@ -331,7 +331,6 @@
       account: null,
       accessToken: null,
       gridApi: null,
-      columnApi: null,
       originalData: [],
       pendingChanges: { updates: new Map(), creates: [], deletes: new Set() },
       columnDefs: [],
@@ -400,7 +399,6 @@
           await initializeApp();
           $('#loadingScreen').classList.add('hidden');
         }else{
-          // show login overlay
           $('#loginScreen').classList.remove('hidden');
         }
 
@@ -429,7 +427,6 @@
         const r = await state.msalInstance.acquireTokenSilent(req);
         state.accessToken = r.accessToken; return r.accessToken;
       }catch(_){
-        // fallback: popup if possible else redirect
         if (canPopup()){
           const r = await state.msalInstance.acquireTokenPopup(req);
           state.accessToken = r.accessToken; return r.accessToken;
@@ -611,16 +608,34 @@
         ...CONFIG.grid,
         columnDefs,
         rowData,
-        defaultColDef: { flex:1, minWidth:100, resizable:true, sortable:true, filter:true },
         rowSelection: 'multiple',
+        defaultColDef: {
+          flex:1, minWidth:100, resizable:true, sortable:true, filter:true,
+          /* Handle SharePoint object-shaped values (URL/Person/Lookup/MultiChoice) */
+          valueFormatter: (p) => {
+            const v = p.value;
+            if (v == null) return '';
+            if (typeof v === 'object') {
+              if (v.Url) return v.Url;
+              if (v.Title) return v.Title;
+              if (Array.isArray(v.results)) return v.results.join(', ');
+              try { return JSON.stringify(v); } catch { return String(v); }
+            }
+            return v;
+          },
+          valueParser: (p) => p.newValue
+        },
         onCellValueChanged,
         onSelectionChanged: updateGridStats,
         onFilterChanged: updateGridStats,
         onSortChanged: updateGridStats,
-        onGridReady: p => { state.gridApi = p.api; state.columnApi = p.columnApi; updateGridStats(); populateColumnMenu(); },
+        onGridReady: () => { updateGridStats(); populateColumnMenu(); },
         onColumnVisible: populateColumnMenu
       };
-      new agGrid.Grid(document.getElementById('grid'), gridOptions);
+
+      // v31: use createGrid (Grid constructor is deprecated)
+      const api = agGrid.createGrid(document.getElementById('grid'), gridOptions);
+      state.gridApi = api;
     }
 
     function onCellValueChanged(params){
@@ -681,22 +696,36 @@
 
     function populateColumnMenu(){
       const list = $('#columnList');
-      if (!state.columnApi) return;
+      if (!state.gridApi) return;
       list.innerHTML = '';
-      state.columnDefs.forEach(cd=>{
+
+      const defs = (typeof state.gridApi.getColumnDefs === 'function' && state.gridApi.getColumnDefs())
+        ? state.gridApi.getColumnDefs()
+        : state.columnDefs;
+
+      defs.forEach(cd=>{
         if (!cd.field || cd.field === '__selection__') return;
-        const id = `colvis_${cd.field}`;
-        const colState = state.columnApi.getColumn(cd.field);
-        const visible = colState ? colState.isVisible() !== false : true;
+
+        // v31: use api.getColumn instead of columnApi.getColumn
+        const colObj = typeof state.gridApi.getColumn === 'function'
+          ? state.gridApi.getColumn(cd.field)
+          : null;
+        const visible = colObj ? colObj.isVisible() !== false : !cd.hide;
 
         const row = document.createElement('label');
         row.className = 'column-item';
         row.style.cursor = 'pointer';
         row.innerHTML = `
-          <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
-          <span>${cd.headerName}</span>
+          <input type="checkbox" class="column-checkbox" ${visible ? 'checked' : ''} />
+          <span>${cd.headerName || humanizeHeader(cd.field)}</span>
         `;
-        row.querySelector('input').onchange = (e)=> state.columnApi.setColumnVisible(cd.field, e.target.checked);
+        row.querySelector('input').onchange = (e)=> {
+          if (typeof state.gridApi.setColumnVisible === 'function') {
+            state.gridApi.setColumnVisible(cd.field, e.target.checked);
+          } else if (typeof state.gridApi.setColumnsVisible === 'function') {
+            state.gridApi.setColumnsVisible([cd.field], e.target.checked);
+          }
+        };
         list.appendChild(row);
       });
     }
