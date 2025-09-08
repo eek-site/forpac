@@ -1,24 +1,36 @@
----
-layout: default
-title: FormanPacific | Service Claims Management & Emergency Response Coordination
-head_extra: |
-  <meta name="description" content="FormanPacific (ForPac) Service Claims - Professional claims intermediary and emergency service coordination platform. Connecting verified service providers with insurance and corporate clients across New Zealand.">
-  <meta name="keywords" content="service claims management, insurance intermediary, emergency response coordination, supplier network, claims processing, ForPac, FormanPacific">
-  <meta property="og:title" content="FormanPacific - Service Claims Management Platform">
-  <meta property="og:description" content="Professional service claims intermediary connecting verified suppliers with insurance and corporate clients. Streamlined claims processing and emergency response coordination.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.formanpacific.com">
-  <meta property="og:image" content="https://www.formanpacific.com/og-image.jpg">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FormanPacific | Service Claims Management & Emergency Response Coordination</title>
+  <meta name="description" content="FormanPacific (ForPac) Service Claims - Professional claims intermediary and emergency service coordination platform. Connecting verified service providers with insurance and corporate clients across New Zealand." />
+  <meta name="keywords" content="service claims management, insurance intermediary, emergency response coordination, supplier network, claims processing, ForPac, FormanPacific" />
+  <meta property="og:title" content="FormanPacific - Service Claims Management Platform" />
+  <meta property="og:description" content="Professional service claims intermediary connecting verified suppliers with insurance and corporate clients. Streamlined claims processing and emergency response coordination." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.formanpacific.com" />
+  <meta property="og:image" content="https://www.formanpacific.com/og-image.jpg" />
 
-  <!-- No CSP/other security meta here. Those are set as response headers at Cloudflare. -->
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https:;
+  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
+  frame-src 'self' https://www.googletagmanager.com;
+  font-src 'self' data:;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17529704008"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
+    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'AW-17529704008');
+    gtag('config','AW-17529704008');
   </script>
 
   <!-- Schema.org -->
@@ -43,48 +55,102 @@ head_extra: |
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;color:#2c3e50;}
 
-    .after-hours-banner{background:linear-gradient(135deg,#666,#888);color:#fff;padding:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.2);display:none;position:relative;margin-bottom:12px;border-radius:0 0 10px 10px;}
+    /* After Hours Banner (scrolls with page) */
+    .after-hours-banner{
+      background:linear-gradient(135deg,#666,#888);
+      color:#fff;
+      padding:15px;
+      text-align:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.2);
+      display:none;
+      position:relative;   /* was sticky */
+      top:auto;
+      z-index:auto;
+      margin-bottom:12px;
+      border-radius:0 0 10px 10px;
+    }
     .after-hours-banner h3{margin:0 0 10px 0;font-size:1.2em;}
     .after-hours-banner p{margin:5px 0;font-size:0.9em;}
     .after-hours-banner a{color:#fff;text-decoration:underline;font-weight:700;}
 
+    /* Header */
     .header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000;}
-    .header-content{max-width:1200px;margin:0 auto;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;}
+    .header-content{max-width:1200px;margin:0 auto;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:relative;}
     .logo-section{display:flex;align-items:center;gap:12px;}
-    .logo{width:40px;height:40px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;}
+    .logo{width:40px;height:40px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;flex-shrink:0;}
     .company-info{display:flex;flex-direction:column;}
     .company-name{font-size:1.4em;font-weight:600;color:#1e3c72;line-height:1.1;}
     .tagline{font-size:.75em;color:#718096;margin-top:2px;}
-
+    
+    /* Mobile Menu Toggle */
     .mobile-menu-toggle{display:none;background:none;border:none;padding:8px;cursor:pointer;color:#2c3e50;}
     .mobile-menu-toggle svg{width:28px;height:28px;}
+    
+    /* Desktop Nav */
     .header-nav{display:flex;gap:25px;align-items:center;}
     .nav-link{color:#4a5568;text-decoration:none;font-weight:500;white-space:nowrap;}
     .nav-link:hover{color:#1e3c72;}
     .phone-button{background:#1e3c72;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
     .phone-button:hover{background:#2a5298;transform:translateY(-2px);box-shadow:0 5px 15px rgba(30,60,114,.3);}
-
-    .mobile-nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1190;}
-    .mobile-nav{position:fixed;top:0;right:-100%;width:80%;max-width:320px;height:100%;background:#fff;box-shadow:-5px 0 20px rgba(0,0,0,.1);transition:right .3s ease;z-index:1200;overflow-y:auto;}
-    .mobile-nav.active{right:0;}
-    .mobile-nav-header{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;}
+    .admin-link{color:#a0aec0;font-size:.85em;text-decoration:none;margin-left:15px;white-space:nowrap;}
+    .admin-link:hover{color:#718096;}
+    
+    /* Mobile Nav Overlay — sits ABOVE the after-hours banner */
+    .mobile-nav-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1190; /* higher than banner */
+    }
+    .mobile-nav {
+      position: fixed;
+      top: 0; right: -100%;
+      width: 80%; max-width: 320px; height: 100%;
+      background: #fff;
+      box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+      transition: right 0.3s ease;
+      z-index: 1200; /* highest */
+      overflow-y: auto;
+    }
+    .mobile-nav.active { right: 0; }
+    .mobile-nav-header {display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;}
+    .mobile-nav-close{background:none;border:none;padding:8px;cursor:pointer;color:#4a5568;}
+    .mobile-nav-close svg{width:24px;height:24px;}
     .mobile-nav-links{padding:20px;}
     .mobile-nav-links a{display:block;padding:12px 0;color:#4a5568;text-decoration:none;font-weight:500;border-bottom:1px solid #f7fafc;}
     .mobile-nav-links a:hover{color:#1e3c72;}
     .mobile-nav-links .phone-button{margin-top:15px;text-align:center;width:100%;justify-content:center;}
-    body.menu-open .after-hours-banner{pointer-events:none;}
+    .mobile-nav-links .admin-link{margin:15px 0 0 0;padding:12px 0;border-bottom:1px solid #f7fafc;}
+
+    /* Optional: prevent banner catching taps while menu is open */
+    body.menu-open .after-hours-banner { pointer-events: none; }
+    
+    /* Touch Screen Styles - Applied via JavaScript */
     body.touch-device .header-nav{display:none;}
     body.touch-device .mobile-menu-toggle{display:block;}
     .mobile-nav-overlay.active{display:block;}
+    
+    /* Small Screen Overrides */
+    @media (max-width: 768px) {
+      .after-hours-banner p{font-size:0.8em;line-height:1.4;}
+      .after-hours-banner h3{font-size:1.1em;}
+      .header-content{padding:12px 15px;}
+      .logo{width:36px;height:36px;font-size:18px;}
+      .company-name{font-size:1.2em;}
+      .tagline{display:none;}
+    }
+    @media (max-width: 480px) {
+      .company-name{font-size:1.1em;}
+      .logo-section{gap:10px;}
+    }
 
-    @media (max-width:768px){.after-hours-banner p{font-size:.8em;line-height:1.4}.after-hours-banner h3{font-size:1.1em}.header-content{padding:12px 15px}.logo{width:36px;height:36px;font-size:18px}.company-name{font-size:1.2em}.tagline{display:none}}
-    @media (max-width:480px){.company-name{font-size:1.1em}.logo-section{gap:10px}}
-
+    /* Hero */
     .hero{padding:56px 30px 30px;margin:40px auto;max-width:1200px;border-radius:24px;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.08);}
     .hero-inner{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;}
     .hero-left h1{font-size:clamp(2.2rem,3.2vw,3rem);line-height:1.1;color:#1e3c72;font-weight:800;margin:10px 0 14px;}
     .hero-left .accent{position:relative;}
-    .hero-left .accent:after{content:'';position:absolute;left:0;right:0;bottom:.15em;height:.35em;background:linear-gradient(90deg,#90cdf4,#63b3ed);opacity:.35;border-radius:6px;z-index:-1;}
+    .hero-left .accent:after{content:"";position:absolute;left:0;right:0;bottom:0.15em;height:0.35em;background:linear-gradient(90deg,#90cdf4,#63b3ed);opacity:.35;border-radius:6px;z-index:-1;}
     .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:6px 12px;border-radius:100px;background:#edf2f7;color:#4a5568;font-weight:600;font-size:.9rem;}
     .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:#48bb78;box-shadow:0 0 0 3px rgba(72,187,120,.25);}
     .subtitle{font-size:1.2rem;color:#4a5568;line-height:1.6;max-width:640px;}
@@ -95,7 +161,13 @@ head_extra: |
     .btn-primary svg{width:20px;height:20px;}
     .btn-secondary{background:#edf2f7;color:#2d3748;}
     .btn-secondary:hover{background:#e2e8f0;transform:translateY(-2px);}
+    .trustbar{margin-top:18px;display:flex;align-items:center;gap:12px;color:#718096;}
+    .trustbar .label{font-weight:700;color:#4a5568;}
+    .trustbar ul{display:flex;gap:10px;list-style:none;padding:0;margin:0;flex-wrap:wrap;}
+    .trustbar li{position:relative;padding-left:14px;}
+    .trustbar li::before{content:"•";position:absolute;left:0;color:#cbd5e0;}
     .kpis{display:flex;gap:18px;list-style:none;padding:0;margin:18px 0 0;flex-wrap:wrap;}
+    .kpis li{background:#f7fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;min-width:150px;}
     .kpis .num{display:block;font-size:1.3rem;font-weight:800;color:#1e3c72;}
     .kpis .cap{display:block;font-size:.85rem;color:#718096;margin-top:4px;}
     .hero-right{display:grid;}
@@ -103,8 +175,9 @@ head_extra: |
     .media-card svg{display:block;width:100%;height:auto;}
     .media-footer{display:flex;gap:8px;padding:12px;flex-wrap:wrap;background:#f8fafc;border-top:1px solid #e2e8f0;}
     .media-footer .chip{padding:6px 10px;border-radius:999px;font-size:.85rem;color:#2d3748;background:#edf2f7;}
-    @media (max-width:980px){.hero-inner{grid-template-columns:1fr}.hero-right{order:-1}}
+    @media (max-width:980px){.hero-inner{grid-template-columns:1fr;}.hero-right{order:-1;}}
 
+    /* Services */
     .services-section{max-width:1200px;margin:40px auto;padding:0 30px;}
     .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px;}
     .service-card{background:#fff;border-radius:15px;padding:30px;box-shadow:0 5px 20px rgba(0,0,0,.08);border-top:4px solid transparent;}
@@ -112,214 +185,553 @@ head_extra: |
     .service-card p{color:#718096;margin-bottom:18px;}
     .service-features{list-style:none;padding:0;}
     .service-features li{padding:7px 0;color:#4a5568;}
-    .service-features li::before{content:'✓ ';color:#48bb78;font-weight:bold;}
+    .service-features li::before{content:"✓ ";color:#48bb78;font-weight:bold;}
+    .service-card.emergency{border-top-color:#f56565;}
     .service-card.claims{border-top-color:#4299e1;}
     .service-card.network{border-top-color:#48bb78;}
     .service-card.compliance{border-top-color:#9f7aea;}
 
+    /* Stats */
+    .stats-section{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:60px 30px;margin:40px 0;}
+    .stats-container{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;text-align:center;}
+    .stat-item h3{font-size:3em;margin-bottom:10px;}
+    .stat-item p{opacity:.9;}
+
+    /* Resources */
+    .resources-section{background:#fff;padding:60px 30px;margin:40px auto;max-width:1200px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.1);}
+    .resources-section h2{text-align:center;color:#1e3c72;font-size:2.2em;margin-bottom:40px;}
+    .resources-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+    .resource-card{background:#f7fafc;padding:25px;border-radius:12px;text-align:center;transition:.25s;border:2px solid transparent;text-decoration:none;color:inherit;display:block;}
+    .resource-card:hover{background:#fff;border-color:#4299e1;transform:translateY(-3px);}
+    .resource-icon{font-size:2.2em;margin-bottom:10px;}
+
+    /* Footer */
     .footer{background:#2d3748;color:#fff;padding:40px 30px 20px;margin-top:60px;}
+    .footer-content{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:30px;}
+    .footer-section h4{margin-bottom:12px;}
+    .footer-section a{color:#cbd5e0;text-decoration:none;display:block;padding:5px 0;}
+    .footer-section a:hover{color:#fff;}
     .footer-bottom{border-top:1px solid #4a5568;padding-top:20px;text-align:center;color:#a0aec0;}
+    .contact-link{display:flex;align-items:center;gap:8px;}
 
-    .sticky-fab{position:fixed;right:16px;bottom:16px;background:#1e3c72;color:#fff;text-decoration:none;padding:12px 16px;border-radius:999px;box-shadow:0 8px 20px rgba(0,0,0,.2);font-weight:700;display:none;z-index:1300;}
+    /* Sticky action button */
+    .sticky-fab{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      background:#1e3c72;
+      color:#fff;
+      text-decoration:none;
+      padding:12px 16px;
+      border-radius:999px;
+      box-shadow:0 8px 20px rgba(0,0,0,.2);
+      font-weight:700;
+      display:none;       /* toggled by JS */
+      z-index:1300;       /* above mobile menu/overlay */
+    }
     .sticky-fab:hover{transform:translateY(-2px);}
----
-<!-- After Hours Banner -->
-<div id="closedBanner" class="after-hours-banner" style="display:none;">
-  <h3 id="closedTitle">🕐 OFFICE CURRENTLY CLOSED</h3>
-  <div id="afterHoursMessage">
-    <p><strong>Business Hours:</strong> Monday - Friday: 8:30 AM - 5:00 PM | Saturday - Sunday: Closed</p>
-    <p>For urgent supplier inquiries, please use our <a href="/supplier-inquiry">Supplier Inquiry Form</a></p>
-  </div>
-  <div id="tempUnavailableMessage" style="display:none;">
-    <p><strong>Our phone lines are currently busy.</strong> Please submit your inquiry online or try calling again shortly.</p>
-  </div>
-</div>
-
-<!-- Header -->
-<header class="header">
-  <div class="header-content">
-    <div class="logo-section">
-      <div class="logo">FP</div>
-      <div class="company-info">
-        <div class="company-name">FormanPacific</div>
-        <div class="tagline">Service Claims & Emergency Coordination</div>
-      </div>
+  </style>
+</head>
+<body>
+  <!-- After Hours Banner (scrolls away) -->
+  <div id="closedBanner" class="after-hours-banner" style="display: none;">
+    <h3 id="closedTitle">🕐 OFFICE CURRENTLY CLOSED</h3>
+    <div id="afterHoursMessage">
+      <p><strong>Business Hours:</strong> Monday - Friday: 8:30 AM - 5:00 PM | Saturday - Sunday: Closed</p>
+      <p>For urgent supplier inquiries, please use our <a href="/supplier-inquiry">Supplier Inquiry Form</a></p>
     </div>
-
-    <nav class="header-nav">
-      <a class="nav-link" href="#services">Services</a>
-      <a class="nav-link" href="#network">Supplier Network</a>
-      <a class="nav-link" href="#contact">Contact</a>
-      <a class="phone-button" href="tel:048873337">📞 04 887 3337</a>
-    </nav>
-
-    <button class="mobile-menu-toggle" aria-label="Open menu" onclick="toggleMobileMenu()">
-      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2"/>
-      </svg>
-    </button>
-  </div>
-</header>
-
-<!-- Mobile nav -->
-<div class="mobile-nav-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
-<aside class="mobile-nav" id="mobileNav" aria-hidden="true">
-  <div class="mobile-nav-header">
-    <strong>Menu</strong>
-    <button class="mobile-nav-close" aria-label="Close menu" onclick="closeMobileMenu()">
-      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-    </button>
-  </div>
-  <div class="mobile-nav-links">
-    <a href="#services" onclick="closeMobileMenu()">Services</a>
-    <a href="#network" onclick="closeMobileMenu()">Supplier Network</a>
-    <a href="#contact" onclick="closeMobileMenu()">Contact</a>
-    <a class="phone-button" href="tel:048873337" onclick="closeMobileMenu()">📞 04 887 3337</a>
-    <a class="admin-link" href="/admin" onclick="closeMobileMenu()">Admin Login</a>
-  </div>
-</aside>
-
-<!-- Hero -->
-<section class="hero" id="top">
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="eyebrow"><span class="dot"></span> Claims & Coordination</div>
-      <h1><span class="accent">FormanPacific</span> Service Claims Platform</h1>
-      <p class="subtitle">Connecting verified suppliers with insurers and enterprise customers across New Zealand.</p>
-      <div class="cta-row">
-        <a class="btn-primary" href="/supplier-inquiry">
-          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-          Supplier Inquiry
-        </a>
-        <a class="btn-secondary" href="/admin">Admin Login</a>
-      </div>
-      <ul class="kpis">
-        <li><span class="num">NZ-wide</span><span class="cap">Coverage</span></li>
-        <li><span class="num">Verified</span><span class="cap">Supplier Network</span></li>
-        <li><span class="num">24/7</span><span class="cap">Coordination</span></li>
-      </ul>
+    <div id="tempUnavailableMessage" style="display: none;">
+      <p><strong>Our phone lines are currently busy.</strong> Please submit your inquiry online or try calling again shortly.</p>
     </div>
+  </div>
 
-    <div class="hero-right">
-      <div class="media-card">
-        <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet">
-          <rect width="400" height="220" fill="#f2f6ff"/>
-          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-                font-family="Segoe UI, sans-serif" font-size="18" fill="#1e3c72">
-            FormanPacific — Claims & Coordination
-          </text>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-info">
+          <div class="company-name">FormanPacific</div>
+          <div class="tagline">Service Claims Management Platform</div>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round"/>
         </svg>
+      </button>
+      
+      <!-- Desktop Nav -->
+      <nav class="header-nav">
+        <a href="#services" class="nav-link">Services</a>
+        <a href="#network" class="nav-link">Network</a>
+        <a href="#resources" class="nav-link">Resources</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <a href="tel:048873337" class="phone-button" onclick="track('header_call')">📞 04 887 3337</a>
+        <a href="/admin" class="admin-link">Sign In</a>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav-overlay" onclick="closeMobileMenu()"></div>
+  <nav id="mobile-nav" class="mobile-nav" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="mobile-nav-header">
+      <div class="company-name" style="font-size:1.2em;">FormanPacific</div>
+      <button class="mobile-nav-close" onclick="closeMobileMenu()" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="mobile-nav-links">
+      <a href="#services" onclick="closeMobileMenu()">Services</a>
+      <a href="#network" onclick="closeMobileMenu()">Network</a>
+      <a href="#resources" onclick="closeMobileMenu()">Resources</a>
+      <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+      <a href="tel:048873337" class="phone-button" onclick="track('mobile_call'); closeMobileMenu();">📞 04 887 3337</a>
+      <a href="/admin" class="admin-link" onclick="closeMobileMenu()">Sign In</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="eyebrow"><span class="dot"></span> Est. 2002 • Live Platform</div>
+        <h1>Insurance Claims <span class="accent">Reimagined</span></h1>
+        <p class="subtitle">Connect with <strong>500+ verified suppliers</strong>, deploy emergency response teams in <strong>30 minutes</strong>, and process claims <strong>70% faster</strong>—all in one platform built for insurers, corporates, and government.</p>
+        <div class="cta-row">
+          <a href="/new-business" class="btn-primary" onclick="track('hero_get_started')">Get Started
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="tel:048873337" class="btn-secondary" onclick="track('hero_talk_specialist')">Talk to a Specialist</a>
+        </div>
+        <div class="trustbar">
+          <span class="label">Trusted by</span>
+          <ul><li>Leading Insurers</li><li>Corporate Clients</li><li>Government</li></ul>
+        </div>
+        <ul class="kpis">
+          <li><span class="num">30–60min</span><span class="cap">Avg. Response</span></li>
+          <li><span class="num">24/7</span><span class="cap">Always Online</span></li>
+          <li><span class="num">100%</span><span class="cap">NZ Coverage</span></li>
+        </ul>
       </div>
-      <div class="media-footer">
-        <span class="chip">Insurance & Enterprise</span>
-        <span class="chip">Fast Triage</span>
-        <span class="chip">Audit-ready</span>
+
+      <div class="hero-right">
+        <div class="media-card" aria-label="Platform highlights">
+          <svg viewBox="0 0 560 360" role="img" aria-label="ForPac highlights">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#1e3c72"/><stop offset="1" stop-color="#2a5298"/>
+              </linearGradient>
+            </defs>
+            <rect x="0.5" y="0.5" width="559" height="359" rx="16" fill="#fff" stroke="#E2E8F0"/>
+            <text x="32" y="56" font-family="Segoe UI, system-ui" font-size="20" fill="#1E3C72" font-weight="700">Service-Level Highlights</text>
+            <g transform="translate(32,80)">
+              <rect width="496" height="88" rx="12" fill="#F7FAFC" stroke="#E2E8F0"/>
+              <text x="20" y="38" font-family="Segoe UI, system-ui" font-size="16" fill="#4A5568">Average Dispatch to Site</text>
+              <text x="20" y="66" font-family="Segoe UI, system-ui" font-size="28" fill="#1E3C72" font-weight="800">30 minutes</text>
+              <rect x="360" y="22" width="108" height="44" rx="8" fill="url(#g1)"/>
+              <text x="374" y="50" font-family="Segoe UI, system-ui" font-size="14" fill="#fff" font-weight="700">Priority SLA</text>
+            </g>
+            <g transform="translate(32,184)">
+              <rect width="236" height="144" rx="12" fill="#fff" stroke="#E2E8F0"/>
+              <text x="20" y="42" font-family="Segoe UI, system-ui" font-size="16" fill="#4A5568">Verified Suppliers</text>
+              <text x="20" y="78" font-family="Segoe UI, system-ui" font-size="40" fill="#1E3C72" font-weight="800">500+</text>
+              <text x="20" y="112" font-family="Segoe UI, system-ui" font-size="13" fill="#718096">Background-checked nationwide</text>
+            </g>
+            <g transform="translate(292,184)">
+              <rect width="236" height="144" rx="12" fill="#fff" stroke="#E2E8F0"/>
+              <text x="20" y="42" font-family="Segoe UI, system-ui" font-size="16" fill="#4A5568">Coverage</text>
+              <text x="20" y="78" font-family="Segoe UI, system-ui" font-size="40" fill="#1E3C72" font-weight="800">100%</text>
+              <text x="20" y="112" font-family="Segoe UI, system-ui" font-size="13" fill="#718096">Auckland → Invercargill</text>
+            </g>
+          </svg>
+          <div class="media-footer">
+            <div class="chip">ISO Compliant</div>
+            <div class="chip">Direct Billing</div>
+            <div class="chip">Real-time Tracking</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Services -->
-<section class="services-section" id="services">
-  <div class="services-grid">
-    <div class="service-card claims">
-      <h3>Claims Intermediary</h3>
-      <p>Streamlined claims intake, triage, and supplier dispatch.</p>
-      <ul class="service-features">
-        <li>Structured intake</li>
-        <li>Priority routing</li>
-        <li>Status visibility</li>
-      </ul>
+  <!-- Services -->
+  <section class="services-section" id="services">
+    <div class="services-grid">
+      <div class="service-card emergency">
+        <h3>Emergency Response Coordination</h3>
+        <p>24/7 emergency service dispatch and coordination for critical infrastructure and commercial clients.</p>
+        <ul class="service-features">
+          <li>Vehicle breakdown & mechanical</li>
+          <li>Commercial refrigeration emergencies</li>
+          <li>Flood response & water damage</li>
+          <li>Tree removal & storm damage</li>
+          <li>30–60 minute response times</li>
+        </ul>
+      </div>
+
+      <div class="service-card claims">
+        <h3>Claims Processing & Management</h3>
+        <p>Streamlined intermediary services for insurance providers and corporate partners.</p>
+        <ul class="service-features">
+          <li>Automated claim validation</li>
+          <li>Real-time status tracking</li>
+          <li>Compliance documentation</li>
+          <li>Quality assurance protocols</li>
+          <li>Direct billing integration</li>
+        </ul>
+      </div>
+
+      <div class="service-card network" id="network">
+        <h3>Supplier Network Management</h3>
+        <p>Comprehensive supplier vetting, onboarding, and performance management.</p>
+        <ul class="service-features">
+          <li>Verified contractor database</li>
+          <li>Performance metrics tracking</li>
+          <li>Automated dispatch system</li>
+          <li>Geographic coverage mapping</li>
+          <li>Capacity management</li>
+        </ul>
+      </div>
+
+      <div class="service-card compliance">
+        <h3>Compliance & Quality Assurance</h3>
+        <p>Industry-leading compliance standards and quality control processes.</p>
+        <ul class="service-features">
+          <li>ISO certification support</li>
+          <li>Health & safety compliance</li>
+          <li>Insurance verification</li>
+          <li>Regular audits & assessments</li>
+          <li>Training & certification programs</li>
+        </ul>
+      </div>
     </div>
-    <div class="service-card network" id="network">
-      <h3>Supplier Network</h3>
-      <p>Verified, compliant providers across New Zealand.</p>
-      <ul class="service-features">
-        <li>Onboarding & checks</li>
-        <li>Performance tracking</li>
-        <li>Coverage mapping</li>
-      </ul>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stat-item"><h3>500+</h3><p>Verified Suppliers</p></div>
+      <div class="stat-item"><h3>24/7</h3><p>Emergency Response</p></div>
+      <div class="stat-item"><h3>30–60min</h3><p>Average Response Time</p></div>
+      <div class="stat-item"><h3>100%</h3><p>Coverage NZ-Wide</p></div>
     </div>
-    <div class="service-card compliance">
-      <h3>Compliance & Reporting</h3>
-      <p>Audit-ready data and documentation.</p>
-      <ul class="service-features">
-        <li>Incident summaries</li>
-        <li>SLAs & KPIs</li>
-        <li>Exportable reports</li>
-      </ul>
+  </section>
+
+  <!-- Resources -->
+  <section class="resources-section" id="resources">
+    <h2>Supplier Resources & Tools</h2>
+    <div class="resources-grid">
+      <a href="/supplier-registration" class="resource-card" onclick="track('resource_supplier_registration')">
+        <div class="resource-icon">🤝</div>
+        <h4>Become a Supplier</h4>
+        <p>Join our verified network of service providers</p>
+      </a>
+      <a href="/supplier-portal" class="resource-card" onclick="track('resource_supplier_portal')">
+        <div class="resource-icon">📱</div>
+        <h4>Supplier Portal</h4>
+        <p>Access jobs, invoices, and performance metrics</p>
+      </a>
+      <a href="/training" class="resource-card" onclick="track('resource_training')">
+        <div class="resource-icon">🎓</div>
+        <h4>Training Resources</h4>
+        <p>Certification courses and compliance training</p>
+      </a>
+      <a href="/documentation" class="resource-card" onclick="track('resource_documentation')">
+        <div class="resource-icon">📄</div>
+        <h4>Documentation</h4>
+        <p>Forms, templates, and procedure guides</p>
+      </a>
+      <a href="/compliance" class="resource-card" onclick="track('resource_compliance')">
+        <div class="resource-icon">✅</div>
+        <h4>Compliance Center</h4>
+        <p>Standards, certifications, and requirements</p>
+      </a>
+      <a href="/support" class="resource-card" onclick="track('resource_support')">
+        <div class="resource-icon">💬</div>
+        <h4>Support Center</h4>
+        <p>Technical support and escalations</p>
+      </a>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Footer -->
-<footer class="footer" id="contact">
-  <div class="footer-bottom">© FormanPacific — All rights reserved.</div>
-</footer>
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Contact Information</h4>
+        <a href="tel:048873337" class="contact-link" style="font-size:1.15em;font-weight:700;" onclick="track('footer_call')">
+          <span style="color:#f56565;">📞</span> 04 887 3337
+        </a>
+        <a href="/contact-form" class="contact-link">
+          <span style="color:#4299e1;">📝</span> General Inquiries
+        </a>
+        <a href="/supplier-inquiry" class="contact-link">
+          <span style="color:#48bb78;">🤝</span> Supplier Inquiries  
+        </a>
+        <a href="/emergency-service" class="contact-link">
+          <span style="color:#f56565;">🚨</span> Emergency Service
+        </a>
+        <p style="margin-top:15px;color:#cbd5e0;font-size:.9em;">
+          <strong>Office Hours:</strong><br>
+          Mon–Fri: 8:30 AM – 5:00 PM<br>
+          Sat–Sun: Closed<br>
+          <em>24/7 Emergency Dispatch Available</em>
+        </p>
+      </div>
+      <div class="footer-section">
+        <h4>Supplier Services</h4>
+        <a href="/supplier-portal">Supplier Portal</a>
+        <a href="/supplier-registration">Become a Supplier</a>
+        <a href="/supplier-payments">Payment Queries</a>
+        <a href="/supplier-compliance">Compliance Support</a>
+        <a href="/supplier-terms">Terms & Conditions</a>
+      </div>
+      <div class="footer-section">
+        <h4>Corporate</h4>
+        <a href="/about">About FormanPacific</a>
+        <a href="/insurance-partners">Insurance Partners</a>
+        <a href="/corporate-services">Corporate Solutions</a>
+        <a href="/careers">Careers</a>
+        <a href="/news">News & Updates</a>
+      </div>
+      <div class="footer-section">
+        <h4>Legal & Compliance</h4>
+        <a href="/terms">Terms of Service</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/compliance-standards">Compliance Standards</a>
+        <a href="/insurance-requirements">Insurance Requirements</a>
+        <a href="/emergency-procedures">Emergency Procedures</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 FormanPacific. All rights reserved. | ForPac Service Claims is a registered trademark of FormanPacific</p>
+    </div>
+  </footer>
 
-<!-- Sticky action button -->
-<a id="stickyFab" class="sticky-fab" href="tel:048873337" aria-label="Call FormanPacific">📞 04 887 3337</a>
+  <!-- Sticky action button -->
+  <a id="stickyFab" class="sticky-fab" href="tel:048873337" aria-label="Call FormanPacific">📞 04 887 3337</a>
 
-<script>
-  function detectTouchDevice() {
-    const isTouch = (('ontouchstart' in window) || navigator.maxTouchPoints > 0);
-    document.body.classList.toggle('touch-device', !!isTouch);
-  }
-  function toggleMobileMenu() {
-    const nav = document.getElementById('mobileNav');
-    const overlay = document.getElementById('mobileOverlay');
-    const open = !nav.classList.contains('active');
-    nav.classList.toggle('active', open);
-    overlay.classList.toggle('active', open);
-    document.body.classList.toggle('menu-open', open);
-    document.getElementById('mobileNav').setAttribute('aria-hidden', open ? 'false' : 'true');
-  }
-  function closeMobileMenu() {
-    document.getElementById('mobileNav').classList.remove('active');
-    document.getElementById('mobileOverlay').classList.remove('active');
-    document.body.classList.remove('menu-open');
-    document.getElementById('mobileNav').setAttribute('aria-hidden', 'true');
-  }
-  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMobileMenu(); });
+  <script>
+    // Detect touch screen devices
+    function detectTouchDevice() {
+      const hasTouch = ('ontouchstart' in window) || 
+                       (navigator.maxTouchPoints > 0) || 
+                       (navigator.msMaxTouchPoints > 0) ||
+                       (window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+      
+      if (hasTouch) {
+        document.body.classList.add('touch-device');
+        // Show mobile menu for touch devices
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        const desktopNav = document.querySelector('.header-nav');
+        const mobileOverlay = document.querySelector('.mobile-nav-overlay');
+        
+        if (mobileToggle) mobileToggle.style.display = 'block';
+        if (desktopNav) desktopNav.style.display = 'none';
+        if (mobileOverlay) {
+          mobileOverlay.addEventListener('click', closeMobileMenu);
+        }
+      }
+    }
 
-  async function checkSystemStatus() {
-    try {
-      const response = await fetch("https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/17b1d2990e6f4082a2b0d9c2f1a29025/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bPyoxJ24kuxJZOyLGAclGaEuH6BHwUTFaGmYOwHofa8", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}), cache: "no-store"
-      });
-      if (response.ok) { const data = await response.json(); return data && data.state === 'Active'; }
-    } catch (e) { console.error('Error checking system status:', e); }
-    return true; // fail-open
-  }
+    // Mobile menu functions
+    function toggleMobileMenu() {
+      const overlay = document.querySelector('.mobile-nav-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      const btn = document.querySelector('.mobile-menu-toggle');
+      const isOpening = !mobileNav.classList.contains('active');
 
-  function isWithinBusinessHours(){
-    const now = new Date(), d = now.getDay(), m = now.getHours()*60 + now.getMinutes();
-    const open = 8*60 + 30, close = 17*60;
-    return d>=1 && d<=5 && m>=open && m<close;
-  }
+      overlay.classList.toggle('active', isOpening);
+      mobileNav.classList.toggle('active', isOpening);
+      document.body.style.overflow = isOpening ? 'hidden' : '';
+      document.body.classList.toggle('menu-open', isOpening);
+      if (btn) btn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+    }
+    
+    function closeMobileMenu() {
+      const overlay = document.querySelector('.mobile-nav-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      overlay.classList.remove('active');
+      mobileNav.classList.remove('active');
+      document.body.style.overflow = '';
+      document.body.classList.remove('menu-open');
+    }
 
-  async function updateHoursDisplay(){
-    const banner = document.getElementById('closedBanner');
-    const sticky = document.getElementById('stickyFab');
-    const openNow = isWithinBusinessHours();
-    const upstreamOK = await checkSystemStatus();
-    const showClosed = !(openNow && upstreamOK);
-    banner.style.display = showClosed ? 'block' : 'none';
-    sticky.style.display = openNow ? 'inline-flex' : 'none';
-  }
-
-  document.querySelectorAll('a[href^="#"]').forEach(a=>{
-    a.addEventListener('click', (e)=>{
-      const id = a.getAttribute('href').slice(1);
-      const el = document.getElementById(id);
-      if (el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth',block:'start'}); }
+    // Close mobile menu on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.querySelector('.mobile-nav')?.classList.contains('active')) {
+        closeMobileMenu();
+      }
     });
-  });
 
-  window.addEventListener('load', function(){
-    detectTouchDevice();
-    updateHoursDisplay();
-    setInterval(updateHoursDisplay, 5*60*1000);
-  });
-  window.addEventListener('resize', detectTouchDevice);
-</script>
+    // Check system availability status
+    async function checkSystemStatus() {
+      try {
+        // Direct API call to check phone system status - shared backend with Eek
+        const response = await fetch("https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/17b1d2990e6f4082a2b0d9c2f1a29025/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bPyoxJ24kuxJZOyLGAclGaEuH6BHwUTFaGmYOwHofa8", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+          cache: "no-store"
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.state === 'Active';
+        }
+      } catch (error) {
+        console.error('Error checking system status:', error);
+      }
+      return true; // Default to active (phones visible) if check fails
+    }
+
+    // Check if current time is within business hours
+    function isWithinBusinessHours() {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const minutes = now.getMinutes();
+      const time = hour + minutes / 60;
+      
+      // Monday-Friday: 8:30 AM - 5:00 PM (NZ Time)
+      if (day >= 1 && day <= 5) {
+        return time >= 8.5 && time < 17;
+      }
+      // Saturday-Sunday: Closed
+      return false;
+    }
+
+    // Update UI based on system status and business hours
+    async function updateHoursDisplay() {
+      const systemActive = await checkSystemStatus();
+      const duringBusinessHours = isWithinBusinessHours();
+      
+      // Update closed banner
+      const closedBanner = document.getElementById('closedBanner');
+      const closedTitle = document.getElementById('closedTitle');
+      const afterHoursMessage = document.getElementById('afterHoursMessage');
+      const tempUnavailableMessage = document.getElementById('tempUnavailableMessage');
+      
+      if (closedBanner) {
+        if (!systemActive) {
+          closedBanner.style.display = 'block';
+          
+          if (duringBusinessHours) {
+            // During business hours but phones off - operational reasons
+            closedTitle.innerHTML = '🚧 PHONE LINES CURRENTLY BUSY';
+            closedBanner.style.background = 'linear-gradient(135deg, #ff8c00, #ff6b00)';
+            afterHoursMessage.style.display = 'none';
+            tempUnavailableMessage.style.display = 'block';
+          } else {
+            // Outside business hours
+            closedTitle.innerHTML = '🕐 OFFICE CURRENTLY CLOSED';
+            closedBanner.style.background = 'linear-gradient(135deg, #666, #888)';
+            afterHoursMessage.style.display = 'block';
+            tempUnavailableMessage.style.display = 'none';
+          }
+        } else {
+          closedBanner.style.display = 'none';
+        }
+      }
+      
+      // Update phone buttons visibility based on system status
+      const phoneButtons = document.querySelectorAll('.phone-button, a[href^="tel:"]');
+      phoneButtons.forEach(btn => {
+        if (!btn.closest('.footer-section')) { // Don't hide footer phone links
+          if (systemActive) {
+            btn.style.display = btn.classList.contains('phone-button') ? 'inline-block' : 'inline-flex';
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+          } else {
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            if (btn.classList.contains('phone-button')) {
+              btn.setAttribute('title', duringBusinessHours ? 'Phone lines busy - please try again shortly' : 'Office closed - please call during business hours');
+            }
+          }
+        }
+      });
+      
+      // Update admin link visibility (ensure admins can still access after hours)
+      const adminLink = document.querySelector('.admin-link');
+      if (adminLink && !systemActive && !duringBusinessHours) {
+        adminLink.style.display = 'inline-block';
+      }
+
+      // Sticky action button logic
+      const stickyFab = document.getElementById('stickyFab');
+      if (stickyFab) {
+        if (systemActive) {
+          // Phones on → show call
+          stickyFab.style.display = 'inline-block';
+          stickyFab.textContent = '📞 04 887 3337';
+          stickyFab.setAttribute('href','tel:048873337');
+          stickyFab.style.background = '#1e3c72';
+          stickyFab.setAttribute('aria-label','Call FormanPacific');
+        } else {
+          // Phones off → show hours (or link to form)
+          stickyFab.style.display = 'inline-block';
+          stickyFab.textContent = duringBusinessHours ? '📅 Phones Busy – View Options' : '🕐 Office Closed';
+          stickyFab.setAttribute('href','#closedBanner'); // change to '/contact-form' if you prefer
+          stickyFab.style.background = duringBusinessHours ? '#ff8c00' : '#666';
+          stickyFab.setAttribute('aria-label', duringBusinessHours ? 'Phones busy – view options' : 'View office hours');
+        }
+      }
+    }
+
+    // Enhanced tracking function
+    function track(label, value){
+      if(typeof gtag!=='undefined'){ 
+        gtag('event', 'click', { 
+          'event_category': 'engagement',
+          'event_label': label,
+          'value': value || 1
+        });
+        if(label.includes('call')){
+          gtag('event', 'conversion', {
+            'send_to': 'AW-17529704008/phone_click'
+          });
+        }
+      }
+    }
+
+    // Admin login redirect
+    function adminLogin(){ 
+      window.location.href='/admin'; 
+    }
+
+    // Smooth scroll for hash links
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click',e=>{
+        const id=a.getAttribute('href'); 
+        if(id.length>1){ 
+          e.preventDefault(); 
+          const t=document.querySelector(id); 
+          if(t){ 
+            t.scrollIntoView({behavior:'smooth'}); 
+          } 
+        }
+      });
+    });
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      detectTouchDevice(); // Detect touch screens first
+      updateHoursDisplay();
+      // Check status every 5 minutes
+      setInterval(updateHoursDisplay, 5 * 60 * 1000);
+    });
+    
+    // Also check on resize in case device orientation changes
+    window.addEventListener('resize', function() {
+      detectTouchDevice();
+    });
+  </script>
+</body>
+</html>
