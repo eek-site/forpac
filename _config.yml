@@ -3,7 +3,6 @@ csp: >-
   base-uri 'self';
   form-action 'self' https://forms.office.com https://forms.microsoft.com;
   object-src 'none';
-  frame-ancestors 'self';
   worker-src 'self' blob:;
   manifest-src 'self';
   media-src 'self' blob: https:;
@@ -65,6 +64,7 @@ csp: >-
     https://challenges.cloudflare.com
     https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com
     https://www.google.com
+    https://www.gstatic.com
     https://adservice.google.com
     https://tpc.googlesyndication.com;
 
@@ -77,4 +77,5 @@ csp: >-
     https://www.youtube.com
     https://player.vimeo.com
     https://challenges.cloudflare.com
-    https://www.facebook.com;
+    https://www.facebook.com
+    https://www.googletagmanager.com;
