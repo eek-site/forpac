@@ -7,7 +7,7 @@
   <meta name="description" content="Edit and manage jobs in SharePoint BookAJobMaster list"/>
   <meta name="robots" content="noindex, nofollow"/>
 
-  <!-- Microsoft Authentication Library -->
+  <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
   <!-- AG Grid Community -->
@@ -78,7 +78,7 @@
     .overlay-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
     .overlay-content{text-align:center;max-width:480px;padding:40px;background:var(--bg-white);border-radius:20px;box-shadow:var(--shadow-xl)}
     .spinner{width:60px;height:60px;border:4px solid var(--border);border-top:4px solid var(--primary);border-radius:50%;animation:spin 1s cubic-bezier(.68,-.55,.265,1.55) infinite;margin:0 auto 20px}
-    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
     .hidden{display:none!important}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)}
     .modal.active{display:flex;animation:fadeIn .3s ease}
@@ -204,7 +204,6 @@
             <input type="text" id="quickSearch" class="search-input" placeholder="Quick search..."/>
             <span class="search-icon">🔍</span>
           </div>
-          <select id="viewPicker" class="pill"><option>Default View</option></select>
 
           <div class="column-config">
             <button id="btnColumnConfig" class="btn secondary">⚙️ Columns</button>
@@ -297,7 +296,7 @@
   <script>
     'use strict';
 
-    /* =================== CONFIG =================== */
+    /* =============== CONFIG =============== */
     const CONFIG = {
       sharepoint: {
         tenant: 'roadandrescue.sharepoint.com',
@@ -312,6 +311,7 @@
         },
         cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: true }
       },
+      spoScopes: [`https://roadandrescue.sharepoint.com/AllSites.FullControl`],
       grid: {
         pagination: true,
         paginationPageSize: 100,
@@ -325,7 +325,7 @@
       }
     };
 
-    /* =================== STATE =================== */
+    /* =============== STATE =============== */
     const state = {
       msalInstance: null,
       account: null,
@@ -336,10 +336,11 @@
       pendingChanges: { updates: new Map(), creates: [], deletes: new Set() },
       columnDefs: [],
       viewFields: [],
-      isDirty: false
+      isDirty: false,
+      listItemEntityType: null
     };
 
-    /* =================== UTILS =================== */
+    /* =============== UTILS =============== */
     const $ = s => document.querySelector(s);
     function showToast(message, type='info'){
       const c = $('#toastContainer');
@@ -364,53 +365,86 @@
       if(!state.gridApi) return;
       $('#rowCount').textContent = state.gridApi.getDisplayedRowCount();
       $('#selectedCount').textContent = state.gridApi.getSelectedRows().length;
-      const model = state.gridApi.getModel?.(); // safeguard
+      const model = state.gridApi.getModel?.();
       const filtered = model?.getRowCount ? model.getRowCount() : state.gridApi.getDisplayedRowCount();
       $('#filteredCount').textContent = filtered;
     }
     function generateInternalName(display){ return display.replace(/[^a-zA-Z0-9]/g,''); }
+    const odataQuote = s => String(s).replace(/'/g,"''");
+    const spSiteUrl = path => `https://${CONFIG.sharepoint.tenant}${CONFIG.sharepoint.siteRelative}${path}`;
+    const listRoot = () => spSiteUrl(`/_api/web/lists/getbytitle('${odataQuote(CONFIG.sharepoint.listTitle)}')`);
 
-    /* =================== AUTH =================== */
+    /* =============== AUTH =============== */
+    const canPopup = () => {
+      const w = window.open('', '_blank', 'width=1,height=1,left=-10000,top=-10000');
+      if (!w || w.closed || typeof w.closed === 'undefined') return false;
+      w.close(); return true;
+    };
+
     async function initAuth(){
       try{
         state.msalInstance = new msal.PublicClientApplication(CONFIG.msal);
         await state.msalInstance.initialize();
-        const resp = await state.msalInstance.handleRedirectPromise();
-        if(resp) {/* handled */}
+
+        const rr = await state.msalInstance.handleRedirectPromise();
+        if (rr?.account) state.account = rr.account;
+
         const accounts = state.msalInstance.getAllAccounts();
-        if(accounts.length>0){
-          state.account = accounts[0];
+        if (!state.account && accounts.length) state.account = accounts[0];
+
+        if(state.account){
           $('#loginScreen').classList.add('hidden');
           $('#loadingScreen').classList.remove('hidden');
-          $('#userPill').textContent = state.account.username;
+          $('#userPill').textContent = state.account.username || state.account.name || 'Signed in';
           await getAccessToken();
           await initializeApp();
           $('#loadingScreen').classList.add('hidden');
+        }else{
+          // show login overlay
+          $('#loginScreen').classList.remove('hidden');
         }
+
+        $('#btnLogin').onclick = async () => {
+          const loginReq = { scopes: CONFIG.spoScopes, redirectStartPage: window.location.href };
+          if (canPopup()){
+            try{
+              const res = await state.msalInstance.loginPopup(loginReq);
+              state.account = res.account; $('#userPill').textContent = state.account.username || state.account.name || 'Signed in';
+              $('#loginScreen').classList.add('hidden'); $('#loadingScreen').classList.remove('hidden');
+              await getAccessToken(); await initializeApp(); $('#loadingScreen').classList.add('hidden');
+            }catch(e){ showToast('Popup blocked or cancelled. Using redirect…','warning'); await state.msalInstance.loginRedirect(loginReq); }
+          }else{
+            await state.msalInstance.loginRedirect(loginReq);
+          }
+        };
       }catch(err){
         console.error('Auth init failed', err);
-        showToast('Authentication failed. Please refresh and try again.','error');
-      }
-    }
-    async function getAccessToken(){
-      const scopes = [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`];
-      try{
-        const r = await state.msalInstance.acquireTokenSilent({ scopes, account: state.account });
-        state.accessToken = r.accessToken; return r.accessToken;
-      }catch(_){
-        const r = await state.msalInstance.acquireTokenPopup({ scopes });
-        state.accessToken = r.accessToken; return r.accessToken;
+        showToast('Authentication failed. Refresh and try again.','error');
       }
     }
 
-    /* =================== SHAREPOINT API =================== */
-    function spSiteUrl(path=''){ return `https://${CONFIG.sharepoint.tenant}${CONFIG.sharepoint.siteRelative}${path}`; }
+    async function getAccessToken(){
+      const req = { scopes: CONFIG.spoScopes, account: state.account };
+      try{
+        const r = await state.msalInstance.acquireTokenSilent(req);
+        state.accessToken = r.accessToken; return r.accessToken;
+      }catch(_){
+        // fallback: popup if possible else redirect
+        if (canPopup()){
+          const r = await state.msalInstance.acquireTokenPopup(req);
+          state.accessToken = r.accessToken; return r.accessToken;
+        }
+        await state.msalInstance.acquireTokenRedirect({ ...req, redirectStartPage: window.location.href });
+      }
+    }
+
+    /* =============== SHAREPOINT REST =============== */
     async function spRequest(url, options={}){
       const r = await fetch(url, {
         ...options,
         headers: {
           'Authorization': `Bearer ${state.accessToken}`,
-          'Accept': 'application/json;odata=nometadata',
+          'Accept': options.accept || 'application/json;odata=nometadata',
           ...options.headers
         }
       });
@@ -418,77 +452,106 @@
         const t = await r.text().catch(()=> '');
         throw new Error(`SharePoint API error: ${r.status} ${r.statusText} ${t}`);
       }
-      return r.status===204 ? null : r.json();
+      if(r.status === 204) return null;
+      const ct = r.headers.get('content-type') || '';
+      return ct.includes('application/json') ? r.json() : r.text();
     }
 
-    // Try to get rows via RenderListDataAsStream (fast & respects view)
+    async function getListItemEntityType(){
+      if (state.listItemEntityType) return state.listItemEntityType;
+      const info = await spRequest(`${listRoot()}?$select=ListItemEntityTypeFullName`);
+      state.listItemEntityType = info.ListItemEntityTypeFullName;
+      return state.listItemEntityType;
+    }
+
+    // Fast, view-aware read
     async function loadListData(){
       setStatus('Loading data...','info');
-      const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
       const body = {
         parameters: {
           RenderOptions: 570,
-          ViewXml:
-            '<View>' +
-              '<RowLimit>5000</RowLimit>' +
-              '<Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query>' +
-            '</View>'
+          ViewXml: '<View><RowLimit>5000</RowLimit><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query></View>'
         }
       };
-      return spRequest(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(body) });
+      return spRequest(`${listRoot()}/RenderListDataAsStream`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json;odata=verbose' },
+        body: JSON.stringify(body),
+        accept: 'application/json;odata=verbose'
+      });
     }
 
-    // Schema fallback when ListSchema.Field is absent
     async function loadFieldsSchemaOnly(){
-      const url = spSiteUrl(
-        `/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields` +
-        `?$select=Title,InternalName,TypeAsString,Hidden,ReadOnlyField,Sealed,Choices`
-      );
-      const { value } = await spRequest(url);
-      return value.map(f => ({
+      const data = await spRequest(`${listRoot()}/fields?$select=Title,InternalName,TypeAsString,Hidden,ReadOnlyField,Sealed,Choices`);
+      const arr = data.value || data.d?.results || [];
+      return arr.map(f => ({
         Name: f.InternalName,
         DisplayName: f.Title,
         Type: f.TypeAsString,
         Hidden: !!f.Hidden,
         ReadOnlyField: !!f.ReadOnlyField,
         Sealed: !!f.Sealed,
-        Choices: Array.isArray(f.Choices?.results) ? f.Choices.results :
-                 Array.isArray(f.Choices) ? f.Choices : undefined
+        Choices: Array.isArray(f.Choices?.results) ? f.Choices.results : f.Choices
       }));
     }
 
-    async function createItem(item){
-      const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
-      return spRequest(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose' }, body: JSON.stringify(item) });
+    async function createItem(fieldBag){
+      const entityType = await getListItemEntityType();
+      const payload = { '__metadata': { 'type': entityType }, ...fieldBag };
+      return spRequest(`${listRoot()}/items`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json;odata=verbose' },
+        body: JSON.stringify(payload),
+        accept: 'application/json;odata=verbose'
+      });
     }
+
     async function updateItem(id, updates){
-      const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
-      await spRequest(url, { method:'POST', headers:{ 'Content-Type':'application/json;odata=verbose','IF-MATCH':'*','X-HTTP-Method':'MERGE' }, body: JSON.stringify(updates) });
+      const entityType = await getListItemEntityType();
+      const payload = { '__metadata': { 'type': entityType }, ...updates };
+      await spRequest(`${listRoot()}/items(${id})`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json;odata=verbose','IF-MATCH':'*','X-HTTP-Method':'MERGE' },
+        body: JSON.stringify(payload)
+      });
     }
+
     async function deleteItem(id){
-      const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
-      await spRequest(url, { method:'POST', headers:{ 'IF-MATCH':'*','X-HTTP-Method':'DELETE' } });
+      await spRequest(`${listRoot()}/items(${id})`, {
+        method:'POST',
+        headers:{ 'IF-MATCH':'*','X-HTTP-Method':'DELETE' }
+      });
     }
+
     async function addField(cfg){
-      const url = spSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
       const base = { Title: cfg.displayName, Required: !!cfg.required };
       let body;
       switch(cfg.type){
-        case 'Number': body={...base,'__metadata':{type:'SP.FieldNumber'},FieldTypeKind:9}; break;
-        case 'Currency': body={...base,'__metadata':{type:'SP.FieldCurrency'},FieldTypeKind:10,CurrencyLocaleId:1033}; break;
-        case 'DateTime': body={...base,'__metadata':{type:'SP.FieldDateTime'},FieldTypeKind:4,DisplayFormat:1}; break;
-        case 'Boolean': body={...base,'__metadata':{type:'SP.Field'},FieldTypeKind:8}; break;
-        case 'Choice': body={...base,'__metadata':{type:'SP.FieldChoice'},FieldTypeKind:6,Choices:{results:cfg.choices||[]}}; break;
-        case 'MultiChoice': body={...base,'__metadata':{type:'SP.FieldMultiChoice'},FieldTypeKind:15,Choices:{results:cfg.choices||[]}}; break;
-        case 'URL': body={...base,'__metadata':{type:'SP.FieldUrl'},FieldTypeKind:11}; break;
-        case 'Note': body={...base,'__metadata':{type:'SP.FieldMultiLineText'},FieldTypeKind:3}; break;
-        default: body={...base,'__metadata':{type:'SP.FieldText'},FieldTypeKind:2};
+        case 'Number':     body={...base,'__metadata':{type:'SP.FieldNumber'},     FieldTypeKind:9};  break;
+        case 'Currency':   body={...base,'__metadata':{type:'SP.FieldCurrency'},   FieldTypeKind:10, CurrencyLocaleId:1033}; break;
+        case 'DateTime':   body={...base,'__metadata':{type:'SP.FieldDateTime'},   FieldTypeKind:4,  DisplayFormat:1}; break;
+        case 'Boolean':    body={...base,'__metadata':{type:'SP.Field'},           FieldTypeKind:8};  break;
+        case 'Choice':     body={...base,'__metadata':{type:'SP.FieldChoice'},     FieldTypeKind:6,  Choices:{results:cfg.choices||[]}}; break;
+        case 'MultiChoice':body={...base,'__metadata':{type:'SP.FieldMultiChoice'},FieldTypeKind:15, Choices:{results:cfg.choices||[]}}; break;
+        case 'URL':        body={...base,'__metadata':{type:'SP.FieldUrl'},        FieldTypeKind:11}; break;
+        case 'Note':       body={...base,'__metadata':{type:'SP.FieldMultiLineText'},FieldTypeKind:3}; break;
+        default:           body={...base,'__metadata':{type:'SP.FieldText'},       FieldTypeKind:2};
       }
       if(cfg.defaultValue) body.DefaultValue = cfg.defaultValue;
-      return spRequest(url,{method:'POST',headers:{'Content-Type':'application/json;odata=verbose'},body:JSON.stringify(body)});
+
+      return spRequest(`${listRoot()}/fields`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json;odata=verbose' },
+        body: JSON.stringify(body),
+        accept: 'application/json;odata=verbose'
+      });
     }
 
-    /* =================== GRID =================== */
+    /* =============== GRID =============== */
+    function humanizeHeader(h){
+      return String(h).replace(/_x0020_/g,' ').replace(/([A-Z])/g,' $1').replace(/^\s+/,'').trim();
+    }
+
     function buildColumnDefs(schemaFields){
       const visible = (schemaFields || []).filter(f => !f.Hidden);
       state.viewFields = visible.map(f => f.Name);
@@ -572,14 +635,14 @@
       updateChangeCount();
     }
 
-    /* =================== APP =================== */
+    /* =============== APP FLOW =============== */
     async function initializeApp(){
       try{
         setStatus('Loading list data...','info');
 
         const listData = await loadListData();
 
-        // Normalize schema (from RLDAS or fallback to /fields)
+        // Schema (RLDAS or fallback to /fields)
         let schemaFields = Array.isArray(listData?.ListSchema?.Field)
           ? listData.ListSchema.Field.map(f => ({
               Name: f.Name ?? f.InternalName ?? f.StaticName,
@@ -594,7 +657,7 @@
 
         const columnDefs = buildColumnDefs(schemaFields);
 
-        // Normalize rows
+        // Rows
         const rowData = Array.isArray(listData?.Row)
           ? listData.Row.map(r => ({ ...r }))
           : Array.isArray(listData?.ListData?.Rows)
@@ -607,10 +670,10 @@
         initGrid(columnDefs, rowData);
         setupEventHandlers();
 
-        setStatus(`Loaded ${rowData.length} rows`, 'success');
-        showToast(`Successfully loaded ${rowData.length} rows from SharePoint`, 'success');
+        setStatus(`Loaded ${rowData.length} rows`,'success');
+        showToast(`Loaded ${rowData.length} rows from SharePoint`,'success');
       }catch(err){
-        console.error('Failed to initialize app:', err);
+        console.error('Init failed:', err);
         setStatus('Failed to load data','error');
         showToast('Failed to load data from SharePoint. Please refresh.','error');
       }
@@ -639,9 +702,6 @@
     }
 
     function setupEventHandlers(){
-      $('#btnLogin').onclick = async () => {
-        await state.msalInstance.loginRedirect({ scopes: [`https://${CONFIG.sharepoint.tenant}/AllSites.FullControl`] });
-      };
       $('#btnRefresh').onclick = () => {
         if(state.isDirty && !confirm('You have unsaved changes. Refresh anyway?')) return;
         window.location.reload();
@@ -700,10 +760,7 @@
       $('#btnColumnConfig').onclick = () => { $('#columnMenu').classList.toggle('show'); };
       $('#btnAddColumn').onclick = () => { $('#columnModal').classList.add('active'); };
       $('#colDisplay').oninput = e => { $('#colInternal').value = generateInternalName(e.target.value); };
-      $('#colType').onchange = e => {
-        const choice = e.target.value==='Choice' || e.target.value==='MultiChoice';
-        $('#choiceRow').style.display = choice?'block':'none';
-      };
+      $('#colType').onchange = e => { const choice = e.target.value==='Choice' || e.target.value==='MultiChoice'; $('#choiceRow').style.display = choice?'block':'none'; };
       $('#btnCreateColumn').onclick = createColumn;
 
       document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if(e.target===m) m.classList.remove('active'); });
@@ -728,7 +785,8 @@
             const tempId = payload.ID;
             delete payload.ID; delete payload.__selection__;
             const created = await createItem(payload);
-            const realId = created.ID || created.Id;
+            const createdWrap = created?.d || created;
+            const realId = createdWrap?.ID || createdWrap?.Id;
             if (realId){
               idMap.set(tempId, realId);
               // update displayed row ID
@@ -738,14 +796,15 @@
                 targetNode.setData({
                   ...targetNode.data,
                   ID: realId,
-                  Created: created.Created || targetNode.data.Created,
-                  Modified: created.Modified || targetNode.data.Modified,
+                  Created: createdWrap.Created || targetNode.data.Created,
+                  Modified: createdWrap.Modified || targetNode.data.Modified,
                 });
               }
             }
             ok++;
           }catch(e){ console.error('Create failed',e); err++; }
         }
+
         // UPDATES
         for(const [id, updates] of state.pendingChanges.updates.entries()){
           try{
@@ -754,6 +813,7 @@
             ok++;
           }catch(e){ console.error('Update failed',e); err++; }
         }
+
         // DELETES
         for(const id of state.pendingChanges.deletes){
           try{
@@ -765,8 +825,7 @@
 
         state.pendingChanges.updates.clear(); state.pendingChanges.creates=[]; state.pendingChanges.deletes.clear();
 
-        const allRows=[];
-        state.gridApi.forEachNode(n => allRows.push(n.data));
+        const allRows=[]; state.gridApi.forEachNode(n => allRows.push(n.data));
         state.originalData = JSON.parse(JSON.stringify(allRows));
         updateChangeCount();
 
@@ -795,7 +854,7 @@
         await addField({ displayName, type, required, defaultValue: defVal || undefined, choices: choices.length?choices:undefined });
         closeColumnModal();
         showToast(`Column "${displayName}" created successfully`,'success');
-        setTimeout(()=>{ if(confirm('Reload page to see the new column?')) window.location.reload(); }, 800);
+        setTimeout(()=>{ if(confirm('Reload page to see the new column?')) window.location.reload(); }, 600);
       }catch(e){
         console.error('Add column failed', e);
         showToast('Failed to create column. Please try again.','error');
@@ -809,6 +868,7 @@
     }
 
     function exportToCSV(rows, basename){
+      if(!rows.length){ showToast('No data to export','warning'); return; }
       const headers = Object.keys(rows[0]).filter(k=>k!=='__selection__');
       const csv = [headers.join(','), ...rows.map(r => headers.map(h => {
         let v = r[h]; if (v==null) v = '';
@@ -821,7 +881,7 @@
       showToast(`Exported ${rows.length} rows`,'success');
     }
 
-    /* =================== BOOT =================== */
+    /* =============== BOOT =============== */
     window.addEventListener('DOMContentLoaded', initAuth);
   </script>
 </body>
