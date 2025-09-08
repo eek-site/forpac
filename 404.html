@@ -1,521 +1,204 @@
 ---
+layout: none
 ---
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  {% include csp.html %}
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Redirecting... | FormanPacific Service Claims</title>
-      
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            padding: 20px;
-        }
-        
-        .container {
-            text-align: center;
-            max-width: 700px;
-            padding: 40px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 100%;
-        }
-        
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 28px;
-        }
-        
-        .logo-text {
-            font-size: 2.2em;
-            font-weight: bold;
-            color: #1e3c72;
-        }
-        
-        .brand-tagline {
-            color: #666;
-            font-size: 1.1em;
-            margin-bottom: 30px;
-        }
-        
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #f5f5f5;
-            border-top: 4px solid #1e3c72;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .message {
-            font-size: 1.2em;
-            margin: 20px 0;
-            color: #333;
-        }
-        
-        .countdown {
-            font-size: 2em;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #1e3c72;
-        }
-        
-        .manual-link a, .cta-button {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            text-decoration: none;
-            padding: 15px 25px;
-            border-radius: 8px;
-            font-size: 1.2em;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            display: inline-block;
-            transition: all 0.3s ease;
-            margin: 0 7px;
-        }
-        
-        .manual-link a:hover, .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-        }
-        
-        .error-container {
-            display: none;
-        }
-        
-        .error-container.show {
-            display: block;
-        }
-        
-        .error-container h2 {
-            color: #333;
-            margin-bottom: 15px;
-        }
-        
-        .error-container p {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        
-        .suggestions {
-            margin-top: 30px;
-            text-align: left;
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 12px;
-        }
-        
-        .suggestions h3 {
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .suggestions ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .suggestions li {
-            margin: 10px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .suggestions li:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        
-        .suggestions a {
-            color: #333;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .suggestions a strong {
-            color: #1e3c72;
-            font-size: 1.1em;
-        }
-        
-        .suggestions a small {
-            color: #666;
-            font-size: 0.9em;
-        }
-        
-        .trust-indicators {
-            margin-top: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
-            border-radius: 8px;
-            border-left: 4px solid #1e3c72;
-        }
-        
-        .trust-indicators .badges {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .trust-badge {
-            text-align: center;
-        }
-        
-        .trust-badge .icon {
-            font-size: 1.5em;
-            color: #1e3c72;
-        }
-        
-        .trust-badge small {
-            color: #666;
-            display: block;
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-            
-            .logo-text {
-                font-size: 1.8em;
-            }
-            
-            .manual-link a, .cta-button {
-                padding: 12px 20px;
-                font-size: 1.1em;
-                margin: 5px;
-                display: block;
-            }
-            
-            .suggestions {
-                padding: 15px;
-            }
-            
-            .suggestions li {
-                padding: 12px;
-            }
-        }
-    </style>
+
+  <!-- Security headers (CSP, etc.) are set in Cloudflare. No meta CSP here. -->
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;color:#333;padding:20px}
+    .container{text-align:center;max-width:700px;padding:40px;background:#fff;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,.1);width:100%}
+    .logo{display:inline-flex;align-items:center;gap:15px;margin-bottom:20px}
+    .logo-icon{width:60px;height:60px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px}
+    .logo-text{font-size:2.2em;font-weight:700;color:#1e3c72}
+    .brand-tagline{color:#666;font-size:1.1em;margin-bottom:30px}
+    .spinner{width:60px;height:60px;border:4px solid #f5f5f5;border-top:4px solid #1e3c72;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    .message{font-size:1.2em;margin:20px 0;color:#333}
+    .countdown{font-size:2em;font-weight:700;margin:20px 0;color:#1e3c72}
+    .manual-link a,.cta-button{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;text-decoration:none;padding:15px 25px;border-radius:8px;font-size:1.2em;box-shadow:0 4px 6px rgba(0,0,0,.2);display:inline-block;transition:.3s;margin:0 7px}
+    .manual-link a:hover,.cta-button:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,.3)}
+    .error-container{display:none}
+    .error-container.show{display:block}
+    .error-container h2{color:#333;margin-bottom:15px}
+    .error-container p{color:#666;margin-bottom:20px}
+    .suggestions{margin-top:30px;text-align:left;background:#f5f5f5;padding:20px;border-radius:12px}
+    .suggestions h3{color:#333;margin-bottom:15px;text-align:center}
+    .suggestions ul{list-style:none;padding:0;margin:0}
+    .suggestions li{margin:10px 0;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);transition:.3s}
+    .suggestions li:hover{box-shadow:0 4px 8px rgba(0,0,0,.1);transform:translateY(-2px)}
+    .suggestions a{color:#333;text-decoration:none;display:block}
+    .suggestions a strong{color:#1e3c72;font-size:1.1em}
+    .suggestions a small{color:#666;font-size:.9em}
+    .trust-indicators{margin-top:30px;padding:20px;background:linear-gradient(135deg,#f0f8ff,#e6f3ff);border-radius:8px;border-left:4px solid #1e3c72}
+    .trust-indicators .badges{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap}
+    .trust-badge{text-align:center}
+    .trust-badge .icon{font-size:1.5em;color:#1e3c72}
+    .trust-badge small{color:#666;display:block;margin-top:5px}
+    @media (max-width:768px){
+      .container{padding:20px;margin:10px}
+      .logo-text{font-size:1.8em}
+      .manual-link a,.cta-button{padding:12px 20px;font-size:1.1em;margin:5px;display:block}
+      .suggestions{padding:15px}
+      .suggestions li{padding:12px}
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <div class="logo-icon">FP</div>
-            <div class="logo-text">FormanPacific</div>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-icon">FP</div>
+      <div class="logo-text">FormanPacific</div>
+    </div>
+    <div class="brand-tagline">Looking for the page you requested...</div>
+
+    <div id="loadingContainer">
+      <div class="spinner"></div>
+      <div class="message">Checking our service directory</div>
+      <div class="countdown" id="countdown" style="display:none;">3</div>
+
+      <div class="trust-indicators">
+        <div class="badges">
+          <div class="trust-badge"><div class="icon">🔒</div><small>Secure Platform</small></div>
+          <div class="trust-badge"><div class="icon">✅</div><small>ISO Certified</small></div>
+          <div class="trust-badge"><div class="icon">⚡</div><small>24/7 Service</small></div>
         </div>
-        <div class="brand-tagline">Looking for the page you requested...</div>
-        
-        <div id="loadingContainer">
-            <div class="spinner"></div>
-            <div class="message">Checking our service directory</div>
-            <div class="countdown" id="countdown" style="display: none;">3</div>
-            
-            <!-- Trust indicators -->
-            <div class="trust-indicators">
-                <div class="badges">
-                    <div class="trust-badge">
-                        <div class="icon">🔒</div>
-                        <small>Secure Platform</small>
-                    </div>
-                    <div class="trust-badge">
-                        <div class="icon">✅</div>
-                        <small>ISO Certified</small>
-                    </div>
-                    <div class="trust-badge">
-                        <div class="icon">⚡</div>
-                        <small>24/7 Service</small>
-                    </div>
-                </div>
-                <p style="text-align: center; margin-top: 15px; color: #555; font-size: 0.9em;">
-                    <strong>Your data is protected.</strong> Connecting you to FormanPacific's secure service management platform.
-                </p>
-            </div>
-        </div>
-        
-        <div id="errorContainer" class="error-container">
-            <h2>Page Not Found</h2>
-            <p>We couldn't find the page you're looking for, and no redirect was configured for this URL.</p>
-            
-            <div class="suggestions">
-                <h3>🔧 Quick Links to Popular Services:</h3>
-                <ul id="suggestionsList">
-                    <!-- Suggestions will be populated here -->
-                </ul>
-            </div>
-            
-            <div class="manual-link">
-                <a href="https://www.formanpacific.com" class="cta-button">🏠 Go to Homepage</a>
-                <a href="tel:048873337" class="cta-button">📞 Call 04 887 3337</a>
-            </div>
-        </div>
+        <p style="text-align:center;margin-top:15px;color:#555;font-size:.9em;">
+          <strong>Your data is protected.</strong> Connecting you to FormanPacific's secure service management platform.
+        </p>
+      </div>
     </div>
 
-    <script>
-        // Redirect database for FormanPacific
-        const redirectDatabase = {
-            // ALL paths go to the unified form
-            '/new-business': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/contact-form': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/contact': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-inquiry': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/emergency-service': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/emergency': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-registration': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-portal': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-payments': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-compliance': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/training': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/documentation': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/compliance': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/support': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/about': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/insurance-partners': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/corporate-services': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/careers': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/news': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/admin': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/admin/login': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/dashboard': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/claim': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/insurance-claim': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/claim-status': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/escalation': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/feedback': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/complaint': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-relations': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            
-            // Legal documents - ALL go to the form now
-            '/terms': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/privacy': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/supplier-terms': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/compliance-standards': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/insurance-requirements': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/emergency-procedures': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            
-            // Case variations (common typos)
-            '/New-Business': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/NEW-BUSINESS': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/Contact': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4ut',
-            '/CONTACT': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/Emergency': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/EMERGENCY': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/Supplier': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-            '/SUPPLIER': 'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u'
-        };
+    <div id="errorContainer" class="error-container">
+      <h2>Page Not Found</h2>
+      <p>We couldn't find the page you're looking for, and no redirect was configured for this URL.</p>
 
-        function handleRedirect() {
-            const currentPath = window.location.pathname;
-            console.log('Current path:', currentPath);
-            
-            // Check for exact match
-            if (redirectDatabase[currentPath]) {
-                console.log('Found exact match for:', currentPath);
-                performRedirect(redirectDatabase[currentPath], currentPath);
-                return;
-            }
-            
-            // Check for case-insensitive match
-            const lowerPath = currentPath.toLowerCase();
-            for (const [key, value] of Object.entries(redirectDatabase)) {
-                if (key.toLowerCase() === lowerPath) {
-                    console.log('Found case-insensitive match for:', currentPath);
-                    performRedirect(value, currentPath);
-                    return;
-                }
-            }
-            
-            // No match found - show error page
-            console.log('No redirect found for:', currentPath);
-            showErrorPage(currentPath);
-        }
-        
-        function performRedirect(url, originalPath) {
-            // Fire conversion tracking for key paths
-            if (originalPath === '/new-business' || originalPath.toLowerCase() === '/new-business') {
-                fireConversionEvent('new_business_form');
-            }
-            if (originalPath === '/claim' || originalPath.toLowerCase() === '/claim') {
-                fireConversionEvent('claim_form');
-            }
-            if (originalPath === '/emergency' || originalPath.toLowerCase() === '/emergency') {
-                fireConversionEvent('emergency_service');
-            }
-            
-            // Determine service info
-            let serviceInfo = getServiceInfo(url, originalPath);
-            
-            document.querySelector('.message').innerHTML = `
-                <strong style="color: #1e3c72;">✅ ${serviceInfo.title}</strong><br>
-                ${serviceInfo.description}
-            `;
-            
-            document.querySelector('.brand-tagline').innerHTML = 
-                'Securely connecting you to FormanPacific services...';
-            
-            document.getElementById('countdown').style.display = 'none';
-            
-            // Redirect after brief delay
-            setTimeout(() => {
-                window.location.href = url;
-            }, 1500);
-        }
-        
-        function fireConversionEvent(eventName) {
-            // Google tracking removed
-            console.log('Event fired:', eventName);
-        }
-        
-        function getServiceInfo(url, path) {
-            // Service-specific messages
-            if (path === '/new-business') {
-                return {
-                    title: 'New Business Registration',
-                    description: 'Taking you to our secure new business application form. Join our network of insurance and corporate partners.'
-                };
-            }
-            if (path === '/contact-form') {
-                return {
-                    title: 'General Inquiry Form',
-                    description: 'Connecting you to our secure contact form. Our team will respond to your inquiry promptly.'
-                };
-            }
-            if (path === '/supplier-registration') {
-                return {
-                    title: 'Supplier Registration',
-                    description: 'Taking you to our supplier network application. Join 500+ verified service providers across New Zealand.'
-                };
-            }
-            if (path === '/supplier-portal') {
-                return {
-                    title: 'Supplier Portal Access',
-                    description: 'Accessing the secure supplier portal for job management, invoicing, and performance tracking.'
-                };
-            }
-            if (path === '/emergency' || path === '/emergency-service') {
-                return {
-                    title: 'Emergency Service Request',
-                    description: 'Connecting you to our 24/7 emergency dispatch system. Response teams available immediately.'
-                };
-            }
-            if (path === '/claim' || path === '/insurance-claim') {
-                return {
-                    title: 'Insurance Claim Processing',
-                    description: 'Taking you to our secure claim submission form. Fast-track your insurance claim with our streamlined process.'
-                };
-            }
-            if (path === '/admin' || path === '/dashboard') {
-                return {
-                    title: 'Administrator Access',
-                    description: 'Redirecting to the secure admin portal. Authentication required for access.'
-                };
-            }
-            if (path === '/training') {
-                return {
-                    title: 'Training Resources',
-                    description: 'Accessing our comprehensive training platform for suppliers and partners.'
-                };
-            }
-            if (path === '/compliance') {
-                return {
-                    title: 'Compliance Center',
-                    description: 'Taking you to our compliance documentation and certification resources.'
-                };
-            }
-            if (url.includes('sharepoint.com')) {
-                return {
-                    title: 'Secure Document Access',
-                    description: 'Accessing FormanPacific secure document portal for policies and procedures.'
-                };
-            }
-            if (url.includes('forms.office.com') || url.includes('forms.microsoft')) {
-                return {
-                    title: 'Secure Form Access',
-                    description: 'Connecting you to our protected Microsoft Forms platform for secure data submission.'
-                };
-            }
-            // Default fallback
-            return {
-                title: 'Connecting You Securely',
-                description: 'Taking you to the requested FormanPacific service. Your information is protected and encrypted.'
-            };
-        }
-        
-        function showErrorPage(path) {
-            document.getElementById('loadingContainer').style.display = 'none';
-            document.getElementById('errorContainer').classList.add('show');
-            
-            // Generate public suggestions
-            const suggestionsList = document.getElementById('suggestionsList');
-            const suggestions = [
-                { url: 'https://www.formanpacific.com/', title: '🏠 Homepage', desc: 'Main FormanPacific website' },
-                { url: 'tel:048873337', title: '📞 Call 04 887 3337', desc: 'Speak directly with our team' },
-                { url: '/new-business', title: '🚀 New Business', desc: 'Start your partnership with FormanPacific' },
-                { url: '/supplier-registration', title: '🤝 Become a Supplier', desc: 'Join our verified supplier network' },
-                { url: '/emergency', title: '🚨 Emergency Service', desc: '24/7 emergency dispatch available' },
-                { url: '/contact-form', title: '📝 Contact Us', desc: 'General inquiries and support' }
-            ];
-            
-            suggestionsList.innerHTML = suggestions.map(s => `
-                <li>
-                    <a href="${s.url}">
-                        <strong>${s.title}</strong><br>
-                        <small>${s.desc}</small>
-                    </a>
-                </li>
-            `).join('');
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            handleRedirect(); // Execute immediately, no delay
-        });
-    </script>
+      <div class="suggestions">
+        <h3>🔧 Quick Links to Popular Services:</h3>
+        <ul id="suggestionsList"></ul>
+      </div>
+
+      <div class="manual-link">
+        <a href="https://www.formanpacific.com" class="cta-button">🏠 Go to Homepage</a>
+        <a href="tel:048873337" class="cta-button">📞 Call 04 887 3337</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Redirect database (all go to unified Microsoft Form)
+    const redirectDatabase = {
+      '/new-business':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/contact-form':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/contact':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-inquiry':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/emergency-service':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/emergency':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-registration':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-portal':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-payments':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-compliance':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/training':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/documentation':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/compliance':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/support':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/about':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/insurance-partners':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/corporate-services':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/careers':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/news':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/admin':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/admin/login':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/dashboard':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/claim':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/insurance-claim':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/claim-status':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/escalation':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/feedback':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/complaint':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-relations':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+
+      /* case variants */
+      '/new-business':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u'
+    };
+
+    function handleRedirect(){
+      // normalize path (strip trailing slash except root) and do case-insensitive lookup
+      const raw = window.location.pathname;
+      const path = raw.replace(/\/+$/,'') || '/';
+      const lower = path.toLowerCase();
+
+      // build lowercase lookup map once
+      const dbLower = handleRedirect._dbLower || (handleRedirect._dbLower =
+        Object.fromEntries(Object.entries(redirectDatabase).map(([k,v]) => [k.toLowerCase(), v]))
+      );
+
+      const url = dbLower[lower];
+      if (url) {
+        performRedirect(url, path);
+      } else {
+        showErrorPage(path);
+      }
+    }
+
+    function performRedirect(url, originalPath){
+      if (['/new-business','/claim','/emergency'].includes(originalPath.toLowerCase())){
+        fireConversionEvent(originalPath.toLowerCase().slice(1));
+      }
+
+      const info = getServiceInfo(url, originalPath);
+      document.querySelector('.message').innerHTML =
+        `<strong style="color:#1e3c72;">✅ ${info.title}</strong><br>${info.description}`;
+      document.querySelector('.brand-tagline').textContent =
+        'Securely connecting you to FormanPacific services...';
+      document.getElementById('countdown').style.display = 'none';
+
+      setTimeout(() => { window.location.href = url; }, 1500);
+    }
+
+    function fireConversionEvent(name){ console.log('Event fired:', name); }
+
+    function getServiceInfo(url, path){
+      const p = path.toLowerCase();
+      if (p === '/new-business') return {title:'New Business Registration', description:'Taking you to our secure new business application form.'};
+      if (p === '/contact-form') return {title:'General Inquiry Form', description:'Connecting you to our secure contact form.'};
+      if (p === '/supplier-registration') return {title:'Supplier Registration', description:'Join 500+ verified service providers across New Zealand.'};
+      if (p === '/supplier-portal') return {title:'Supplier Portal Access', description:'Access job management, invoicing, and performance tracking.'};
+      if (p === '/emergency' || p === '/emergency-service') return {title:'Emergency Service Request', description:'Connecting you to our 24/7 emergency dispatch system.'};
+      if (p === '/claim' || p === '/insurance-claim') return {title:'Insurance Claim Processing', description:'Fast-track your insurance claim with our streamlined process.'};
+      if (p === '/admin' || p === '/dashboard') return {title:'Administrator Access', description:'Redirecting to the secure admin portal.'};
+      if (p === '/training') return {title:'Training Resources', description:'Access training for suppliers and partners.'};
+      if (p === '/compliance') return {title:'Compliance Center', description:'Compliance documentation and certification resources.'};
+      if (url.includes('sharepoint.com')) return {title:'Secure Document Access', description:'Accessing FormanPacific document portal.'};
+      if (url.includes('forms.office.com') || url.includes('forms.microsoft')) return {title:'Secure Form Access', description:'Protected Microsoft Forms platform for submission.'};
+      return {title:'Connecting You Securely', description:'Taking you to the requested FormanPacific service.'};
+    }
+
+    function showErrorPage(path){
+      document.getElementById('loadingContainer').style.display = 'none';
+      document.getElementById('errorContainer').classList.add('show');
+
+      const suggestions = [
+        { url:'https://www.formanpacific.com/', title:'🏠 Homepage', desc:'Main FormanPacific website' },
+        { url:'tel:048873337', title:'📞 Call 04 887 3337', desc:'Speak directly with our team' },
+        { url:'/new-business', title:'🚀 New Business', desc:'Start your partnership with FormanPacific' },
+        { url:'/supplier-registration', title:'🤝 Become a Supplier', desc:'Join our verified supplier network' },
+        { url:'/emergency', title:'🚨 Emergency Service', desc:'24/7 emergency dispatch available' },
+        { url:'/contact-form', title:'📝 Contact Us', desc:'General inquiries and support' }
+      ];
+
+      document.getElementById('suggestionsList').innerHTML =
+        suggestions.map(s => `<li><a href="${s.url}"><strong>${s.title}</strong><br><small>${s.desc}</small></a></li>`).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', handleRedirect);
+  </script>
 </body>
 </html>
