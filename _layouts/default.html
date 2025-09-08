@@ -4,13 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{{ page.title | default: site.title }}</title>
-
-  <!-- CSP from single source of truth -->
-  <meta http-equiv="Content-Security-Policy" content="{{ site.csp | strip }}">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
-
   {% if page.head_extra %}{{ page.head_extra }}{% endif %}
 </head>
 <body>
