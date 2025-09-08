@@ -71,7 +71,7 @@
     .overlay-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
     .overlay-content{text-align:center;max-width:480px;padding:40px;background:var(--bg-white);border-radius:20px;box-shadow:var(--shadow-xl)}
     .spinner{width:60px;height:60px;border:4px solid var(--border);border-top:4px solid var(--primary);border-radius:50%;animation:spin 1s cubic-bezier(.68,-.55,.265,1.55) infinite;margin:0 auto 20px}
-    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
     .hidden{display:none!important}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)}
     .modal.active{display:flex;animation:fadeIn .3s ease}
@@ -358,7 +358,7 @@
       sharepoint: {
         tenant: 'roadandrescue.sharepoint.com',
         siteRelative: '/sites/rar',
-        listTitle: 'JobBuildNotes' // exact SharePoint list Title
+        listTitle: 'JobBuildNotes'
       },
       msal: {
         auth: {
@@ -372,7 +372,6 @@
         pagination: true,
         paginationPageSize: 100,
         animateRows: true,
-        // No enterprise-only options here
         enableCellChangeFlash: true,
         undoRedoCellEditing: true,
         undoRedoCellEditingLimit: 20,
@@ -386,7 +385,7 @@
       msalInstance: null,
       account: null,
       accessToken: null,
-      gridApi: null,            // v31: unified API
+      gridApi: null,
       originalData: [],
       pendingChanges: { updates:new Map(), creates:[], deletes:new Set() },
       columnDefs: [],
@@ -482,7 +481,7 @@
       }
     }
 
-   // ===== SP REST =====
+    // ===== SP REST =====
     async function spRequest(url, options = {}, _retried = false){
       const resp = await fetch(url, {
         ...options,
@@ -507,7 +506,7 @@
         throw e;
       }
 
-      if (resp.status === 204) return null; // no content is normal on DELETE/MERGE
+      if (resp.status === 204) return null; // no content
 
       const contentType = resp.headers.get('Content-Type') || '';
       const text = await resp.text().catch(()=> '');
@@ -519,68 +518,60 @@
       return text;
     }
 
-      if (!r.ok){
-        const t = await r.text().catch(()=> '');
-        throw new Error(`SharePoint API error: ${r.status} ${r.statusText} ${t}`);
-      }
-      if (r.status === 204) return null;
-      return r.json();
-    }
-
     function getSiteUrl(path=''){
       return `https://${CONFIG.sharepoint.tenant}${CONFIG.sharepoint.siteRelative}${path}`;
     }
 
     async function loadListData(){
-  setStatus('Loading data...', 'info');
-  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
-  const body = {
-    parameters:{
-      RenderOptions: 570,
-      ViewXml: '<View><RowLimit>5000</RowLimit><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query></View>'
+      setStatus('Loading data...', 'info');
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/RenderListDataAsStream`);
+      const body = {
+        parameters:{
+          RenderOptions: 570,
+          ViewXml: '<View><RowLimit>5000</RowLimit><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE"/></OrderBy></Query></View>'
+        }
+      };
+      return spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(body)
+      });
     }
-  };
-  return spRequest(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json;odata=nometadata' },
-    body: JSON.stringify(body)
-  });
-}
 
     async function createItem(item){
-  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
-  return spRequest(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json;odata=nometadata' },
-    body: JSON.stringify(item)
-  });
-}
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items`);
+      return spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=nometadata' },
+        body: JSON.stringify(item)
+      });
+    }
 
     async function updateItem(id, updates){
-  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
-  await spRequest(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;odata=nometadata',
-      'IF-MATCH': '*',
-      'X-HTTP-Method': 'MERGE'
-    },
-    body: JSON.stringify(updates)
-  });
-}
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+      await spRequest(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;odata=nometadata',
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'MERGE'
+        },
+        body: JSON.stringify(updates)
+      });
+    }
 
     async function deleteItem(id){
-  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
-  await spRequest(url, {
-    method: 'DELETE',
-    headers: { 'IF-MATCH': '*' }
-  });
-}
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/items(${id})`);
+      await spRequest(url, {
+        method: 'DELETE',
+        headers: { 'IF-MATCH': '*' }
+      });
+    }
 
-   async function addField(fieldConfig){
-  const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
-  const common = { Title: fieldConfig.displayName, Required: !!fieldConfig.required };
-  let body;
+    async function addField(fieldConfig){
+      const url = getSiteUrl(`/_api/web/lists/getbytitle('${encodeURIComponent(CONFIG.sharepoint.listTitle)}')/fields`);
+      const common = { Title: fieldConfig.displayName, Required: !!fieldConfig.required };
+      let body;
       switch(fieldConfig.type){
         case 'Number':
           body = { ...common, '__metadata':{ 'type':'SP.FieldNumber' },   FieldTypeKind: 9 };
@@ -611,12 +602,12 @@
       }
       if (fieldConfig.defaultValue) body.DefaultValue = fieldConfig.defaultValue;
 
-       return spRequest(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json;odata=nometadata' },
-    body: JSON.stringify(body)
-  });
-}
+      return spRequest(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;odata=verbose' },
+        body: JSON.stringify(body)
+      });
+    }
 
     // ===== GRID =====
     function buildColumnDefs(schemaFields){
@@ -650,7 +641,8 @@
           cd.filter = 'agNumberColumnFilter';
           cd.valueParser = p => {
             const v = p.newValue;
-            return (v==='' || v==null) ? null : Number(v);
+            const n = Number(v);
+            return (v==='' || v==null || Number.isNaN(n)) ? null : n;
           };
         }
 
@@ -661,14 +653,14 @@
             const d = new Date(p.value);
             return isNaN(d) ? p.value : d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
           };
-          cd.width = Math.max(cd.width, 160);
+          cd.minWidth = Math.max(cd.minWidth || 110, 160);
         }
 
         if (type === 'boolean'){
           cd.cellRenderer = p => p.value ? '✓' : '✗';
           cd.cellEditor = 'agSelectCellEditor';
           cd.cellEditorParams = { values:[true,false] };
-          cd.width = Math.max(cd.width, 110);
+          cd.minWidth = Math.max(cd.minWidth || 110, 110);
         }
 
         if (type === 'choice' || type === 'multichoice'){
@@ -685,7 +677,7 @@
         }
         if (/job(id|reference)|rego/.test(lname)){
           cd.cellStyle = { color:'var(--primary)', fontWeight:'600' };
-          cd.width = Math.max(cd.width, 150);
+          cd.minWidth = Math.max(cd.minWidth || 110, 150);
         }
         if (type === 'text' && /activity|type/.test(lname)){
           cd.cellEditor = 'agSelectCellEditor';
@@ -705,7 +697,7 @@
     function initGrid(columnDefs, rowData){
       const gridOptions = {
         ...CONFIG.grid,
-        rowSelection: 'multiple',            // v31: needed for headerCheckboxSelection
+        rowSelection: 'multiple',
         columnDefs,
         rowData,
         defaultColDef:{
@@ -714,8 +706,8 @@
             const v = p.value;
             if (v == null) return '';
             if (typeof v === 'object') {
-              if (v.Url) return v.Url;                    // SP URL field
-              if (v.Title) return v.Title;                // SP Lookup/User
+              if (v.Url) return v.Url;
+              if (v.Title) return v.Title;
               if (Array.isArray(v.results)) return v.results.join(', ');
               try { return JSON.stringify(v); } catch { return String(v); }
             }
@@ -727,16 +719,15 @@
         onSelectionChanged: updateGridStats,
         onFilterChanged: updateGridStats,
         onSortChanged: updateGridStats,
-        onGridReady: () => {            // v31: no need to grab p.api/columnApi here
+        onGridReady: () => {
           updateGridStats();
           populateColumnMenu();
         },
         onColumnVisible: populateColumnMenu
       };
 
-      // v31 API creation
       const api = agGrid.createGrid(document.getElementById('grid'), gridOptions);
-      state.gridApi = api; // unified API
+      state.gridApi = api;
     }
 
     function onCellValueChanged(params){
@@ -757,8 +748,8 @@
         setStatus('Loading activity...', 'info');
         const listData = await loadListData();
 
-        const schemaFields = Array.isArray(listData.ListSchema?.Field) ? listData.ListSchema.Field : [];
-        const rowDataRaw = Array.isArray(listData.Row) ? listData.Row.map(r => ({ ...r })) : [];
+        const schemaFields = Array.isArray(listData?.ListSchema?.Field) ? listData.ListSchema.Field : [];
+        const rowDataRaw = Array.isArray(listData?.Row) ? listData.Row.map(r => ({ ...r })) : [];
         const columnDefs = schemaFields.length
           ? buildColumnDefs(schemaFields)
           : buildColumnDefs((Object.keys(rowDataRaw[0]||{})).map(k=>({ Name:k, Title:k, Type:'Text', Hidden:false })));
@@ -778,15 +769,30 @@
       }
     }
 
+    function safeSetColumnVisible(field, visible){
+      // AG Grid v31: gridApi has setColumnVisible; fallback to setColumnsVisible
+      if (typeof state.gridApi.setColumnVisible === 'function') {
+        state.gridApi.setColumnVisible(field, visible);
+      } else if (typeof state.gridApi.setColumnsVisible === 'function') {
+        state.gridApi.setColumnsVisible([field], visible);
+      }
+    }
+
     function populateColumnMenu(){
       const list = $('#columnList');
       if (!state.gridApi) return;
       list.innerHTML = '';
-      state.columnDefs.forEach(cd=>{
+
+      // Use current columnDefs (API if available to capture any runtime changes)
+      const defs = typeof state.gridApi.getColumnDefs === 'function'
+        ? state.gridApi.getColumnDefs()
+        : state.columnDefs;
+
+      defs.forEach(cd=>{
         if (!cd.field || cd.field === '__selection__') return;
         const id = `colvis_${cd.field}`;
-        const colState = state.gridApi.getColumn(cd.field);
-        const visible = colState ? colState.isVisible() !== false : true;
+        const isHidden = !!cd.hide;
+        const visible = !isHidden;
 
         const row = document.createElement('label');
         row.className = 'bulk-menu-item';
@@ -795,7 +801,7 @@
           <input type="checkbox" id="${id}" class="column-checkbox" ${visible ? 'checked' : ''} />
           <span>${cd.headerName}</span>
         `;
-        row.querySelector('input').onchange = (e)=> state.gridApi.setColumnVisible(cd.field, e.target.checked);
+        row.querySelector('input').onchange = (e)=> safeSetColumnVisible(cd.field, e.target.checked);
         list.appendChild(row);
       });
     }
@@ -985,11 +991,10 @@
 
     async function saveChanges(){
       try{
-  setStatus('Saving changes...','info');
-  $('#btnSave').disabled = true;
+        setStatus('Saving changes...','info');
+        $('#btnSave').disabled = true;
 
-  // Ensure fresh token for long sessions
-  try { await getAccessToken(); } catch {}
+        try { await getAccessToken(); } catch {}
 
         let ok = 0, fail = 0;
         const idMap = new Map(); // tempId -> realId
@@ -1003,7 +1008,7 @@
             delete copy.Created; delete copy.Modified; delete copy.Author;
 
             const created = await createItem(copy);
-            const realId = created.ID ?? created.Id;
+            const realId = created?.ID ?? created?.Id;
 
             if (realId){
               idMap.set(tempId, realId);
@@ -1014,8 +1019,8 @@
                 targetNode.setData({
                   ...targetNode.data,
                   ID: realId,
-                  Created: created.Created || targetNode.data.Created,
-                  Modified: created.Modified || targetNode.data.Modified,
+                  Created: created?.Created || targetNode.data.Created,
+                  Modified: created?.Modified || targetNode.data.Modified,
                 });
               }
             }
@@ -1035,15 +1040,15 @@
 
         // DELETES
         for (const id of state.pendingChanges.deletes){
-  try{
-    const realId = idMap.get(id) || id;
-    await deleteItem(realId);
-    ok++;
-  }catch(e){
-    if (e?.status === 404) { ok++; /* already deleted elsewhere */ }
-    else { console.error('Delete failed', id, e); fail++; }
-  }
-}
+          try{
+            const realId = idMap.get(id) || id;
+            await deleteItem(realId);
+            ok++;
+          }catch(e){
+            if (e?.status === 404) { ok++; } else { console.error('Delete failed', id, e); fail++; }
+          }
+        }
+
         // Clear pending
         state.pendingChanges.updates.clear();
         state.pendingChanges.creates = [];
