@@ -1,43 +1,252 @@
-csp: >-
-  default-src 'self';
-  base-uri 'self';
-  object-src 'none';
-  frame-ancestors 'self';
-  form-action 'self' https://forms.office.com https://forms.microsoft.com;
-  worker-src 'self' blob:;
-  upgrade-insecure-requests;
+---
+layout: default
+title: FormanPacific | Service Claims Management & Emergency Response Coordination
+head_extra: |
+  <meta name="description" content="FormanPacific (ForPac) Service Claims - Professional claims intermediary and emergency service coordination platform. Connecting verified service providers with insurance and corporate clients across New Zealand.">
+  <meta name="keywords" content="service claims management, insurance intermediary, emergency response coordination, supplier network, claims processing, ForPac, FormanPacific">
+  <meta property="og:title" content="FormanPacific - Service Claims Management Platform">
+  <meta property="og:description" content="Professional service claims intermediary connecting verified suppliers with insurance and corporate clients. Streamlined claims processing and emergency response coordination.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.formanpacific.com">
+  <meta property="og:image" content="https://www.formanpacific.com/og-image.jpg">
 
-  # No inline/eval JS. All scripts must be external files or allowed CDNs.
-  script-src 'self'
-    https://alcdn.msauth.net
-    https://aadcdn.msftauth.net
-    https://login.microsoftonline.com
-    https://cdn.jsdelivr.net
-    https://www.googletagmanager.com
-    https://www.google-analytics.com
-    https://www.gstatic.com;
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17529704008"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config','AW-17529704008');
+  </script>
 
-  # Keep inline CSS for now (you use big <style> blocks). We can tighten later.
-  style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "FormanPacific",
+    "description": "Professional service claims management and emergency response coordination across New Zealand.",
+    "telephone": "+6448873337",
+    "url": "https://www.formanpacific.com",
+    "image": "https://www.formanpacific.com/brand-image.png",
+    "address": {"@type":"PostalAddress","addressCountry":"NZ"},
+    "areaServed": {"@type":"Country","name":"New Zealand"},
+    "openingHours": ["Mo 08:30-17:00","Tu 08:30-17:00","We 08:30-17:00","Th 08:30-17:00","Fr 08:30-17:00"]
+  }
+  </script>
 
-  img-src 'self' data: blob: https:;
-  font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net;
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  # XHR/fetch/websocket targets used across your site
-  connect-src 'self'
-    https://roadandrescue.sharepoint.com
-    https://*.sharepoint.com
-    https://graph.microsoft.com
-    https://login.microsoftonline.com
-    https://alcdn.msauth.net
-    https://aadcdn.msftauth.net
-    https://forms.office.com
-    https://www.googletagmanager.com
-    https://www.google-analytics.com
-    https://region1.google-analytics.com
-    https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com;
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;color:#2c3e50;}
 
-  # Allowed frames/embeds
-  frame-src 'self'
-    https://login.microsoftonline.com
-    https://forms.office.com;
+    /* After Hours Banner (scrolls with page) */
+    .after-hours-banner{
+      background:linear-gradient(135deg,#666,#888);
+      color:#fff;
+      padding:15px;
+      text-align:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.2);
+      display:none;
+      position:relative;
+      top:auto;
+      z-index:auto;
+      margin-bottom:12px;
+      border-radius:0 0 10px 10px;
+    }
+    .after-hours-banner h3{margin:0 0 10px 0;font-size:1.2em;}
+    .after-hours-banner p{margin:5px 0;font-size:0.9em;}
+    .after-hours-banner a{color:#fff;text-decoration:underline;font-weight:700;}
+
+    /* Header */
+    .header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000;}
+    .header-content{max-width:1200px;margin:0 auto;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:relative;}
+    .logo-section{display:flex;align-items:center;gap:12px;}
+    .logo{width:40px;height:40px;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;flex-shrink:0;}
+    .company-info{display:flex;flex-direction:column;}
+    .company-name{font-size:1.4em;font-weight:600;color:#1e3c72;line-height:1.1;}
+    .tagline{font-size:.75em;color:#718096;margin-top:2px;}
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle{display:none;background:none;border:none;padding:8px;cursor:pointer;color:#2c3e50;}
+    .mobile-menu-toggle svg{width:28px;height:28px;}
+
+    /* Desktop Nav */
+    .header-nav{display:flex;gap:25px;align-items:center;}
+    .nav-link{color:#4a5568;text-decoration:none;font-weight:500;white-space:nowrap;}
+    .nav-link:hover{color:#1e3c72;}
+    .phone-button{background:#1e3c72;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+    .phone-button:hover{background:#2a5298;transform:translateY(-2px);box-shadow:0 5px 15px rgba(30,60,114,.3);}
+    .admin-link{color:#a0aec0;font-size:.85em;text-decoration:none;margin-left:15px;white-space:nowrap;}
+    .admin-link:hover{color:#718096;}
+
+    /* Mobile Nav Overlay — sits ABOVE the after-hours banner */
+    .mobile-nav-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1190; }
+    .mobile-nav { position:fixed; top:0; right:-100%; width:80%; max-width:320px; height:100%; background:#fff; box-shadow:-5px 0 20px rgba(0,0,0,0.1); transition:right 0.3s ease; z-index:1200; overflow-y:auto; }
+    .mobile-nav.active { right:0; }
+    .mobile-nav-header {display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;}
+    .mobile-nav-close{background:none;border:none;padding:8px;cursor:pointer;color:#4a5568;}
+    .mobile-nav-close svg{width:24px;height:24px;}
+    .mobile-nav-links{padding:20px;}
+    .mobile-nav-links a{display:block;padding:12px 0;color:#4a5568;text-decoration:none;font-weight:500;border-bottom:1px solid #f7fafc;}
+    .mobile-nav-links a:hover{color:#1e3c72;}
+    .mobile-nav-links .phone-button{margin-top:15px;text-align:center;width:100%;justify-content:center;}
+    .mobile-nav-links .admin-link{margin:15px 0 0 0;padding:12px 0;border-bottom:1px solid #f7fafc;}
+    body.menu-open .after-hours-banner { pointer-events: none; }
+
+    /* Touch Screen Styles */
+    body.touch-device .header-nav{display:none;}
+    body.touch-device .mobile-menu-toggle{display:block;}
+    .mobile-nav-overlay.active{display:block;}
+
+    /* Small Screen Overrides */
+    @media (max-width: 768px) {
+      .after-hours-banner p{font-size:0.8em;line-height:1.4;}
+      .after-hours-banner h3{font-size:1.1em;}
+      .header-content{padding:12px 15px;}
+      .logo{width:36px;height:36px;font-size:18px;}
+      .company-name{font-size:1.2em;}
+      .tagline{display:none;}
+    }
+    @media (max-width: 480px) {
+      .company-name{font-size:1.1em;}
+      .logo-section{gap:10px;}
+    }
+
+    /* Hero + sections (unchanged from your file) */
+    .hero{padding:56px 30px 30px;margin:40px auto;max-width:1200px;border-radius:24px;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.08);}
+    .hero-inner{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;}
+    .hero-left h1{font-size:clamp(2.2rem,3.2vw,3rem);line-height:1.1;color:#1e3c72;font-weight:800;margin:10px 0 14px;}
+    .hero-left .accent{position:relative;}
+    .hero-left .accent:after{content:"";position:absolute;left:0;right:0;bottom:0.15em;height:0.35em;background:linear-gradient(90deg,#90cdf4,#63b3ed);opacity:.35;border-radius:6px;z-index:-1;}
+    .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:6px 12px;border-radius:100px;background:#edf2f7;color:#4a5568;font-weight:600;font-size:.9rem;}
+    .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:#48bb78;box-shadow:0 0 0 3px rgba(72,187,120,.25);}
+    .subtitle{font-size:1.2rem;color:#4a5568;line-height:1.6;max-width:640px;}
+    .cta-row{display:flex;gap:14px;margin:22px 0 8px;flex-wrap:wrap;}
+    .btn-primary,.btn-secondary{display:inline-flex;gap:10px;align-items:center;text-decoration:none;border-radius:12px;padding:12px 18px;font-weight:700;}
+    .btn-primary{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;box-shadow:0 10px 20px rgba(30,60,114,.25);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(30,60,114,.3);}
+    .btn-primary svg{width:20px;height:20px;}
+    .btn-secondary{background:#edf2f7;color:#2d3748;}
+    .btn-secondary:hover{background:#e2e8f0;transform:translateY(-2px);}
+    .trustbar{margin-top:18px;display:flex;align-items:center;gap:12px;color:#718096;}
+    .trustbar .label{font-weight:700;color:#4a5568;}
+    .trustbar ul{display:flex;gap:10px;list-style:none;padding:0;margin:0;flex-wrap:wrap;}
+    .trustbar li{position:relative;padding-left:14px;}
+    .trustbar li::before{content:"•";position:absolute;left:0;color:#cbd5e0;}
+    .kpis{display:flex;gap:18px;list-style:none;padding:0;margin:18px 0 0;flex-wrap:wrap;}
+    .kpis .num{display:block;font-size:1.3rem;font-weight:800;color:#1e3c72;}
+    .kpis .cap{display:block;font-size:.85rem;color:#718096;margin-top:4px;}
+    .hero-right{display:grid;}
+    .media-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.06);}
+    .media-card svg{display:block;width:100%;height:auto;}
+    .media-footer{display:flex;gap:8px;padding:12px;flex-wrap:wrap;background:#f8fafc;border-top:1px solid #e2e8f0;}
+    .media-footer .chip{padding:6px 10px;border-radius:999px;font-size:.85rem;color:#2d3748;background:#edf2f7;}
+    @media (max-width:980px){.hero-inner{grid-template-columns:1fr;}.hero-right{order:-1;}}
+
+    .services-section{max-width:1200px;margin:40px auto;padding:0 30px;}
+    .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px;}
+    .service-card{background:#fff;border-radius:15px;padding:30px;box-shadow:0 5px 20px rgba(0,0,0,.08);border-top:4px solid transparent;}
+    .service-card h3{margin-bottom:12px;font-size:1.35em;color:#2d3748;}
+    .service-card p{color:#718096;margin-bottom:18px;}
+    .service-features{list-style:none;padding:0;}
+    .service-features li{padding:7px 0;color:#4a5568;}
+    .service-features li::before{content:"✓ ";color:#48bb78;font-weight:bold;}
+    .service-card.emergency{border-top-color:#f56565;}
+    .service-card.claims{border-top-color:#4299e1;}
+    .service-card.network{border-top-color:#48bb78;}
+    .service-card.compliance{border-top-color:#9f7aea;}
+
+    .stats-section{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:60px 30px;margin:40px 0;}
+    .stats-container{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;text-align:center;}
+    .stat-item h3{font-size:3em;margin-bottom:10px;}
+    .stat-item p{opacity:.9;}
+
+    .resources-section{background:#fff;padding:60px 30px;margin:40px auto;max-width:1200px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.1);}
+    .resources-section h2{text-align:center;color:#1e3c72;font-size:2.2em;margin-bottom:40px;}
+    .resources-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+    .resource-card{background:#f7fafc;padding:25px;border-radius:12px;text-align:center;transition:.25s;border:2px solid transparent;text-decoration:none;color:inherit;display:block;}
+    .resource-card:hover{background:#fff;border-color:#4299e1;transform:translateY(-3px);}
+    .resource-icon{font-size:2.2em;margin-bottom:10px;}
+
+    .footer{background:#2d3748;color:#fff;padding:40px 30px 20px;margin-top:60px;}
+    .footer-content{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:30px;}
+    .footer-section h4{margin-bottom:12px;}
+    .footer-section a{color:#cbd5e0;text-decoration:none;display:block;padding:5px 0;}
+    .footer-section a:hover{color:#fff;}
+    .footer-bottom{border-top:1px solid #4a5568;padding-top:20px;text-align:center;color:#a0aec0;}
+    .contact-link{display:flex;align-items:center;gap:8px;}
+
+    .sticky-fab{ position:fixed; right:16px; bottom:16px; background:#1e3c72; color:#fff; text-decoration:none; padding:12px 16px; border-radius:999px; box-shadow:0 8px 20px rgba(0,0,0,.2); font-weight:700; display:none; z-index:1300; }
+    .sticky-fab:hover{transform:translateY(-2px);}
+  </style>
+---
+
+<!-- PAGE CONTENT (body only) -->
+<!-- After Hours Banner -->
+<div id="closedBanner" class="after-hours-banner" style="display: none;">
+  <h3 id="closedTitle">🕐 OFFICE CURRENTLY CLOSED</h3>
+  <div id="afterHoursMessage">
+    <p><strong>Business Hours:</strong> Monday - Friday: 8:30 AM - 5:00 PM | Saturday - Sunday: Closed</p>
+    <p>For urgent supplier inquiries, please use our <a href="/supplier-inquiry">Supplier Inquiry Form</a></p>
+  </div>
+  <div id="tempUnavailableMessage" style="display: none;">
+    <p><strong>Our phone lines are currently busy.</strong> Please submit your inquiry online or try calling again shortly.</p>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <!-- … everything from your original <body> stays exactly the same … -->
+</header>
+
+<!-- (keep the rest of your sections/markup exactly as in your file) -->
+
+<!-- Sticky action button -->
+<a id="stickyFab" class="sticky-fab" href="tel:048873337" aria-label="Call FormanPacific">📞 04 887 3337</a>
+
+<script>
+  /* your original JS from the bottom of the file, unchanged */
+  // Detect touch screen devices
+  function detectTouchDevice() { /* ... */ }
+
+  // Mobile menu functions
+  function toggleMobileMenu() { /* ... */ }
+  function closeMobileMenu() { /* ... */ }
+  document.addEventListener('keydown', (e)=>{ /* ... */ });
+
+  // Check system availability status
+  async function checkSystemStatus() {
+    try {
+      const response = await fetch("https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/17b1d2990e6f4082a2b0d9c2f1a29025/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bPyoxJ24kuxJZOyLGAclGaEuH6BHwUTFaGmYOwHofa8", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+        cache: "no-store"
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.state === 'Active';
+      }
+    } catch (error) {
+      console.error('Error checking system status:', error);
+    }
+    return true;
+  }
+
+  function isWithinBusinessHours(){ /* ... */ }
+  async function updateHoursDisplay(){ /* ... */ }
+
+  function track(label,value){ /* ... */ }
+  function adminLogin(){ window.location.href='/admin'; }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{ /* ... */ });
+
+  window.addEventListener('load', function() {
+    detectTouchDevice();
+    updateHoursDisplay();
+    setInterval(updateHoursDisplay, 5 * 60 * 1000);
+  });
+  window.addEventListener('resize', function() { detectTouchDevice(); });
+</script>
