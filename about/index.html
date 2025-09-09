@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About FormanPacific | Our Story & Innovation Journey Since 2002</title>
+  
+  <meta name="description" content="Learn about FormanPacific's 20+ year journey of innovation in automation systems, from construction to insurance claims management. Discover how we've revolutionized service delivery across New Zealand." />
+  <meta name="keywords" content="FormanPacific history, automation innovation, service claims technology, New Zealand technology company" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+      min-height: 100vh; 
+      color: #2c3e50; 
+    }
+    
+    /* Header (simplified version) */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #1e3c72, #2a5298); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #1e3c72; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #1e3c72; }
+    .phone-button { background: #1e3c72; color: #fff; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    
+    /* Hero Section */
+    .hero-about {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 80px 30px;
+      text-align: center;
+    }
+    .hero-about h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .hero-about .subtitle {
+      font-size: 1.3em;
+      opacity: 0.95;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    /* Content Container */
+    .content-container {
+      max-width: 1200px;
+      margin: -40px auto 60px;
+      padding: 0 30px;
+    }
+    
+    /* Story Section */
+    .story-section {
+      background: #fff;
+      border-radius: 20px;
+      padding: 60px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+    .story-intro {
+      font-size: 1.25em;
+      color: #4a5568;
+      line-height: 1.8;
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .story-intro strong {
+      color: #1e3c72;
+    }
+    
+    /* Timeline */
+    .timeline-container {
+      position: relative;
+      padding: 40px 0;
+    }
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, #1e3c72, #2a5298);
+      transform: translateX(-50%);
+    }
+    .timeline-item {
+      display: flex;
+      margin-bottom: 60px;
+      position: relative;
+    }
+    .timeline-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+    .timeline-content {
+      width: 45%;
+      padding: 30px;
+      background: #f7fafc;
+      border-radius: 15px;
+      border: 2px solid #e2e8f0;
+      position: relative;
+    }
+    .timeline-item:nth-child(odd) .timeline-content {
+      margin-right: auto;
+    }
+    .timeline-item:nth-child(even) .timeline-content {
+      margin-left: auto;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: 50%;
+      top: 40px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border: 4px solid #1e3c72;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    .timeline-year {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 5px 15px;
+      border-radius: 20px;
+      display: inline-block;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    .timeline-title {
+      font-size: 1.3em;
+      color: #2d3748;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .timeline-description {
+      color: #718096;
+      line-height: 1.6;
+    }
+    .timeline-tech {
+      margin-top: 15px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tech-tag {
+      background: #edf2f7;
+      color: #4a5568;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85em;
+    }
+    
+    /* Values Section */
+    .values-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+    .value-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border-top: 4px solid #1e3c72;
+    }
+    .value-card h3 {
+      color: #2d3748;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    .value-card p {
+      color: #718096;
+      line-height: 1.6;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+      text-align: center;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 30px 20px;
+      border-radius: 15px;
+    }
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      opacity: 0.95;
+    }
+    
+    /* Leadership Section */
+    .leadership-section {
+      background: #f7fafc;
+      padding: 60px;
+      border-radius: 20px;
+      margin: 40px 0;
+    }
+    .leadership-section h2 {
+      color: #1e3c72;
+      font-size: 2.2em;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .leadership-message {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.1em;
+      line-height: 1.8;
+      color: #4a5568;
+    }
+    .leadership-signature {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 2px solid #e2e8f0;
+      text-align: right;
+    }
+    .leadership-signature strong {
+      display: block;
+      color: #2d3748;
+      font-size: 1.1em;
+    }
+    .leadership-signature span {
+      color: #718096;
+      font-style: italic;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 60px;
+      border-radius: 20px;
+      text-align: center;
+      margin: 40px 0;
+    }
+    .cta-section h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .cta-section p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      opacity: 0.95;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-button {
+      background: #fff;
+      color: #1e3c72;
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+    .cta-button:hover {
+      transform: translateY(-3px);
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      margin-top: 60px;
+      text-align: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .timeline-container::before {
+        left: 30px;
+      }
+      .timeline-item,
+      .timeline-item:nth-child(even) {
+        flex-direction: column;
+      }
+      .timeline-content {
+        width: calc(100% - 60px);
+        margin-left: 60px !important;
+      }
+      .timeline-dot {
+        left: 30px;
+      }
+      .story-section {
+        padding: 40px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/services" class="nav-link">Services</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="tel:048873337" class="phone-button">📞 04 887 3337</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero-about">
+    <h1>Pioneering Automation Since 2002</h1>
+    <p class="subtitle">
+      Two decades of innovation, transformation, and relentless pursuit of efficiency. 
+      From construction automation to comprehensive service claims management, 
+      FormanPacific has been at the forefront of New Zealand's digital revolution.
+    </p>
+  </section>
+
+  <!-- Main Content -->
+  <div class="content-container">
+    
+    <!-- Story Section -->
+    <section class="story-section">
+      <div class="story-intro">
+        <strong>FormanPacific began with a simple vision:</strong> to eliminate inefficiencies through intelligent automation. 
+        What started as a platform connecting construction clients with suppliers in 2002 has evolved into New Zealand's 
+        most comprehensive service claims management ecosystem. Our journey spans multiple industries, thousands of 
+        integrations, and millions of automated transactions—each milestone building toward the revolutionary 
+        platform we operate today.
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline-container">
+        
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2002-2004</span>
+            <h3 class="timeline-title">Building Industry Automation</h3>
+            <p class="timeline-description">
+              Launched our first platform automating client-to-supplier workflows in the construction industry. 
+              Pioneered digital job dispatch and real-time tracking when most of the industry still relied on phone and fax.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Construction Tech</span>
+              <span class="tech-tag">Supplier Networks</span>
+              <span class="tech-tag">Job Dispatch</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2004-2012</span>
+            <h3 class="timeline-title">Automated Accounting Systems</h3>
+            <p class="timeline-description">
+              Developed comprehensive automated accounting solutions, processing millions in transactions. 
+              Our systems handled everything from invoicing to reconciliation, setting new standards for financial automation.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Financial Automation</span>
+              <span class="tech-tag">Invoice Processing</span>
+              <span class="tech-tag">Reconciliation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2004-2015</span>
+            <h3 class="timeline-title">Sales & Service Platforms</h3>
+            <p class="timeline-description">
+              Built automated sales and customer service platforms that revolutionized how businesses interact 
+              with customers. Our CRM and workflow automation tools powered thousands of customer interactions daily.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">CRM Systems</span>
+              <span class="tech-tag">Workflow Automation</span>
+              <span class="tech-tag">Customer Service</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2004-2025</span>
+            <h3 class="timeline-title">PABX Systems</h3>
+            <p class="timeline-description">
+              Continuously evolved our automated phone systems, from basic IVR to sophisticated AI-powered 
+              call routing. Our PABX solutions have handled millions of calls, ensuring 24/7 availability.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">VoIP Technology</span>
+              <span class="tech-tag">Call Routing</span>
+              <span class="tech-tag">IVR Systems</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2012-2014</span>
+            <h3 class="timeline-title">NZTA Fuel Claims Platform</h3>
+            <p class="timeline-description">
+              Selected by NZTA to build automated fuel claim submission systems. Processed thousands of claims 
+              with 99.9% accuracy, significantly reducing processing times and administrative burden.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Government Systems</span>
+              <span class="tech-tag">Claims Processing</span>
+              <span class="tech-tag">Compliance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2012-2025</span>
+            <h3 class="timeline-title">Mobile Communication Services</h3>
+            <p class="timeline-description">
+              Developed automated text-to-mobile services handling millions of messages. From appointment 
+              reminders to emergency alerts, our systems ensure critical information reaches people instantly.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">SMS Automation</span>
+              <span class="tech-tag">Mobile Integration</span>
+              <span class="tech-tag">Alert Systems</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2015-2022</span>
+            <h3 class="timeline-title">Legal & Case Management</h3>
+            <p class="timeline-description">
+              Created sophisticated legislation and case management systems for civil and court filings. 
+              Our platform streamlined legal workflows, reducing filing times by 80% and ensuring compliance.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Legal Tech</span>
+              <span class="tech-tag">Court Systems</span>
+              <span class="tech-tag">Document Management</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2021-2025</span>
+            <h3 class="timeline-title">Roadside Assistance Systems</h3>
+            <p class="timeline-description">
+              Launched automated roadside assistance platforms connecting drivers with help in minutes. 
+              Our GPS-enabled dispatch system ensures the nearest qualified provider responds immediately.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Emergency Response</span>
+              <span class="tech-tag">GPS Dispatch</span>
+              <span class="tech-tag">Real-time Tracking</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2022-2024</span>
+            <h3 class="timeline-title">Security Systems Integration</h3>
+            <p class="timeline-description">
+              Built automated security systems integrating alarms, cameras, and response protocols. 
+              Our platform coordinates instant response to security events, protecting assets 24/7.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Security Tech</span>
+              <span class="tech-tag">IoT Integration</span>
+              <span class="tech-tag">Response Coordination</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2022-2025</span>
+            <h3 class="timeline-title">Next-Gen Service Platforms</h3>
+            <p class="timeline-description">
+              Relaunched comprehensive sales and service automation platforms using cutting-edge AI and 
+              machine learning. These systems predict needs, automate responses, and optimize outcomes.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">AI Integration</span>
+              <span class="tech-tag">Predictive Analytics</span>
+              <span class="tech-tag">Machine Learning</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-year">2025</span>
+            <h3 class="timeline-title">FormanPacific Service Claims Platform</h3>
+            <p class="timeline-description">
+              The culmination of 23 years of innovation. Our comprehensive platform integrates every lesson learned, 
+              every system built, and every efficiency gained into the ultimate service claims management solution.
+            </p>
+            <div class="timeline-tech">
+              <span class="tech-tag">Complete Integration</span>
+              <span class="tech-tag">Multi-Industry</span>
+              <span class="tech-tag">Total Automation</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">23+</div>
+        <div class="stat-label">Years of Innovation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">10M+</div>
+        <div class="stat-label">Automated Transactions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Integrated Partners</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">99.9%</div>
+        <div class="stat-label">System Uptime</div>
+      </div>
+    </div>
+
+    <!-- Values Section -->
+    <section class="values-section">
+      <div class="value-card">
+        <h3>🚀 Innovation First</h3>
+        <p>
+          We don't just adopt technology—we pioneer it. Every system we build pushes boundaries 
+          and sets new industry standards for automation and efficiency.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>⚡ Speed & Reliability</h3>
+        <p>
+          Two decades of experience have taught us that speed without reliability is worthless. 
+          Our systems deliver both, ensuring critical services are always available.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>🤝 Partnership Approach</h3>
+        <p>
+          We succeed when our partners succeed. Every integration, every automation, 
+          and every innovation is designed to create value for our entire ecosystem.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>🔧 Continuous Evolution</h3>
+        <p>
+          Technology never stands still, and neither do we. We constantly refine, 
+          upgrade, and reimagine our systems to stay ahead of tomorrow's challenges.
+        </p>
+      </div>
+    </section>
+
+    <!-- Leadership Section -->
+    <section class="leadership-section">
+      <h2>A Message from Leadership</h2>
+      <div class="leadership-message">
+        <p>
+          "When we started FormanPacific in 2002, we had a simple belief: that technology could eliminate 
+          the inefficiencies plaguing New Zealand businesses. What began as automating construction workflows 
+          has grown into something far greater—a comprehensive ecosystem that touches every aspect of 
+          service delivery.
+        </p>
+        <p style="margin-top: 20px;">
+          Our journey through accounting automation, government systems, legal technology, and emergency 
+          response has given us unique insights into what truly drives efficiency. Each system we've built, 
+          each integration we've completed, has contributed to our understanding of how to create seamless, 
+          reliable automation at scale.
+        </p>
+        <p style="margin-top: 20px;">
+          Today's FormanPacific platform represents the convergence of everything we've learned. It's not 
+          just a claims management system—it's the culmination of 23 years of innovation, built to handle 
+          the complexities of modern service delivery with the speed and reliability that only comes from 
+          decades of experience.
+        </p>
+        <p style="margin-top: 20px;">
+          As we look to the future, we remain committed to our founding vision: making business better 
+          through intelligent automation. The journey continues, and we're excited to have you be part of it."
+        </p>
+        <div class="leadership-signature">
+          <strong>The FormanPacific Team</strong>
+          <span>Building New Zealand's Digital Future Since 2002</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <h2>Ready to Experience 23 Years of Innovation?</h2>
+      <p>Join the hundreds of partners who trust FormanPacific to power their operations.</p>
+      <div class="cta-buttons">
+        <a href="/new-business" class="cta-button">Get Started</a>
+        <a href="/contact" class="cta-button">Contact Our Team</a>
+        <a href="/supplier-registration" class="cta-button">Become a Supplier</a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific. Pioneering automation since 2002.</p>
+    <p style="margin-top: 10px; opacity: 0.8;">
+      FormanPacific Service Claims | <a href="tel:048873337" style="color: #fff;">04 887 3337</a> | 
+      <a href="/" style="color: #fff;">Back to Home</a>
+    </p>
+  </footer>
+
+</body>
+</html>
