@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency Procedures | FormanPacific 24/7 Disaster Response Protocol</title>
+  
+  <meta name="description" content="FormanPacific emergency response procedures and protocols. 24/7 disaster activation, immediate response coordination, and comprehensive emergency management for insurance and corporate clients." />
+  <meta name="keywords" content="emergency procedures, disaster response, 24/7 emergency service, claims emergency, FormanPacific emergency protocol" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: #f8fafc;
+      min-height: 100vh; 
+      color: #2c3e50; 
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #dc2626, #991b1b); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #991b1b; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #dc2626; }
+    .emergency-hotline {
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    /* Emergency Alert Banner */
+    .emergency-banner {
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .emergency-banner h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .emergency-banner p {
+      font-size: 1.2em;
+      opacity: 0.95;
+    }
+    .emergency-numbers {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .emergency-number {
+      background: rgba(255,255,255,0.2);
+      padding: 15px 25px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+    .emergency-number .label {
+      font-size: 0.9em;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+    .emergency-number .number {
+      font-size: 1.5em;
+      font-weight: 800;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+      background: #fff;
+      padding: 40px 30px;
+      margin: -20px auto 40px;
+      max-width: 1200px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .action-card {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.3s;
+      border: 2px solid #fca5a5;
+    }
+    .action-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(220,38,38,0.2);
+    }
+    .action-icon {
+      font-size: 36px;
+      margin-bottom: 15px;
+    }
+    .action-card h3 {
+      color: #991b1b;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    .action-card p {
+      color: #7f1d1d;
+      font-size: 0.95em;
+    }
+    
+    /* Emergency Types Section */
+    .emergency-types {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px 60px;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .section-header h2 {
+      font-size: 2.5em;
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+    .section-header p {
+      font-size: 1.2em;
+      color: #64748b;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .emergency-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    .emergency-card {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .emergency-header {
+      padding: 25px;
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .emergency-header h3 {
+      color: #1e3c72;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+    }
+    .response-time {
+      display: inline-block;
+      background: #10b981;
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .emergency-body {
+      padding: 25px;
+    }
+    .emergency-body h4 {
+      color: #475569;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+    .procedure-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    .procedure-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      position: relative;
+      padding-left: 30px;
+    }
+    .procedure-list li:before {
+      content: "▶";
+      position: absolute;
+      left: 0;
+      color: #dc2626;
+      font-weight: bold;
+    }
+    .procedure-list li:last-child {
+      border-bottom: none;
+    }
+    
+    /* Activation Process */
+    .activation-section {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      padding: 80px 30px;
+      margin: 60px 0;
+    }
+    .activation-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .activation-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .step-card {
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 15px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      font-weight: 800;
+      margin: 0 auto 20px;
+    }
+    .step-card h4 {
+      color: #1e3c72;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+    .step-card p {
+      color: #64748b;
+      font-size: 0.95em;
+      line-height: 1.5;
+    }
+    .step-time {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: 600;
+      margin-top: 15px;
+    }
+    
+    /* Coverage Map */
+    .coverage-section {
+      background: #fff;
+      padding: 60px 30px;
+      text-align: center;
+    }
+    .coverage-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .coverage-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+    .coverage-stat {
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border-radius: 15px;
+    }
+    .coverage-stat .number {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: #16a34a;
+      display: block;
+    }
+    .coverage-stat .label {
+      color: #15803d;
+      margin-top: 10px;
+    }
+    
+    /* Supplier Network */
+    .supplier-section {
+      background: #f8fafc;
+      padding: 60px 30px;
+    }
+    .supplier-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .supplier-categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 40px;
+    }
+    .supplier-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      border-left: 4px solid #3b82f6;
+    }
+    .supplier-card h4 {
+      color: #1e3c72;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .supplier-count {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .supplier-list {
+      list-style: none;
+      color: #64748b;
+      font-size: 0.95em;
+    }
+    .supplier-list li {
+      padding: 5px 0;
+    }
+    
+    /* Escalation Matrix */
+    .escalation-section {
+      background: #fff;
+      padding: 60px 30px;
+    }
+    .escalation-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .escalation-table {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-top: 40px;
+    }
+    .escalation-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .escalation-table th {
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      color: #fff;
+      padding: 20px;
+      text-align: left;
+      font-weight: 700;
+    }
+    .escalation-table td {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .escalation-table tr:last-child td {
+      border-bottom: none;
+    }
+    .severity-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .severity-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .severity-high {
+      background: #fed7aa;
+      color: #9a3412;
+    }
+    .severity-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .severity-low {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    /* Contact Section */
+    .contact-section {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 60px 30px;
+      text-align: center;
+    }
+    .contact-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .contact-card {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    .contact-card h4 {
+      margin-bottom: 20px;
+      font-size: 1.3em;
+    }
+    .contact-info {
+      margin: 10px 0;
+      font-size: 1.1em;
+      opacity: 0.95;
+    }
+    .contact-info a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .contact-info a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Important Notes */
+    .notes-section {
+      background: #fef3c7;
+      padding: 40px 30px;
+      margin: 40px auto;
+      max-width: 1000px;
+      border-radius: 20px;
+      border: 2px solid #fbbf24;
+    }
+    .notes-section h3 {
+      color: #92400e;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .notes-list {
+      list-style: none;
+      color: #78350f;
+    }
+    .notes-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #fde68a;
+      padding-left: 25px;
+      position: relative;
+    }
+    .notes-list li:before {
+      content: "⚠️";
+      position: absolute;
+      left: 0;
+    }
+    .notes-list li:last-child {
+      border-bottom: none;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .emergency-banner h1 { font-size: 1.8em; }
+      .emergency-numbers { flex-direction: column; align-items: center; }
+      .emergency-grid { grid-template-columns: 1fr; }
+      .activation-steps { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific Emergency</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/services" class="nav-link">Services</a>
+        <a href="tel:048873337" class="emergency-hotline">
+          🚨 EMERGENCY: 04 887 3337
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Emergency Alert Banner -->
+  <section class="emergency-banner">
+    <h1>24/7 Emergency Response Coordination</h1>
+    <p>Immediate disaster response and emergency service coordination across New Zealand</p>
+    <div class="emergency-numbers">
+      <div class="emergency-number">
+        <div class="label">Emergency Hotline</div>
+        <div class="number">04 887 3337</div>
+      </div>
+      <div class="emergency-number">
+        <div class="label">Response Time</div>
+        <div class="number">30 MIN</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions">
+    <div class="actions-grid">
+      <a href="/report-emergency" class="action-card">
+        <div class="action-icon">🚨</div>
+        <h3>Report Emergency</h3>
+        <p>Immediate incident reporting and dispatch activation</p>
+      </a>
+      <a href="/track-response" class="action-card">
+        <div class="action-icon">📍</div>
+        <h3>Track Response</h3>
+        <p>Real-time GPS tracking of emergency responders</p>
+      </a>
+      <a href="/emergency-resources" class="action-card">
+        <div class="action-icon">📋</div>
+        <h3>Emergency Resources</h3>
+        <p>Download protocols, checklists, and guides</p>
+      </a>
+      <a href="/supplier-activation" class="action-card">
+        <div class="action-icon">🔧</div>
+        <h3>Supplier Activation</h3>
+        <p>Emergency supplier mobilization portal</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Emergency Types Section -->
+  <section class="emergency-types">
+    <div class="section-header">
+      <h2>Emergency Response Categories</h2>
+      <p>Comprehensive coverage for all emergency types with guaranteed response times</p>
+    </div>
+    
+    <div class="emergency-grid">
+      
+      <!-- Natural Disasters -->
+      <div class="emergency-card">
+        <div class="emergency-header">
+          <h3>🌊 Natural Disasters</h3>
+          <span class="response-time">IMMEDIATE RESPONSE</span>
+        </div>
+        <div class="emergency-body">
+          <h4>Coverage Includes:</h4>
+          <ul class="procedure-list">
+            <li>Flooding & water damage</li>
+            <li>Earthquake damage assessment</li>
+            <li>Storm & cyclone response</li>
+            <li>Landslide & subsidence</li>
+            <li>Tsunami evacuation & recovery</li>
+          </ul>
+          <h4>Response Protocol:</h4>
+          <ul class="procedure-list">
+            <li>Immediate safety assessment</li>
+            <li>Emergency stabilization within 30 minutes</li>
+            <li>Coordinate multiple suppliers simultaneously</li>
+            <li>Direct liaison with Civil Defence</li>
+            <li>24/7 command center activation</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Building Emergencies -->
+      <div class="emergency-card">
+        <div class="emergency-header">
+          <h3>🏢 Building Emergencies</h3>
+          <span class="response-time">30 MIN RESPONSE</span>
+        </div>
+        <div class="emergency-body">
+          <h4>Coverage Includes:</h4>
+          <ul class="procedure-list">
+            <li>Structural damage & collapse risk</li>
+            <li>Fire & smoke damage</li>
+            <li>Major water leaks & pipe bursts</li>
+            <li>Power failures & electrical hazards</li>
+            <li>Gas leaks & hazardous materials</li>
+          </ul>
+          <h4>Response Protocol:</h4>
+          <ul class="procedure-list">
+            <li>Dispatch nearest qualified contractor</li>
+            <li>Emergency make-safe procedures</li>
+            <li>Coordinate with emergency services</li>
+            <li>Temporary repairs & stabilization</li>
+            <li>Full documentation for insurance</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Critical Infrastructure -->
+      <div class="emergency-card">
+        <div class="emergency-header">
+          <h3>⚡ Critical Infrastructure</h3>
+          <span class="response-time">15 MIN RESPONSE</span>
+        </div>
+        <div class="emergency-body">
+          <h4>Coverage Includes:</h4>
+          <ul class="procedure-list">
+            <li>Data center failures</li>
+            <li>Telecommunications outages</li>
+            <li>Hospital & healthcare facilities</li>
+            <li>Power generation & distribution</li>
+            <li>Water treatment facilities</li>
+          </ul>
+          <h4>Response Protocol:</h4>
+          <ul class="procedure-list">
+            <li>Priority 1 immediate dispatch</li>
+            <li>Specialist technician deployment</li>
+            <li>Backup system activation</li>
+            <li>Continuous monitoring until resolved</li>
+            <li>Executive escalation available</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Vehicle & Transport -->
+      <div class="emergency-card">
+        <div class="emergency-header">
+          <h3>🚛 Vehicle & Transport</h3>
+          <span class="response-time">45 MIN RESPONSE</span>
+        </div>
+        <div class="emergency-body">
+          <h4>Coverage Includes:</h4>
+          <ul class="procedure-list">
+            <li>Fleet vehicle breakdowns</li>
+            <li>Accident recovery & towing</li>
+            <li>Hazardous goods incidents</li>
+            <li>Heavy vehicle recovery</li>
+            <li>Mobile equipment failures</li>
+          </ul>
+          <h4>Response Protocol:</h4>
+          <ul class="procedure-list">
+            <li>GPS-tracked nearest provider dispatch</li>
+            <li>Priority towing & recovery</li>
+            <li>On-site mechanical repairs</li>
+            <li>Replacement vehicle coordination</li>
+            <li>Cargo protection & transfer</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Environmental Hazards -->
+      <div class="emergency-card">
+        <div class="emergency-header">
+          <h3>☣️ Environmental Hazards</h3>
+          <span class="response-time">30 MIN RESPONSE</span>
+        </div>
+        <div class="emergency-body">
+          <h4>Coverage Includes:</h4>
+          <ul class="procedure-list">
+            <li>Chemical spills & contamination</li>
+            <li>Asbestos exposure</li>
+            <li>Biohazard cleanup</li>
+            <li>Fuel & oil spills</li>
+            <li>Mold & air quality issues</li>
+          </ul>
+          <h4>Response Protocol:</h4>
+          <ul class="procedure-list">
+            <li>Certified hazmat team deployment</li>
+            <li>Containment & isolation procedures</li>
+            <li>Environmental compliance reporting</li>
+            <li>Safe disposal coordination</li>
+            <li>WorkSafe notification if required</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Security Incidents -->
+      <div class="emergency-card">
+        <div class="emergency-header">
+          <h3>🔒 Security Incidents</h3>
+          <span class="response-time">60 MIN RESPONSE</span>
+        </div>
+        <div class="emergency-body">
+          <h4>Coverage Includes:</h4>
+          <ul class="procedure-list">
+            <li>Break-in & vandalism</li>
+            <li>Emergency locksmith services</li>
+            <li>Security system failures</li>
+            <li>Access control breaches</li>
+            <li>Perimeter securing</li>
+          </ul>
+          <h4>Response Protocol:</h4>
+          <ul class="procedure-list">
+            <li>Immediate site securing</li>
+            <li>Emergency boarding & fencing</li>
+            <li>Lock replacement & rekeying</li>
+            <li>Temporary security personnel</li>
+            <li>Police liaison & reporting</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Activation Process -->
+  <section class="activation-section">
+    <div class="activation-container">
+      <div class="section-header">
+        <h2>Emergency Activation Process</h2>
+        <p>From your call to on-site response in minutes</p>
+      </div>
+      
+      <div class="activation-steps">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4>Initial Contact</h4>
+          <p>Call our 24/7 emergency hotline. Immediate answer, no hold times.</p>
+          <div class="step-time">0-15 seconds</div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4>Rapid Assessment</h4>
+          <p>Emergency coordinator assesses situation and determines response level.</p>
+          <div class="step-time">15-60 seconds</div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4>Supplier Dispatch</h4>
+          <p>AI system identifies and dispatches nearest qualified suppliers.</p>
+          <div class="step-time">1-2 minutes</div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h4>GPS Tracking</h4>
+          <p>Real-time tracking activated. ETA and supplier details sent to you.</p>
+          <div class="step-time">2-3 minutes</div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <h4>On-Site Arrival</h4>
+          <p>Supplier arrives on site and begins emergency response procedures.</p>
+          <div class="step-time">30 minutes average</div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">6</div>
+          <h4>Continuous Support</h4>
+          <p>Ongoing coordination until emergency is fully resolved.</p>
+          <div class="step-time">24/7 monitoring</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coverage Statistics -->
+  <section class="coverage-section">
+    <div class="coverage-container">
+      <div class="section-header">
+        <h2>Emergency Response Coverage</h2>
+        <p>Nationwide network ready to respond 24/7/365</p>
+      </div>
+      
+      <div class="coverage-stats">
+        <div class="coverage-stat">
+          <span class="number">500+</span>
+          <span class="label">Emergency Suppliers</span>
+        </div>
+        <div class="coverage-stat">
+          <span class="number">100%</span>
+          <span class="label">NZ Coverage</span>
+        </div>
+        <div class="coverage-stat">
+          <span class="number">30min</span>
+          <span class="label">Average Response</span>
+        </div>
+        <div class="coverage-stat">
+          <span class="number">24/7</span>
+          <span class="label">Always Available</span>
+        </div>
+        <div class="coverage-stat">
+          <span class="number">15,000+</span>
+          <span class="label">Annual Responses</span>
+        </div>
+        <div class="coverage-stat">
+          <span class="number">99.9%</span>
+          <span class="label">SLA Achievement</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supplier Network -->
+  <section class="supplier-section">
+    <div class="supplier-container">
+      <div class="section-header">
+        <h2>Emergency Supplier Network</h2>
+        <p>Pre-qualified, certified, and ready to respond</p>
+      </div>
+      
+      <div class="supplier-categories">
+        <div class="supplier-card">
+          <h4>🔧 General Contractors <span class="supplier-count">127</span></h4>
+          <ul class="supplier-list">
+            <li>• Emergency repairs & make-safe</li>
+            <li>• Structural stabilization</li>
+            <li>• Temporary weatherproofing</li>
+            <li>• Site securing & fencing</li>
+          </ul>
+        </div>
+        
+        <div class="supplier-card">
+          <h4>💧 Water Damage Specialists <span class="supplier-count">89</span></h4>
+          <ul class="supplier-list">
+            <li>• Flood extraction & drying</li>
+            <li>• Plumbing emergency repairs</li>
+            <li>• Moisture detection & monitoring</li>
+            <li>• Contents restoration</li>
+          </ul>
+        </div>
+        
+        <div class="supplier-card">
+          <h4>⚡ Electrical Contractors <span class="supplier-count">76</span></h4>
+          <ul class="supplier-list">
+            <li>• Power restoration</li>
+            <li>• Emergency lighting</li>
+            <li>• Generator installation</li>
+            <li>• Electrical safety checks</li>
+          </ul>
+        </div>
+        
+        <div class="supplier-card">
+          <h4>🌳 Tree & Vegetation <span class="supplier-count">54</span></h4>
+          <ul class="supplier-list">
+            <li>• Emergency tree removal</li>
+            <li>• Storm damage clearing</li>
+            <li>• Power line clearance</li>
+            <li>• Debris removal</li>
+          </ul>
+        </div>
+        
+        <div class="supplier-card">
+          <h4>🚛 Transport & Recovery <span class="supplier-count">93</span></h4>
+          <ul class="supplier-list">
+            <li>• Vehicle towing & recovery</li>
+            <li>• Heavy equipment transport</li>
+            <li>• Mobile mechanics</li>
+            <li>• Accident scene management</li>
+          </ul>
+        </div>
+        
+        <div class="supplier-card">
+          <h4>☣️ Hazmat Teams <span class="supplier-count">31</span></h4>
+          <ul class="supplier-list">
+            <li>• Chemical spill response</li>
+            <li>• Asbestos containment</li>
+            <li>• Biohazard cleanup</li>
+            <li>• Environmental remediation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Escalation Matrix -->
+  <section class="escalation-section">
+    <div class="escalation-container">
+      <div class="section-header">
+        <h2>Escalation Matrix</h2>
+        <p>Clear escalation paths based on incident severity</p>
+      </div>
+      
+      <div class="escalation-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Severity Level</th>
+              <th>Response Time</th>
+              <th>Escalation Path</th>
+              <th>Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="severity-badge severity-critical">CRITICAL</span></td>
+              <td><strong>15 minutes</strong></td>
+              <td>CEO + Executive Team + Civil Defence</td>
+              <td>Major disaster, multiple casualties, critical infrastructure failure</td>
+            </tr>
+            <tr>
+              <td><span class="severity-badge severity-high">HIGH</span></td>
+              <td><strong>30 minutes</strong></td>
+              <td>Operations Director + Senior Management</td>
+              <td>Building collapse risk, major flooding, large-scale evacuation</td>
+            </tr>
+            <tr>
+              <td><span class="severity-badge severity-medium">MEDIUM</span></td>
+              <td><strong>60 minutes</strong></td>
+              <td>Operations Manager + Team Leaders</td>
+              <td>Localized flooding, power outage, vehicle accidents</td>
+            </tr>
+            <tr>
+              <td><span class="severity-badge severity-low">LOW</span></td>
+              <td><strong>2-4 hours</strong></td>
+              <td>Duty Coordinator + Response Team</td>
+              <td>Minor leaks, single vehicle breakdown, non-urgent repairs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Important Notes -->
+  <section class="notes-section">
+    <h3>⚠️ Important Emergency Procedures</h3>
+    <ul class="notes-list">
+      <li>Life-threatening emergencies: Always call 111 first, then contact FormanPacific</li>
+      <li>Have your policy/account number ready when calling (speeds up response)</li>
+      <li>Take photos of damage if safe to do so (helps with assessment)</li>
+      <li>Do not attempt repairs yourself if there's any safety risk</li>
+      <li>Keep all receipts for emergency expenses (fully reimbursable)</li>
+      <li>Our emergency response overrides normal approval processes</li>
+      <li>All emergency suppliers are pre-authorized for immediate work</li>
+      <li>Cost approval up to $50,000 automatic for emergencies</li>
+    </ul>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="contact-container">
+      <h2>Emergency Contact Information</h2>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h4>🚨 Emergency Hotline</h4>
+          <div class="contact-info">
+            <a href="tel:048873337">04 887 3337</a>
+          </div>
+          <div class="contact-info">
+            Available 24/7/365
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <h4>📧 Emergency Email</h4>
+          <div class="contact-info">
+            <a href="mailto:emergency@formanpacific.com">emergency@formanpacific.com</a>
+          </div>
+          <div class="contact-info">
+            Monitored continuously
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <h4>📱 SMS Activation</h4>
+          <div class="contact-info">
+            Text EMERGENCY to 4337
+          </div>
+          <div class="contact-info">
+            Include location & incident type
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p><strong>Emergency Line Always Available: 04 887 3337</strong></p>
+    <p style="margin-top: 10px;">&copy; 2025 FormanPacific. Your emergency response partner since 2002.</p>
+    <p style="margin-top: 10px; opacity: 0.8;">
+      <a href="/" style="color: #fff;">Home</a> | 
+      <a href="/about" style="color: #fff;">About</a> | 
+      <a href="/contact" style="color: #fff;">Contact</a> | 
+      <a href="/supplier-portal" style="color: #fff;">Supplier Portal</a>
+    </p>
+  </footer>
+
+</body>
+</html>
