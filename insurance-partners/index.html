@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insurance Partners | Outsourced Claims Management Solution - FormanPacific</title>
+  
+  <meta name="description" content="Transform your claims operations with FormanPacific's complete outsourced claims management solution. Reduce costs by 40%, improve settlement times by 70%, and achieve 95% customer satisfaction." />
+  <meta name="keywords" content="insurance claims outsourcing, claims management solution, insurance BPO, claims processing automation, insurance partners New Zealand" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+      min-height: 100vh; 
+      color: #2c3e50; 
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #1e3c72, #2a5298); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #1e3c72; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #1e3c72; }
+    .contact-button { background: #1e3c72; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .contact-button:hover { background: #2a5298; }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 80px 30px;
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-left h1 {
+      font-size: 3.2em;
+      line-height: 1.1;
+      margin-bottom: 25px;
+      font-weight: 800;
+    }
+    .hero-left .highlight {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 1.3em;
+      line-height: 1.6;
+      opacity: 0.95;
+      margin-bottom: 30px;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: #fff;
+      color: #1e3c72;
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.3s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background 0.3s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2em;
+      font-weight: 800;
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+    
+    /* Pain Points Section */
+    .pain-points {
+      background: #fff;
+      padding: 80px 30px;
+      margin: -40px auto 0;
+      max-width: 1200px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .section-header h2 {
+      font-size: 2.5em;
+      color: #1e3c72;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .section-header p {
+      font-size: 1.2em;
+      color: #718096;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    .pain-card {
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s;
+    }
+    .pain-card:hover {
+      border-color: #cbd5e0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transform: translateY(-5px);
+    }
+    .pain-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #fef3c7, #fbbf24);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .pain-card h3 {
+      color: #2d3748;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
+    .pain-card p {
+      color: #718096;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .pain-impact {
+      background: #fef3c7;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid #f59e0b;
+    }
+    .pain-impact strong {
+      color: #92400e;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .pain-impact span {
+      color: #78350f;
+      font-size: 0.9em;
+    }
+    
+    /* Solution Section */
+    .solution-section {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      padding: 80px 30px;
+      margin: 60px 0;
+    }
+    .solution-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .solution-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .solution-header h2 {
+      font-size: 2.5em;
+      color: #14532d;
+      margin-bottom: 20px;
+    }
+    .solution-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    .solution-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border-top: 4px solid #22c55e;
+    }
+    .solution-card h3 {
+      color: #14532d;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    .solution-features {
+      list-style: none;
+      margin-top: 20px;
+    }
+    .solution-features li {
+      padding: 8px 0;
+      color: #4a5568;
+      position: relative;
+      padding-left: 25px;
+    }
+    .solution-features li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #22c55e;
+      font-weight: bold;
+    }
+    
+    /* Process Flow */
+    .process-section {
+      padding: 80px 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .process-timeline {
+      position: relative;
+      padding: 40px 0;
+    }
+    .process-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #1e3c72, #2a5298);
+      z-index: 0;
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .process-step {
+      text-align: center;
+    }
+    .step-circle {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      border: 4px solid #1e3c72;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #1e3c72;
+    }
+    .step-title {
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+    .step-desc {
+      font-size: 0.9em;
+      color: #718096;
+    }
+    
+    /* ROI Calculator */
+    .roi-section {
+      background: #1e3c72;
+      color: #fff;
+      padding: 80px 30px;
+      text-align: center;
+    }
+    .roi-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .roi-header h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .roi-header p {
+      font-size: 1.2em;
+      opacity: 0.95;
+      margin-bottom: 40px;
+    }
+    .roi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .roi-metric {
+      background: rgba(255,255,255,0.1);
+      padding: 30px 20px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    .roi-metric .value {
+      font-size: 2.5em;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .roi-metric .label {
+      opacity: 0.9;
+    }
+    .roi-cta {
+      background: #fff;
+      color: #1e3c72;
+      padding: 15px 40px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-block;
+      margin-top: 20px;
+    }
+    
+    /* Case Studies */
+    .case-studies {
+      padding: 80px 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .case-card {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    .case-header {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 30px;
+    }
+    .case-header h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    .case-header p {
+      opacity: 0.9;
+    }
+    .case-body {
+      padding: 30px;
+    }
+    .case-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .metric {
+      text-align: center;
+      padding: 15px;
+      background: #f7fafc;
+      border-radius: 10px;
+    }
+    .metric .number {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: #1e3c72;
+      display: block;
+    }
+    .metric .label {
+      font-size: 0.85em;
+      color: #718096;
+    }
+    .case-quote {
+      padding: 20px;
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      border-radius: 5px;
+      font-style: italic;
+      color: #4a5568;
+    }
+    
+    /* Features Table */
+    .features-section {
+      background: #f7fafc;
+      padding: 80px 30px;
+    }
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .comparison-table {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-top: 40px;
+    }
+    .comparison-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .comparison-table th {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 20px;
+      text-align: left;
+      font-weight: 700;
+    }
+    .comparison-table td {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table .feature-name {
+      font-weight: 600;
+      color: #2d3748;
+    }
+    .comparison-table .traditional {
+      color: #dc2626;
+      text-align: center;
+    }
+    .comparison-table .forpac {
+      color: #16a34a;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    /* CTA Section */
+    .final-cta {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 80px 30px;
+      text-align: center;
+    }
+    .final-cta h2 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    .final-cta p {
+      font-size: 1.3em;
+      margin-bottom: 40px;
+      opacity: 0.95;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 968px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+      }
+      .process-steps {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .process-line {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/services" class="nav-link">Services</a>
+        <a href="#contact" class="contact-button">Schedule Demo</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-left">
+        <h1>Stop Managing Claims. <span class="highlight">Start Delivering Value.</span></h1>
+        <p class="hero-subtitle">
+          Complete claims outsourcing from acceptance to settlement. 
+          Reduce operational costs by 40% while improving customer satisfaction to 95%.
+        </p>
+        <div class="hero-cta">
+          <a href="#roi-calculator" class="btn-primary">
+            Calculate Your Savings →
+          </a>
+          <a href="#demo" class="btn-secondary">
+            Request Demo
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">70%</span>
+            <span class="stat-label">Faster Settlement</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">40%</span>
+            <span class="stat-label">Cost Reduction</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">95%</span>
+            <span class="stat-label">CSAT Score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pain Points Section -->
+  <section class="pain-points">
+    <div class="section-header">
+      <h2>Your Claims Department Is Broken</h2>
+      <p>And it's costing you millions in operational inefficiency, customer churn, and regulatory risk.</p>
+    </div>
+    
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">💸</div>
+        <h3>Escalating Operational Costs</h3>
+        <p>
+          Claims processing consumes 70% of operational expenses. Staff costs rise 8% annually 
+          while productivity remains flat. Manual processes drain resources without adding value.
+        </p>
+        <div class="pain-impact">
+          <strong>Impact on Your Business:</strong>
+          <span>$2.4M average annual overspend on claims operations</span>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">⏱️</div>
+        <h3>Slow Settlement Times</h3>
+        <p>
+          Average claim takes 14-21 days to settle. Customers expect resolution in 48 hours. 
+          Each day of delay increases complaint risk by 23% and churn probability by 15%.
+        </p>
+        <div class="pain-impact">
+          <strong>Impact on Your Business:</strong>
+          <span>18% annual customer churn due to claims friction</span>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">📊</div>
+        <h3>Poor Supplier Management</h3>
+        <p>
+          Managing 200+ suppliers across regions. No real-time performance visibility. 
+          Quality varies wildly. Fraud and overcharging go undetected for months.
+        </p>
+        <div class="pain-impact">
+          <strong>Impact on Your Business:</strong>
+          <span>12% claims leakage from supplier issues</span>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">⚠️</div>
+        <h3>Compliance & Risk Exposure</h3>
+        <p>
+          Regulatory requirements change quarterly. Manual compliance tracking. 
+          One violation averages $850K in fines. Audit preparation takes 400+ hours.
+        </p>
+        <div class="pain-impact">
+          <strong>Impact on Your Business:</strong>
+          <span>$3.2M average regulatory penalty risk</span>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">📈</div>
+        <h3>Inability to Scale</h3>
+        <p>
+          Peak periods overwhelm capacity. Hiring takes 3 months, training another 2. 
+          By the time you scale up, demand has normalized. Constant feast or famine.
+        </p>
+        <div class="pain-impact">
+          <strong>Impact on Your Business:</strong>
+          <span>34% of claims poorly handled during peak periods</span>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">😤</div>
+        <h3>Customer Dissatisfaction</h3>
+        <p>
+          NPS scores below 20. Social media complaints damage brand. 
+          Poor claims experience drives 67% of policy non-renewals. Recovery is nearly impossible.
+        </p>
+        <div class="pain-impact">
+          <strong>Impact on Your Business:</strong>
+          <span>$8.4M lifetime value lost per 1000 claims</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Section -->
+  <section class="solution-section">
+    <div class="solution-container">
+      <div class="solution-header">
+        <h2>The Complete Claims Solution</h2>
+        <p>From FNOL to settlement, we handle everything. You focus on growth.</p>
+      </div>
+      
+      <div class="solution-grid">
+        <div class="solution-card">
+          <h3>🚀 Instant Deployment</h3>
+          <p>Go live in 48 hours with zero IT integration. Our platform connects seamlessly with your existing systems.</p>
+          <ul class="solution-features">
+            <li>API-first architecture</li>
+            <li>Real-time data sync</li>
+            <li>No infrastructure changes</li>
+            <li>White-label options</li>
+          </ul>
+        </div>
+
+        <div class="solution-card">
+          <h3>⚡ 24/7 Processing</h3>
+          <p>Claims processed round the clock by our expert team and AI-powered automation.</p>
+          <ul class="solution-features">
+            <li>30-minute emergency response</li>
+            <li>Same-day assessments</li>
+            <li>48-hour settlement SLA</li>
+            <li>Multi-channel intake</li>
+          </ul>
+        </div>
+
+        <div class="solution-card">
+          <h3>🎯 Supplier Excellence</h3>
+          <p>Pre-vetted network of 500+ suppliers with guaranteed SLAs and quality standards.</p>
+          <ul class="solution-features">
+            <li>Background-checked providers</li>
+            <li>Real-time tracking</li>
+            <li>Performance analytics</li>
+            <li>Automated dispatching</li>
+          </ul>
+        </div>
+
+        <div class="solution-card">
+          <h3>🛡️ Total Compliance</h3>
+          <p>Built-in compliance with all NZ insurance regulations. Audit-ready at all times.</p>
+          <ul class="solution-features">
+            <li>Automated documentation</li>
+            <li>Regulatory reporting</li>
+            <li>ISO certified processes</li>
+            <li>Full audit trail</li>
+          </ul>
+        </div>
+
+        <div class="solution-card">
+          <h3>📊 Advanced Analytics</h3>
+          <p>Real-time dashboards and predictive insights to optimize your entire claims strategy.</p>
+          <ul class="solution-features">
+            <li>Fraud detection AI</li>
+            <li>Cost prediction models</li>
+            <li>Customer sentiment analysis</li>
+            <li>Performance benchmarking</li>
+          </ul>
+        </div>
+
+        <div class="solution-card">
+          <h3>💯 White Glove Service</h3>
+          <p>Dedicated account team ensuring seamless operations and continuous improvement.</p>
+          <ul class="solution-features">
+            <li>Dedicated account manager</li>
+            <li>Monthly business reviews</li>
+            <li>Custom reporting</li>
+            <li>24/7 escalation support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Flow -->
+  <section class="process-section">
+    <div class="section-header">
+      <h2>Your New Claims Process</h2>
+      <p>From complex chaos to streamlined simplicity in 5 steps</p>
+    </div>
+    
+    <div class="process-timeline">
+      <div class="process-line"></div>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="step-circle">1</div>
+          <div class="step-title">Claim Received</div>
+          <div class="step-desc">Multi-channel intake with instant validation</div>
+        </div>
+        <div class="process-step">
+          <div class="step-circle">2</div>
+          <div class="step-title">Auto-Assignment</div>
+          <div class="step-desc">AI matches claim to optimal supplier in seconds</div>
+        </div>
+        <div class="process-step">
+          <div class="step-circle">3</div>
+          <div class="step-title">Service Delivery</div>
+          <div class="step-desc">Tracked, monitored, and quality-assured in real-time</div>
+        </div>
+        <div class="process-step">
+          <div class="step-circle">4</div>
+          <div class="step-title">Validation</div>
+          <div class="step-desc">Automated checks ensure compliance and accuracy</div>
+        </div>
+        <div class="process-step">
+          <div class="step-circle">5</div>
+          <div class="step-title">Settlement</div>
+          <div class="step-desc">Fast, accurate payment with full documentation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROI Calculator -->
+  <section class="roi-section" id="roi-calculator">
+    <div class="roi-container">
+      <div class="roi-header">
+        <h2>Your Projected ROI with FormanPacific</h2>
+        <p>Based on industry averages for insurers processing 10,000+ claims annually</p>
+      </div>
+      
+      <div class="roi-grid">
+        <div class="roi-metric">
+          <span class="value">$3.2M</span>
+          <span class="label">Annual Savings</span>
+        </div>
+        <div class="roi-metric">
+          <span class="value">240%</span>
+          <span class="label">ROI Year One</span>
+        </div>
+        <div class="roi-metric">
+          <span class="value">4 months</span>
+          <span class="label">Payback Period</span>
+        </div>
+        <div class="roi-metric">
+          <span class="value">62%</span>
+          <span class="label">Efficiency Gain</span>
+        </div>
+      </div>
+      
+      <a href="/roi-calculator" class="roi-cta">Get Your Custom ROI Report</a>
+    </div>
+  </section>
+
+  <!-- Case Studies -->
+  <section class="case-studies">
+    <div class="section-header">
+      <h2>Success Stories</h2>
+      <p>How leading insurers transformed their claims operations with FormanPacific</p>
+    </div>
+    
+    <div class="case-grid">
+      <div class="case-card">
+        <div class="case-header">
+          <h3>Major General Insurer</h3>
+          <p>15,000 claims annually</p>
+        </div>
+        <div class="case-body">
+          <div class="case-metrics">
+            <div class="metric">
+              <span class="number">68%</span>
+              <span class="label">Faster Settlement</span>
+            </div>
+            <div class="metric">
+              <span class="number">$4.1M</span>
+              <span class="label">Annual Savings</span>
+            </div>
+            <div class="metric">
+              <span class="number">92%</span>
+              <span class="label">CSAT Score</span>
+            </div>
+            <div class="metric">
+              <span class="number">45%</span>
+              <span class="label">Less Complaints</span>
+            </div>
+          </div>
+          <div class="case-quote">
+            "FormanPacific transformed our claims operation. We've reduced costs while dramatically improving customer satisfaction. It's been a game-changer."
+            <br><strong>- Head of Operations</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <h3>Commercial Lines Specialist</h3>
+          <p>8,000 claims annually</p>
+        </div>
+        <div class="case-body">
+          <div class="case-metrics">
+            <div class="metric">
+              <span class="number">81%</span>
+              <span class="label">Automation Rate</span>
+            </div>
+            <div class="metric">
+              <span class="number">$2.8M</span>
+              <span class="label">Cost Reduction</span>
+            </div>
+            <div class="metric">
+              <span class="number">96%</span>
+              <span class="label">SLA Achievement</span>
+            </div>
+            <div class="metric">
+              <span class="number">23%</span>
+              <span class="label">Fraud Detection</span>
+            </div>
+          </div>
+          <div class="case-quote">
+            "The supplier network quality and management alone justified the investment. The cost savings were a bonus."
+            <br><strong>- CEO</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <h3>Digital-First Insurer</h3>
+          <p>25,000 claims annually</p>
+        </div>
+        <div class="case-body">
+          <div class="case-metrics">
+            <div class="metric">
+              <span class="number">24hr</span>
+              <span class="label">Avg Settlement</span>
+            </div>
+            <div class="metric">
+              <span class="number">$5.6M</span>
+              <span class="label">Saved Year 1</span>
+            </div>
+            <div class="metric">
+              <span class="number">+42</span>
+              <span class="label">NPS Increase</span>
+            </div>
+            <div class="metric">
+              <span class="number">100%</span>
+              <span class="label">Digital Claims</span>
+            </div>
+          </div>
+          <div class="case-quote">
+            "FormanPacific enabled us to offer true 24-hour claim settlement. Our customers love it, and our costs have plummeted."
+            <br><strong>- Chief Digital Officer</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Comparison Table -->
+  <section class="features-section">
+    <div class="features-container">
+      <div class="section-header">
+        <h2>Traditional vs. FormanPacific</h2>
+        <p>See why insurers are making the switch</p>
+      </div>
+      
+      <div class="comparison-table">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40%;">Feature</th>
+              <th style="width: 30%;">Traditional In-House</th>
+              <th style="width: 30%;">FormanPacific</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feature-name">Average Settlement Time</td>
+              <td class="traditional">14-21 days</td>
+              <td class="forpac">24-48 hours</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Cost per Claim</td>
+              <td class="traditional">$285</td>
+              <td class="forpac">$98</td>
+            </tr>
+            <tr>
+              <td class="feature-name">First Call Resolution</td>
+              <td class="traditional">34%</td>
+              <td class="forpac">87%</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Supplier Network</td>
+              <td class="traditional">Regional, Limited</td>
+              <td class="forpac">500+ Nationwide</td>
+            </tr>
+            <tr>
+              <td class="feature-name">24/7 Availability</td>
+              <td class="traditional">Business Hours Only</td>
+              <td class="forpac">True 24/7/365</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Scalability</td>
+              <td class="traditional">3-6 Month Lead Time</td>
+              <td class="forpac">Instant, Unlimited</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Compliance Updates</td>
+              <td class="traditional">Manual, Quarterly</td>
+              <td class="forpac">Automatic, Real-time</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Fraud Detection</td>
+              <td class="traditional">Post-payment Audits</td>
+              <td class="forpac">Real-time AI Detection</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Customer Satisfaction</td>
+              <td class="traditional">68% Average</td>
+              <td class="forpac">95% Average</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Implementation Time</td>
+              <td class="traditional">6-12 Months</td>
+              <td class="forpac">48 Hours</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta" id="demo">
+    <h2>Ready to Transform Your Claims?</h2>
+    <p>Join the insurers saving millions while delighting customers</p>
+    <div class="cta-buttons">
+      <a href="/schedule-demo" class="btn-primary">Schedule Your Demo</a>
+      <a href="/roi-calculator" class="btn-primary">Calculate Savings</a>
+      <a href="tel:048873337" class="btn-primary">Call 04 887 3337</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific. Transforming insurance claims since 2002.</p>
+    <p style="margin-top: 10px; opacity: 0.8;">
+      <a href="/" style="color: #fff;">Home</a> | 
+      <a href="/about" style="color: #fff;">About</a> | 
+      <a href="/contact" style="color: #fff;">Contact</a>
+    </p>
+  </footer>
+
+</body>
+</html>
