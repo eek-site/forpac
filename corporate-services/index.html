@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corporate Services | Enterprise Claims & Emergency Response Management - FormanPacific</title>
+  
+  <meta name="description" content="Enterprise-grade claims and emergency response management. Reduce incident costs by 45%, achieve 30-minute response times, and protect your operations 24/7 with FormanPacific's managed services." />
+  <meta name="keywords" content="corporate claims management, enterprise emergency response, facility management, fleet management, business continuity, managed services New Zealand" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+      min-height: 100vh; 
+      color: #2c3e50; 
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #1e3c72, #2a5298); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #1e3c72; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #1e3c72; }
+    .contact-button { background: #1e3c72; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .contact-button:hover { background: #2a5298; }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      padding: 100px 30px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid #3b82f6;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.9em;
+      margin-bottom: 20px;
+      color: #93bbfc;
+    }
+    .hero h1 {
+      font-size: 3.5em;
+      line-height: 1.1;
+      margin-bottom: 25px;
+      font-weight: 800;
+      max-width: 900px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 1.4em;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 40px;
+      max-width: 800px;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+    .btn-hero-primary {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1em;
+      transition: transform 0.3s;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-3px);
+    }
+    .btn-hero-secondary {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 14px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+    .btn-hero-secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      padding: 40px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat-number {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: #3b82f6;
+    }
+    .hero-stat-label {
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+    
+    /* Problem Section */
+    .problem-section {
+      padding: 80px 30px;
+      background: #fff;
+      position: relative;
+    }
+    .problem-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .problem-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .problem-header h2 {
+      font-size: 2.8em;
+      color: #0f172a;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .problem-header .subtext {
+      font-size: 1.2em;
+      color: #64748b;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    .problem-card {
+      background: #f8fafc;
+      padding: 35px;
+      border-radius: 15px;
+      border-left: 4px solid #ef4444;
+      position: relative;
+      transition: transform 0.3s;
+    }
+    .problem-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .problem-icon {
+      width: 50px;
+      height: 50px;
+      background: #fee2e2;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .problem-card h3 {
+      color: #0f172a;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    .problem-card p {
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .problem-stat {
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .problem-stat .label {
+      color: #64748b;
+      font-size: 0.9em;
+    }
+    .problem-stat .value {
+      color: #dc2626;
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+    
+    /* Solutions Section */
+    .solutions-section {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      padding: 80px 30px;
+    }
+    .solutions-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .solutions-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .solutions-header h2 {
+      font-size: 2.8em;
+      color: #0f172a;
+      margin-bottom: 20px;
+    }
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 30px;
+    }
+    .solution-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    .solution-card:hover {
+      transform: translateY(-5px);
+    }
+    .solution-header {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      padding: 30px;
+      color: #fff;
+    }
+    .solution-header h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    .solution-header p {
+      opacity: 0.95;
+    }
+    .solution-body {
+      padding: 30px;
+    }
+    .solution-features {
+      list-style: none;
+      margin-bottom: 25px;
+    }
+    .solution-features li {
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: start;
+      gap: 12px;
+    }
+    .solution-features li:last-child {
+      border-bottom: none;
+    }
+    .solution-features .icon {
+      color: #10b981;
+      font-weight: bold;
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+    .solution-roi {
+      background: #f0fdf4;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #bbf7d0;
+    }
+    .solution-roi .title {
+      color: #14532d;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .roi-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .roi-metric {
+      text-align: center;
+    }
+    .roi-metric .value {
+      color: #16a34a;
+      font-size: 1.5em;
+      font-weight: 800;
+      display: block;
+    }
+    .roi-metric .label {
+      color: #64748b;
+      font-size: 0.85em;
+    }
+    
+    /* Services Grid */
+    .services-grid-section {
+      padding: 80px 30px;
+      background: #fff;
+    }
+    .services-grid-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .service-category {
+      margin-bottom: 60px;
+    }
+    .category-header {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+    .category-header h3 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+    .category-services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .service-item {
+      background: #f8fafc;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s;
+    }
+    .service-item:hover {
+      border-color: #3b82f6;
+      transform: translateY(-3px);
+    }
+    .service-item h4 {
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .service-item p {
+      color: #64748b;
+      font-size: 0.95em;
+      line-height: 1.5;
+    }
+    .service-sla {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .service-sla .time {
+      color: #3b82f6;
+      font-weight: 700;
+    }
+    .service-sla .availability {
+      color: #16a34a;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    
+    /* Industry Focus */
+    .industry-section {
+      background: #f8fafc;
+      padding: 80px 30px;
+    }
+    .industry-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .industry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .industry-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
+    }
+    .industry-card:hover {
+      transform: translateY(-5px);
+    }
+    .industry-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 20px;
+    }
+    .industry-card h3 {
+      color: #0f172a;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    .industry-card ul {
+      list-style: none;
+      text-align: left;
+      color: #64748b;
+    }
+    .industry-card li {
+      padding: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .industry-card li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #3b82f6;
+    }
+    
+    /* Technology Section */
+    .tech-section {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      padding: 80px 30px;
+    }
+    .tech-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .tech-header h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .tech-card {
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .tech-card h3 {
+      color: #3b82f6;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    .tech-card p {
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    /* Case Study */
+    .case-study-section {
+      padding: 80px 30px;
+      background: #fff;
+    }
+    .case-study-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      padding: 50px;
+      border-radius: 20px;
+    }
+    .case-study-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .case-study-header h2 {
+      font-size: 2.2em;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .case-company {
+      color: #3b82f6;
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+    .case-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+    .case-metric {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .case-metric .number {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: #16a34a;
+      display: block;
+    }
+    .case-metric .label {
+      color: #64748b;
+      margin-top: 5px;
+    }
+    .case-quote {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      border-left: 4px solid #3b82f6;
+      margin-top: 30px;
+    }
+    .case-quote p {
+      font-style: italic;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .case-quote .author {
+      color: #0f172a;
+      font-weight: 700;
+    }
+    
+    /* Pricing Section */
+    .pricing-section {
+      background: #f8fafc;
+      padding: 80px 30px;
+    }
+    .pricing-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .pricing-header h2 {
+      font-size: 2.5em;
+      color: #0f172a;
+      margin-bottom: 20px;
+    }
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .pricing-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      transition: transform 0.3s;
+    }
+    .pricing-card.featured {
+      border: 3px solid #3b82f6;
+      transform: scale(1.05);
+    }
+    .pricing-card:hover {
+      transform: translateY(-5px);
+    }
+    .pricing-card.featured:hover {
+      transform: scale(1.05) translateY(-5px);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3b82f6;
+      color: #fff;
+      padding: 5px 20px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .pricing-tier {
+      font-size: 1.5em;
+      color: #0f172a;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .pricing-desc {
+      color: #64748b;
+      margin-bottom: 30px;
+    }
+    .pricing-price {
+      font-size: 2.5em;
+      color: #3b82f6;
+      font-weight: 800;
+      margin-bottom: 30px;
+    }
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    .pricing-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      color: #475569;
+    }
+    .pricing-features li:before {
+      content: "✓ ";
+      color: #16a34a;
+      font-weight: bold;
+    }
+    .pricing-cta {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: #fff;
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: #fff;
+      padding: 100px 30px;
+      text-align: center;
+    }
+    .cta-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .cta-section h2 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .cta-section p {
+      font-size: 1.3em;
+      margin-bottom: 40px;
+      opacity: 0.95;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      padding: 16px 40px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1em;
+      transition: transform 0.3s;
+    }
+    .cta-btn-primary {
+      background: #fff;
+      color: #3b82f6;
+    }
+    .cta-btn-secondary {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .cta-btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    /* Footer */
+    .footer {
+      background: #0f172a;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    .footer a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #fff;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5em; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .solutions-grid { grid-template-columns: 1fr; }
+      .pricing-cards { grid-template-columns: 1fr; }
+      .pricing-card.featured { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/insurance-partners" class="nav-link">Insurance</a>
+        <a href="#contact" class="contact-button">Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🏢 Enterprise Solutions</div>
+      <h1>Your Operations Are Leaking <span class="gradient">$4.7M Annually</span></h1>
+      <p class="hero-subtitle">
+        Between facility emergencies, fleet breakdowns, equipment failures, and supplier chaos, 
+        your business loses millions to inefficient incident management. We fix that in 48 hours.
+      </p>
+      <div class="hero-buttons">
+        <a href="#calculator" class="btn-hero-primary">Calculate Your Losses</a>
+        <a href="#demo" class="btn-hero-secondary">Book Executive Briefing</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-number">30min</div>
+          <div class="hero-stat-label">Emergency Response</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">45%</div>
+          <div class="hero-stat-label">Cost Reduction</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">24/7</div>
+          <div class="hero-stat-label">Coverage</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">500+</div>
+          <div class="hero-stat-label">Verified Suppliers</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="problem-section">
+    <div class="problem-container">
+      <div class="problem-header">
+        <h2>Every Minute Costs You $1,847</h2>
+        <p class="subtext">
+          That's the average cost of operational disruption for New Zealand enterprises. 
+          Your current incident management isn't just slow—it's hemorrhaging money.
+        </p>
+      </div>
+      
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">🏢</div>
+          <h3>Facility Emergencies</h3>
+          <p>
+            Water leaks, power failures, HVAC breakdowns—each incident averages 4.2 hours of disruption. 
+            Your facilities team juggles 50+ suppliers with no real-time visibility or accountability.
+          </p>
+          <div class="problem-stat">
+            <span class="label">Average Annual Loss</span>
+            <span class="value">$1.8M</span>
+          </div>
+        </div>
+
+        <div class="problem-card">
+          <div class="problem-icon">🚛</div>
+          <h3>Fleet Operations</h3>
+          <p>
+            Vehicle breakdowns strand assets and personnel. Average roadside wait: 2.5 hours. 
+            Each hour of vehicle downtime costs $420 in lost productivity and emergency logistics.
+          </p>
+          <div class="problem-stat">
+            <span class="label">Fleet Downtime Cost</span>
+            <span class="value">$960K/year</span>
+          </div>
+        </div>
+
+        <div class="problem-card">
+          <div class="problem-icon">⚙️</div>
+          <h3>Equipment Failures</h3>
+          <p>
+            Critical equipment failures trigger production stops. Finding qualified technicians 
+            takes hours. Emergency rates are 3x standard. No performance guarantees.
+          </p>
+          <div class="problem-stat">
+            <span class="label">Production Loss</span>
+            <span class="value">$2.3M/year</span>
+          </div>
+        </div>
+
+        <div class="problem-card">
+          <div class="problem-icon">📊</div>
+          <h3>Supplier Chaos</h3>
+          <p>
+            Managing 200+ suppliers across divisions. No standardized SLAs. No performance tracking. 
+            Invoicing disputes. Compliance nightmares. Quality varies wildly.
+          </p>
+          <div class="problem-stat">
+            <span class="label">Admin Overhead</span>
+            <span class="value">$540K/year</span>
+          </div>
+        </div>
+
+        <div class="problem-card">
+          <div class="problem-icon">🌊</div>
+          <h3>Natural Disasters</h3>
+          <p>
+            Floods, earthquakes, storms—when disaster strikes, you need immediate response. 
+            Current providers are overwhelmed. Recovery delays compound losses exponentially.
+          </p>
+          <div class="problem-stat">
+            <span class="label">Disaster Recovery</span>
+            <span class="value">72hr average</span>
+          </div>
+        </div>
+
+        <div class="problem-card">
+          <div class="problem-icon">📈</div>
+          <h3>Hidden Costs</h3>
+          <p>
+            Insurance deductibles, overtime wages, reputation damage, customer compensation, 
+            regulatory fines—the true cost of poor incident management is 3x the visible spend.
+          </p>
+          <div class="problem-stat">
+            <span class="label">Total Impact</span>
+            <span class="value">$4.7M/year</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solutions Section -->
+  <section class="solutions-section">
+    <div class="solutions-container">
+      <div class="solutions-header">
+        <h2>One Platform. Total Control.</h2>
+        <p>Replace chaos with command. All incidents, all suppliers, all managed.</p>
+      </div>
+      
+      <div class="solutions-grid">
+        <div class="solution-card">
+          <div class="solution-header">
+            <h3>🚨 Emergency Response Command</h3>
+            <p>30-minute guaranteed response nationwide</p>
+          </div>
+          <div class="solution-body">
+            <ul class="solution-features">
+              <li>
+                <span class="icon">✓</span>
+                <span>24/7 incident hotline with 15-second answer time</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>GPS-dispatched nearest qualified provider</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Real-time tracking and status updates</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Escalation protocols for critical incidents</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Post-incident analysis and prevention planning</span>
+              </li>
+            </ul>
+            <div class="solution-roi">
+              <div class="title">Impact Metrics</div>
+              <div class="roi-metrics">
+                <div class="roi-metric">
+                  <span class="value">87%</span>
+                  <span class="label">Faster Response</span>
+                </div>
+                <div class="roi-metric">
+                  <span class="value">$1.2M</span>
+                  <span class="label">Annual Savings</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-header">
+            <h3>🏗️ Facilities Management Suite</h3>
+            <p>Proactive maintenance, reactive excellence</p>
+          </div>
+          <div class="solution-body">
+            <ul class="solution-features">
+              <li>
+                <span class="icon">✓</span>
+                <span>Scheduled maintenance coordination</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Emergency repair dispatch</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Compliance documentation management</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Multi-site coordination dashboard</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Budget tracking and cost optimization</span>
+              </li>
+            </ul>
+            <div class="solution-roi">
+              <div class="title">Facility Benefits</div>
+              <div class="roi-metrics">
+                <div class="roi-metric">
+                  <span class="value">62%</span>
+                  <span class="label">Less Downtime</span>
+                </div>
+                <div class="roi-metric">
+                  <span class="value">41%</span>
+                  <span class="label">Cost Reduction</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-header">
+            <h3>🚚 Fleet Operations Center</h3>
+            <p>Keep your vehicles moving, your business running</p>
+          </div>
+          <div class="solution-body">
+            <ul class="solution-features">
+              <li>
+                <span class="icon">✓</span>
+                <span>Nationwide roadside assistance network</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Priority towing and recovery services</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Mobile mechanics for on-site repairs</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Replacement vehicle coordination</span>
+              </li>
+              <li>
+                <span class="icon">✓</span>
+                <span>Fleet maintenance scheduling system</span>
+              </li>
+            </ul>
+            <div class="solution-roi">
+              <div class="title">Fleet Performance</div>
+              <div class="roi-metrics">
+                <div class="roi-metric">
+                  <span class="value">94%</span>
+                  <span class="label">Uptime Rate</span>
+                </div>
+                <div class="roi-metric">
+                  <span class="value">$780K</span>
+                  <span class="label">Saved Annually</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="services-grid-section">
+    <div class="services-grid-container">
+      <div class="section-header">
+        <h2>Comprehensive Service Coverage</h2>
+        <p>500+ verified suppliers. Every service you need. One platform.</p>
+      </div>
+      
+      <div class="service-category">
+        <div class="category-header">
+          <h3>🏢 Facility Services</h3>
+          <p>Complete building and infrastructure support</p>
+        </div>
+        <div class="category-services">
+          <div class="service-item">
+            <h4>Plumbing & Water</h4>
+            <p>Leak detection, pipe repairs, flood response, drainage clearing</p>
+            <div class="service-sla">
+              <span class="time">30min response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Electrical Systems</h4>
+            <p>Power restoration, emergency lighting, switchboard repairs</p>
+            <div class="service-sla">
+              <span class="time">30min response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>HVAC Services</h4>
+            <p>Heating/cooling repairs, ventilation, refrigeration systems</p>
+            <div class="service-sla">
+              <span class="time">2hr response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Security Systems</h4>
+            <p>Access control, CCTV, alarm systems, emergency locksmith</p>
+            <div class="service-sla">
+              <span class="time">1hr response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-category">
+        <div class="category-header">
+          <h3>🚛 Fleet & Logistics</h3>
+          <p>Keep your vehicles and goods moving</p>
+        </div>
+        <div class="category-services">
+          <div class="service-item">
+            <h4>Roadside Assistance</h4>
+            <p>Breakdown support, tire changes, battery jumps, fuel delivery</p>
+            <div class="service-sla">
+              <span class="time">45min response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Vehicle Recovery</h4>
+            <p>Towing, accident recovery, heavy vehicle transport</p>
+            <div class="service-sla">
+              <span class="time">30min dispatch</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Mobile Mechanics</h4>
+            <p>On-site repairs, diagnostics, preventive maintenance</p>
+            <div class="service-sla">
+              <span class="time">2hr response</span>
+              <span class="availability">Extended hours</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Freight Recovery</h4>
+            <p>Cargo salvage, refrigerated goods rescue, logistics support</p>
+            <div class="service-sla">
+              <span class="time">Immediate</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-category">
+        <div class="category-header">
+          <h3>🌊 Disaster Response</h3>
+          <p>When nature strikes, we respond faster</p>
+        </div>
+        <div class="category-services">
+          <div class="service-item">
+            <h4>Flood Mitigation</h4>
+            <p>Water extraction, drying equipment, contents protection</p>
+            <div class="service-sla">
+              <span class="time">30min response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Storm Damage</h4>
+            <p>Tree removal, roof tarping, debris clearing, boarding up</p>
+            <div class="service-sla">
+              <span class="time">1hr response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Earthquake Response</h4>
+            <p>Structural assessment, emergency shoring, safe access</p>
+            <div class="service-sla">
+              <span class="time">Immediate</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <h4>Fire & Smoke</h4>
+            <p>Damage assessment, smoke cleaning, odor removal</p>
+            <div class="service-sla">
+              <span class="time">2hr response</span>
+              <span class="availability">24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Industry Focus -->
+  <section class="industry-section">
+    <div class="industry-container">
+      <div class="section-header">
+        <h2>Industry-Specific Solutions</h2>
+        <p>Tailored to your sector's unique challenges</p>
+      </div>
+      
+      <div class="industry-grid">
+        <div class="industry-card">
+          <div class="industry-icon">🏭</div>
+          <h3>Manufacturing</h3>
+          <ul>
+            <li>Production line emergencies</li>
+            <li>Equipment breakdown response</li>
+            <li>Supply chain continuity</li>
+            <li>Compliance management</li>
+            <li>Worker safety incidents</li>
+          </ul>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">🏪</div>
+          <h3>Retail & Hospitality</h3>
+          <ul>
+            <li>Multi-site coordination</li>
+            <li>Customer-facing emergencies</li>
+            <li>Refrigeration failures</li>
+            <li>Security breaches</li>
+            <li>Reputation protection</li>
+          </ul>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">📦</div>
+          <h3>Logistics & Transport</h3>
+          <ul>
+            <li>Fleet breakdown management</li>
+            <li>Warehouse emergencies</li>
+            <li>Cold chain protection</li>
+            <li>Route optimization</li>
+            <li>Compliance tracking</li>
+          </ul>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">🏢</div>
+          <h3>Commercial Property</h3>
+          <ul>
+            <li>Tenant emergency response</li>
+            <li>Building system failures</li>
+            <li>Compliance documentation</li>
+            <li>Multi-property management</li>
+            <li>Disaster preparedness</li>
+          </ul>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">🏥</div>
+          <h3>Healthcare</h3>
+          <ul>
+            <li>Critical system redundancy</li>
+            <li>Medical equipment support</li>
+            <li>Regulatory compliance</li>
+            <li>Patient safety protocols</li>
+            <li>24/7 response guarantee</li>
+          </ul>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">🏛️</div>
+          <h3>Government</h3>
+          <ul>
+            <li>Public facility management</li>
+            <li>Emergency preparedness</li>
+            <li>Vendor compliance</li>
+            <li>Transparent reporting</li>
+            <li>Budget optimization</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Section -->
+  <section class="tech-section">
+    <div class="tech-container">
+      <div class="tech-header">
+        <h2>Powered by 23 Years of Innovation</h2>
+        <p>The technology stack that delivers results</p>
+      </div>
+      
+      <div class="tech-grid">
+        <div class="tech-card">
+          <h3>🤖 AI Dispatch Engine</h3>
+          <p>
+            Machine learning algorithms match incidents to the optimal supplier based on 
+            location, expertise, availability, and performance history.
+          </p>
+        </div>
+        <div class="tech-card">
+          <h3>📍 Real-Time Tracking</h3>
+          <p>
+            GPS tracking of all service providers with live ETAs, route optimization, 
+            and automatic customer notifications.
+          </p>
+        </div>
+        <div class="tech-card">
+          <h3>📊 Predictive Analytics</h3>
+          <p>
+            Anticipate equipment failures, seasonal peaks, and maintenance needs 
+            before they become emergencies.
+          </p>
+        </div>
+        <div class="tech-card">
+          <h3>🔐 Enterprise Security</h3>
+          <p>
+            Bank-level encryption, SOC 2 compliance, role-based access control, 
+            and comprehensive audit trails.
+          </p>
+        </div>
+        <div class="tech-card">
+          <h3>🔌 Seamless Integration</h3>
+          <p>
+            API-first architecture integrates with your ERP, CMMS, fleet management, 
+            and financial systems.
+          </p>
+        </div>
+        <div class="tech-card">
+          <h3>📱 Mobile Command</h3>
+          <p>
+            Full platform access from any device. Manage incidents, approve work, 
+            and track performance on the go.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Case Study -->
+  <section class="case-study-section">
+    <div class="case-study-container">
+      <div class="case-study-header">
+        <h2>Case Study: From Chaos to Control</h2>
+        <p class="case-company">National Retail Chain - 147 Locations</p>
+      </div>
+      
+      <div class="case-metrics">
+        <div class="case-metric">
+          <span class="number">73%</span>
+          <span class="label">Reduction in Response Time</span>
+        </div>
+        <div class="case-metric">
+          <span class="number">$3.8M</span>
+          <span class="label">Annual Cost Savings</span>
+        </div>
+        <div class="case-metric">
+          <span class="number">91%</span>
+          <span class="label">First-Time Fix Rate</span>
+        </div>
+        <div class="case-metric">
+          <span class="number">24/7</span>
+          <span class="label">Coverage Achieved</span>
+        </div>
+      </div>
+      
+      <div class="case-quote">
+        <p>
+          "Before FormanPacific, managing incidents across 147 stores was a nightmare. 
+          Different suppliers, no accountability, costs out of control. Now, one call 
+          handles everything. Response times are incredible, costs are down 45%, and 
+          I actually sleep at night knowing any emergency will be handled. This platform 
+          paid for itself in the first quarter."
+        </p>
+        <div class="author">— Operations Director, National Retail Chain</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section" id="calculator">
+    <div class="pricing-container">
+      <div class="pricing-header">
+        <h2>Investment That Pays for Itself</h2>
+        <p>Transparent pricing. No hidden fees. ROI guaranteed.</p>
+      </div>
+      
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <div class="pricing-tier">Essentials</div>
+          <p class="pricing-desc">For businesses with 1-10 locations</p>
+          <div class="pricing-price">From $4,995/mo</div>
+          <ul class="pricing-features">
+            <li>24/7 emergency response</li>
+            <li>Up to 50 incidents/month</li>
+            <li>Access to 300+ suppliers</li>
+            <li>Basic reporting dashboard</li>
+            <li>Email support</li>
+            <li>2-hour response SLA</li>
+          </ul>
+          <a href="/contact" class="pricing-cta">Get Started</a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-tier">Professional</div>
+          <p class="pricing-desc">For growing enterprises</p>
+          <div class="pricing-price">From $12,995/mo</div>
+          <ul class="pricing-features">
+            <li>Everything in Essentials</li>
+            <li>Unlimited incidents</li>
+            <li>500+ premium suppliers</li>
+            <li>Advanced analytics suite</li>
+            <li>Dedicated account manager</li>
+            <li>1-hour response SLA</li>
+            <li>API integration</li>
+            <li>Custom workflows</li>
+          </ul>
+          <a href="/contact" class="pricing-cta">Get Started</a>
+        </div>
+
+        <div class="pricing-card">
+          <div class="pricing-tier">Enterprise</div>
+          <p class="pricing-desc">For complex operations</p>
+          <div class="pricing-price">Custom</div>
+          <ul class="pricing-features">
+            <li>Everything in Professional</li>
+            <li>Unlimited locations</li>
+            <li>White-label options</li>
+            <li>30-minute response SLA</li>
+            <li>On-site training</li>
+            <li>Custom integrations</li>
+            <li>Dedicated support team</li>
+            <li>SLA guarantees</li>
+          </ul>
+          <a href="/contact" class="pricing-cta">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section" id="demo">
+    <div class="cta-container">
+      <h2>Stop Losing $4.7M Every Year</h2>
+      <p>
+        Join 200+ enterprises that have transformed their incident management with FormanPacific. 
+        Implementation in 48 hours. ROI in 30 days.
+      </p>
+      <div class="cta-buttons">
+        <a href="/schedule-demo" class="cta-btn cta-btn-primary">Schedule Executive Briefing</a>
+        <a href="/roi-calculator" class="cta-btn cta-btn-secondary">Calculate Your Savings</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific. Enterprise incident management since 2002.</p>
+    <p style="margin-top: 10px;">
+      <a href="/">Home</a> | 
+      <a href="/about">About</a> | 
+      <a href="/insurance-partners">Insurance</a> | 
+      <a href="/contact">Contact</a> | 
+      <a href="tel:048873337">04 887 3337</a>
+    </p>
+  </footer>
+
+</body>
+</html>
