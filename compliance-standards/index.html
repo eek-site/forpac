@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compliance Standards | FormanPacific Quality & Regulatory Framework</title>
+  
+  <meta name="description" content="FormanPacific compliance standards, certifications, and regulatory framework. ISO certified, WorkSafe compliant, and adhering to New Zealand's highest industry standards for claims management." />
+  <meta name="keywords" content="compliance standards, ISO certification, regulatory compliance, quality assurance, FormanPacific standards, insurance compliance" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: #f8fafc;
+      min-height: 100vh; 
+      color: #2c3e50; 
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #059669, #047857); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #047857; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #059669; }
+    .download-btn {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #fff;
+      padding: 100px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10" x="0" y="0" fill="white" opacity="0.03"/><rect width="10" height="10" x="20" y="20" fill="white" opacity="0.03"/><rect width="10" height="10" x="40" y="40" fill="white" opacity="0.03"/><rect width="10" height="10" x="60" y="60" fill="white" opacity="0.03"/><rect width="10" height="10" x="80" y="80" fill="white" opacity="0.03"/></svg>');
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .hero-subtitle {
+      font-size: 1.3em;
+      opacity: 0.95;
+      max-width: 800px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    .certification-badges {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .cert-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 15px 25px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cert-badge img {
+      width: 30px;
+      height: 30px;
+    }
+    
+    /* Overview Section */
+    .overview-section {
+      background: #fff;
+      padding: 60px 30px;
+      margin: -40px auto 40px;
+      max-width: 1200px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .overview-card {
+      text-align: center;
+      padding: 30px 20px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 2px solid #bbf7d0;
+    }
+    .overview-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      margin: 0 auto 20px;
+    }
+    .overview-card h3 {
+      color: #047857;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    .overview-card p {
+      color: #15803d;
+      font-size: 0.95em;
+    }
+    
+    /* Standards Section */
+    .standards-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px 60px;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .section-header h2 {
+      font-size: 2.5em;
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+    .section-header p {
+      font-size: 1.2em;
+      color: #64748b;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    /* Certification Cards */
+    .certification-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    .cert-card {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .cert-header {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 25px;
+    }
+    .cert-header h3 {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+    }
+    .cert-number {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+    }
+    .cert-body {
+      padding: 25px;
+    }
+    .cert-body h4 {
+      color: #475569;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+    .cert-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    .cert-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      color: #64748b;
+      padding-left: 25px;
+      position: relative;
+    }
+    .cert-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+    .cert-list li:last-child {
+      border-bottom: none;
+    }
+    .cert-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: #f0fdf4;
+      border-radius: 10px;
+    }
+    .status-label {
+      color: #15803d;
+      font-weight: 600;
+    }
+    .status-date {
+      color: #166534;
+      font-size: 0.9em;
+    }
+    
+    /* Regulatory Framework */
+    .regulatory-section {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      padding: 80px 30px;
+      margin: 60px 0;
+    }
+    .regulatory-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .regulatory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .regulatory-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border-top: 4px solid #3b82f6;
+    }
+    .regulatory-card h3 {
+      color: #1e3c72;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .regulatory-icon {
+      width: 40px;
+      height: 40px;
+      background: #dbeafe;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .regulatory-list {
+      list-style: none;
+      color: #64748b;
+    }
+    .regulatory-list li {
+      padding: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .regulatory-list li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #3b82f6;
+    }
+    
+    /* Quality Metrics */
+    .metrics-section {
+      background: #fff;
+      padding: 60px 30px;
+    }
+    .metrics-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .metric-card {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-radius: 15px;
+    }
+    .metric-number {
+      font-size: 3em;
+      font-weight: 800;
+      color: #1e40af;
+      display: block;
+    }
+    .metric-label {
+      color: #3730a3;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    .metric-description {
+      color: #6366f1;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+    
+    /* Audit Schedule */
+    .audit-section {
+      background: #f8fafc;
+      padding: 60px 30px;
+    }
+    .audit-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .audit-table {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-top: 40px;
+    }
+    .audit-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .audit-table th {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #fff;
+      padding: 20px;
+      text-align: left;
+      font-weight: 700;
+    }
+    .audit-table td {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .audit-table tr:last-child td {
+      border-bottom: none;
+    }
+    .audit-status {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .status-completed {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .status-scheduled {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .status-inprogress {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    /* Supplier Requirements */
+    .supplier-requirements {
+      background: #fff;
+      padding: 60px 30px;
+    }
+    .requirements-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .requirements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .requirement-card {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid #fbbf24;
+    }
+    .requirement-card h3 {
+      color: #92400e;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .requirement-list {
+      list-style: none;
+      color: #78350f;
+    }
+    .requirement-list li {
+      padding: 8px 0;
+      padding-left: 25px;
+      position: relative;
+    }
+    .requirement-list li:before {
+      content: "⚠️";
+      position: absolute;
+      left: 0;
+    }
+    
+    /* Documentation Section */
+    .documentation-section {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 60px 30px;
+      text-align: center;
+    }
+    .documentation-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .documentation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .doc-card {
+      background: rgba(255,255,255,0.1);
+      padding: 25px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.3s;
+    }
+    .doc-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.2);
+    }
+    .doc-icon {
+      font-size: 36px;
+      margin-bottom: 15px;
+    }
+    .doc-card h4 {
+      margin-bottom: 10px;
+    }
+    .doc-card p {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+    
+    /* Contact CTA */
+    .contact-cta {
+      background: #fff;
+      padding: 60px 30px;
+      text-align: center;
+      margin: 60px auto;
+      max-width: 800px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .contact-cta h2 {
+      color: #1e3c72;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .contact-cta p {
+      color: #64748b;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+    .cta-btn-primary {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #fff;
+    }
+    .cta-btn-secondary {
+      background: #f7fafc;
+      color: #1e3c72;
+      border: 2px solid #e2e8f0;
+    }
+    .cta-btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5em; }
+      .certification-grid { grid-template-columns: 1fr; }
+      .regulatory-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific Compliance</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/services" class="nav-link">Services</a>
+        <a href="/compliance-docs" class="download-btn">
+          📄 Download Certificates
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Industry-Leading Compliance Standards</h1>
+      <p class="hero-subtitle">
+        FormanPacific maintains the highest levels of regulatory compliance, quality assurance, 
+        and operational excellence. Our comprehensive framework ensures every supplier, process, 
+        and service delivery meets or exceeds New Zealand's strictest industry standards.
+      </p>
+      <div class="certification-badges">
+        <div class="cert-badge">
+          <span>✓</span> ISO 9001:2015 Quality Management
+        </div>
+        <div class="cert-badge">
+          <span>✓</span> ISO 27001 Information Security
+        </div>
+        <div class="cert-badge">
+          <span>✓</span> ISO 45001 Health & Safety
+        </div>
+        <div class="cert-badge">
+          <span>✓</span> RBNZ Compliant
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview Section -->
+  <section class="overview-section">
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-icon">✓</div>
+        <h3>100% Compliance Rate</h3>
+        <p>Perfect audit record across all regulatory reviews</p>
+      </div>
+      <div class="overview-card">
+        <div class="overview-icon">🛡️</div>
+        <h3>500+ Verified Suppliers</h3>
+        <p>Every supplier certified and continuously monitored</p>
+      </div>
+      <div class="overview-card">
+        <div class="overview-icon">📊</div>
+        <h3>Real-Time Monitoring</h3>
+        <p>Continuous compliance tracking and reporting</p>
+      </div>
+      <div class="overview-card">
+        <div class="overview-icon">🔒</div>
+        <h3>Data Protection</h3>
+        <p>Bank-level security and privacy standards</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certification Standards -->
+  <section class="standards-section">
+    <div class="section-header">
+      <h2>Certification & Standards</h2>
+      <p>Comprehensive certifications ensuring excellence across all operational areas</p>
+    </div>
+    
+    <div class="certification-grid">
+      
+      <!-- ISO 9001 -->
+      <div class="cert-card">
+        <div class="cert-header">
+          <h3>ISO 9001:2015</h3>
+          <span class="cert-number">Cert #NZ-QMS-2024-8847</span>
+        </div>
+        <div class="cert-body">
+          <h4>Quality Management System</h4>
+          <ul class="cert-list">
+            <li>Customer satisfaction focus</li>
+            <li>Process approach to operations</li>
+            <li>Continuous improvement protocols</li>
+            <li>Evidence-based decision making</li>
+            <li>Supplier relationship management</li>
+          </ul>
+          <div class="cert-status">
+            <span class="status-label">✓ Currently Certified</span>
+            <span class="status-date">Expires: Dec 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ISO 27001 -->
+      <div class="cert-card">
+        <div class="cert-header">
+          <h3>ISO 27001:2022</h3>
+          <span class="cert-number">Cert #NZ-ISMS-2024-3412</span>
+        </div>
+        <div class="cert-body">
+          <h4>Information Security Management</h4>
+          <ul class="cert-list">
+            <li>Data encryption at rest and in transit</li>
+            <li>Access control and authentication</li>
+            <li>Incident response procedures</li>
+            <li>Regular security audits</li>
+            <li>Business continuity planning</li>
+          </ul>
+          <div class="cert-status">
+            <span class="status-label">✓ Currently Certified</span>
+            <span class="status-date">Expires: Mar 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ISO 45001 -->
+      <div class="cert-card">
+        <div class="cert-header">
+          <h3>ISO 45001:2018</h3>
+          <span class="cert-number">Cert #NZ-OHS-2024-7623</span>
+        </div>
+        <div class="cert-body">
+          <h4>Occupational Health & Safety</h4>
+          <ul class="cert-list">
+            <li>Hazard identification and risk assessment</li>
+            <li>WorkSafe NZ compliance</li>
+            <li>Contractor safety management</li>
+            <li>Emergency preparedness</li>
+            <li>Incident investigation protocols</li>
+          </ul>
+          <div class="cert-status">
+            <span class="status-label">✓ Currently Certified</span>
+            <span class="status-date">Expires: Sep 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy Act -->
+      <div class="cert-card">
+        <div class="cert-header">
+          <h3>Privacy Act 2020</h3>
+          <span class="cert-number">Registration #PA-2024-FP-1138</span>
+        </div>
+        <div class="cert-body">
+          <h4>Data Protection Compliance</h4>
+          <ul class="cert-list">
+            <li>Personal information protection</li>
+            <li>Data breach notification procedures</li>
+            <li>Privacy officer appointed</li>
+            <li>Regular privacy impact assessments</li>
+            <li>Cross-border data transfer compliance</li>
+          </ul>
+          <div class="cert-status">
+            <span class="status-label">✓ Fully Compliant</span>
+            <span class="status-date">Annual Review: Jul 2025</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RBNZ Standards -->
+      <div class="cert-card">
+        <div class="cert-header">
+          <h3>RBNZ Standards</h3>
+          <span class="cert-number">License #RBNZ-FSP-487736</span>
+        </div>
+        <div class="cert-body">
+          <h4>Financial Service Provider</h4>
+          <ul class="cert-list">
+            <li>Capital adequacy requirements</li>
+            <li>Operational risk management</li>
+            <li>Regular stress testing</li>
+            <li>Quarterly reporting compliance</li>
+            <li>Anti-money laundering (AML/CFT)</li>
+          </ul>
+          <div class="cert-status">
+            <span class="status-label">✓ Licensed Provider</span>
+            <span class="status-date">Review: Q2 2025</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Environmental -->
+      <div class="cert-card">
+        <div class="cert-header">
+          <h3>ISO 14001:2015</h3>
+          <span class="cert-number">Cert #NZ-EMS-2024-9982</span>
+        </div>
+        <div class="cert-body">
+          <h4>Environmental Management</h4>
+          <ul class="cert-list">
+            <li>Environmental impact assessment</li>
+            <li>Waste reduction initiatives</li>
+            <li>Carbon footprint monitoring</li>
+            <li>Sustainable supplier requirements</li>
+            <li>Resource efficiency programs</li>
+          </ul>
+          <div class="cert-status">
+            <span class="status-label">✓ Currently Certified</span>
+            <span class="status-date">Expires: Jun 2026</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Regulatory Framework -->
+  <section class="regulatory-section">
+    <div class="regulatory-container">
+      <div class="section-header">
+        <h2>Regulatory Framework</h2>
+        <p>Complete compliance with New Zealand's regulatory requirements</p>
+      </div>
+      
+      <div class="regulatory-grid">
+        <div class="regulatory-card">
+          <h3>
+            <div class="regulatory-icon">⚖️</div>
+            Insurance Regulations
+          </h3>
+          <ul class="regulatory-list">
+            <li>Insurance (Prudential Supervision) Act 2010</li>
+            <li>Financial Markets Conduct Act 2013</li>
+            <li>Fair Trading Act 1986</li>
+            <li>Consumer Guarantees Act 1993</li>
+            <li>Natural Hazards Insurance Act 2023</li>
+          </ul>
+        </div>
+
+        <div class="regulatory-card">
+          <h3>
+            <div class="regulatory-icon">🏗️</div>
+            Building & Construction
+          </h3>
+          <ul class="regulatory-list">
+            <li>Building Act 2004 compliance</li>
+            <li>Building Code requirements</li>
+            <li>Licensed Building Practitioners scheme</li>
+            <li>Construction Contracts Act 2002</li>
+            <li>Resource Management Act 1991</li>
+          </ul>
+        </div>
+
+        <div class="regulatory-card">
+          <h3>
+            <div class="regulatory-icon">👷</div>
+            Health & Safety
+          </h3>
+          <ul class="regulatory-list">
+            <li>Health and Safety at Work Act 2015</li>
+            <li>WorkSafe NZ requirements</li>
+            <li>Hazardous Substances regulations</li>
+            <li>Asbestos Management requirements</li>
+            <li>Site Safe certification</li>
+          </ul>
+        </div>
+
+        <div class="regulatory-card">
+          <h3>
+            <div class="regulatory-icon">🌍</div>
+            Environmental Standards
+          </h3>
+          <ul class="regulatory-list">
+            <li>Resource Management Act compliance</li>
+            <li>Waste Minimisation Act 2008</li>
+            <li>Climate Change Response Act 2002</li>
+            <li>Hazardous waste disposal protocols</li>
+            <li>Environmental reporting standards</li>
+          </ul>
+        </div>
+
+        <div class="regulatory-card">
+          <h3>
+            <div class="regulatory-icon">💰</div>
+            Financial Compliance
+          </h3>
+          <ul class="regulatory-list">
+            <li>Anti-Money Laundering Act 2009</li>
+            <li>Financial Reporting Act 2013</li>
+            <li>Companies Act 1993</li>
+            <li>Tax Administration Act 1994</li>
+            <li>GST Act 1985 compliance</li>
+          </ul>
+        </div>
+
+        <div class="regulatory-card">
+          <h3>
+            <div class="regulatory-icon">📱</div>
+            Technology & Data
+          </h3>
+          <ul class="regulatory-list">
+            <li>Privacy Act 2020</li>
+            <li>Unsolicited Electronic Messages Act 2007</li>
+            <li>Electronic Transactions Act 2002</li>
+            <li>Cybersecurity frameworks</li>
+            <li>Cloud computing standards</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quality Metrics -->
+  <section class="metrics-section">
+    <div class="metrics-container">
+      <div class="section-header">
+        <h2>Quality Performance Metrics</h2>
+        <p>Measurable excellence across all compliance areas</p>
+      </div>
+      
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-number">100%</span>
+          <span class="metric-label">Audit Pass Rate</span>
+          <span class="metric-description">Perfect record since 2018</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">99.9%</span>
+          <span class="metric-label">SLA Compliance</span>
+          <span class="metric-description">Service level achievement</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">0</span>
+          <span class="metric-label">Data Breaches</span>
+          <span class="metric-description">Zero security incidents</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">48hr</span>
+          <span class="metric-label">Issue Resolution</span>
+          <span class="metric-description">Average compliance query</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">500+</span>
+          <span class="metric-label">Certified Suppliers</span>
+          <span class="metric-description">All verified & compliant</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">24/7</span>
+          <span class="metric-label">Monitoring</span>
+          <span class="metric-description">Continuous compliance</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Audit Schedule -->
+  <section class="audit-section">
+    <div class="audit-container">
+      <div class="section-header">
+        <h2>2025 Audit Schedule</h2>
+        <p>Comprehensive audit program ensuring continuous compliance</p>
+      </div>
+      
+      <div class="audit-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Audit Type</th>
+              <th>Frequency</th>
+              <th>Next Scheduled</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ISO 9001 Quality</strong></td>
+              <td>Annual</td>
+              <td>15 March 2025</td>
+              <td><span class="audit-status status-scheduled">Scheduled</span></td>
+            </tr>
+            <tr>
+              <td><strong>ISO 27001 Security</strong></td>
+              <td>Annual</td>
+              <td>22 April 2025</td>
+              <td><span class="audit-status status-scheduled">Scheduled</span></td>
+            </tr>
+            <tr>
+              <td><strong>Financial Audit</strong></td>
+              <td>Quarterly</td>
+              <td>31 March 2025</td>
+              <td><span class="audit-status status-scheduled">Scheduled</span></td>
+            </tr>
+            <tr>
+              <td><strong>Supplier Compliance</strong></td>
+              <td>Monthly</td>
+              <td>Ongoing</td>
+              <td><span class="audit-status status-inprogress">In Progress</span></td>
+            </tr>
+            <tr>
+              <td><strong>Health & Safety</strong></td>
+              <td>Bi-annual</td>
+              <td>10 June 2025</td>
+              <td><span class="audit-status status-scheduled">Scheduled</span></td>
+            </tr>
+            <tr>
+              <td><strong>Privacy Impact</strong></td>
+              <td>Annual</td>
+              <td>15 July 2025</td>
+              <td><span class="audit-status status-scheduled">Scheduled</span></td>
+            </tr>
+            <tr>
+              <td><strong>Environmental</strong></td>
+              <td>Annual</td>
+              <td>30 September 2025</td>
+              <td><span class="audit-status status-scheduled">Scheduled</span></td>
+            </tr>
+            <tr>
+              <td><strong>Internal Quality</strong></td>
+              <td>Monthly</td>
+              <td>Continuous</td>
+              <td><span class="audit-status status-completed">Completed Jan</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supplier Requirements -->
+  <section class="supplier-requirements">
+    <div class="requirements-container">
+      <div class="section-header">
+        <h2>Supplier Compliance Requirements</h2>
+        <p>Mandatory standards for all FormanPacific network suppliers</p>
+      </div>
+      
+      <div class="requirements-grid">
+        <div class="requirement-card">
+          <h3>📋 Mandatory Documentation</h3>
+          <ul class="requirement-list">
+            <li>Current business registration</li>
+            <li>Public liability insurance ($2M minimum)</li>
+            <li>Professional indemnity insurance</li>
+            <li>Health & Safety policy</li>
+            <li>Site Safe certification</li>
+            <li>Trade qualifications</li>
+          </ul>
+        </div>
+
+        <div class="requirement-card">
+          <h3>🔍 Background Checks</h3>
+          <ul class="requirement-list">
+            <li>Criminal history verification</li>
+            <li>Financial stability assessment</li>
+            <li>Reference checks (3 minimum)</li>
+            <li>Previous claims history</li>
+            <li>Ministry of Justice checks</li>
+            <li>Credit rating verification</li>
+          </ul>
+        </div>
+
+        <div class="requirement-card">
+          <h3>📊 Performance Standards</h3>
+          <ul class="requirement-list">
+            <li>95% on-time arrival rate</li>
+            <li>First-time fix rate >90%</li>
+            <li>Customer satisfaction >4.5/5</li>
+            <li>Monthly reporting compliance</li>
+            <li>Quality assurance protocols</li>
+            <li>Continuous improvement plans</li>
+          </ul>
+        </div>
+
+        <div class="requirement-card">
+          <h3>🎓 Training Requirements</h3>
+          <ul class="requirement-list">
+            <li>Annual H&S refresher</li>
+            <li>Customer service training</li>
+            <li>Platform usage certification</li>
+            <li>Emergency response protocols</li>
+            <li>Privacy & data protection</li>
+            <li>Quality standards training</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Documentation Section -->
+  <section class="documentation-section">
+    <div class="documentation-container">
+      <h2>Compliance Documentation</h2>
+      <p style="margin-bottom: 40px; opacity: 0.95;">Download our compliance certificates, policies, and procedures</p>
+      
+      <div class="documentation-grid">
+        <a href="/docs/iso9001-cert.pdf" class="doc-card">
+          <div class="doc-icon">📜</div>
+          <h4>ISO 9001 Certificate</h4>
+          <p>Quality Management</p>
+        </a>
+        
+        <a href="/docs/iso27001-cert.pdf" class="doc-card">
+          <div class="doc-icon">🔒</div>
+          <h4>ISO 27001 Certificate</h4>
+          <p>Information Security</p>
+        </a>
+        
+        <a href="/docs/privacy-policy.pdf" class="doc-card">
+          <div class="doc-icon">🛡️</div>
+          <h4>Privacy Policy</h4>
+          <p>Data Protection</p>
+        </a>
+        
+        <a href="/docs/supplier-standards.pdf" class="doc-card">
+          <div class="doc-icon">📋</div>
+          <h4>Supplier Standards</h4>
+          <p>Requirements Guide</p>
+        </a>
+        
+        <a href="/docs/health-safety.pdf" class="doc-card">
+          <div class="doc-icon">⚠️</div>
+          <h4>H&S Policy</h4>
+          <p>Safety Procedures</p>
+        </a>
+        
+        <a href="/docs/audit-reports.pdf" class="doc-card">
+          <div class="doc-icon">📊</div>
+          <h4>Audit Reports</h4>
+          <p>Latest Results</p>
+        </a>
+        
+        <a href="/docs/environmental.pdf" class="doc-card">
+          <div class="doc-icon">🌍</div>
+          <h4>Environmental Policy</h4>
+          <p>Sustainability</p>
+        </a>
+        
+        <a href="/docs/compliance-framework.pdf" class="doc-card">
+          <div class="doc-icon">📚</div>
+          <h4>Full Framework</h4>
+          <p>Complete Guide</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section class="contact-cta">
+    <h2>Questions About Compliance?</h2>
+    <p>
+      Our compliance team is available to discuss our standards, provide additional documentation, 
+      or assist with supplier onboarding requirements.
+    </p>
+    <div class="cta-buttons">
+      <a href="mailto:compliance@formanpacific.com" class="cta-btn cta-btn-primary">Contact Compliance Team</a>
+      <a href="/supplier-registration" class="cta-btn cta-btn-secondary">Become a Supplier</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific. Setting the standard for compliance excellence.</p>
+    <p style="margin-top: 10px; opacity: 0.8;">
+      <a href="/" style="color: #fff;">Home</a> | 
+      <a href="/about" style="color: #fff;">About</a> | 
+      <a href="/privacy" style="color: #fff;">Privacy Policy</a> | 
+      <a href="/terms" style="color: #fff;">Terms of Service</a>
+    </p>
+  </footer>
+
+</body>
+</html>
