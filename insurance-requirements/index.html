@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insurance Requirements | FormanPacific Partner Standards</title>
+  
+  <meta name="description" content="Insurance partner requirements for FormanPacific. Integration standards, compliance requirements, and onboarding process for insurance companies." />
+  <meta name="keywords" content="insurance requirements, insurer partnership, FormanPacific insurance, claims integration, insurance standards" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: #f8fafc;
+      min-height: 100vh; 
+      color: #2c3e50; 
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #1e40af; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #2563eb; }
+    .cta-button {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(37,99,235,0.3);
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      color: #fff;
+      padding: 100px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10" x="0" y="0" fill="white" opacity="0.03"/><rect width="10" height="10" x="20" y="20" fill="white" opacity="0.03"/><rect width="10" height="10" x="40" y="40" fill="white" opacity="0.03"/><rect width="10" height="10" x="60" y="60" fill="white" opacity="0.03"/><rect width="10" height="10" x="80" y="80" fill="white" opacity="0.03"/></svg>');
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .hero-subtitle {
+      font-size: 1.3em;
+      opacity: 0.95;
+      max-width: 800px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.1);
+      padding: 20px 30px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-stat .number {
+      font-size: 2.5em;
+      font-weight: 800;
+      display: block;
+    }
+    .hero-stat .label {
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+    
+    /* Requirements Overview */
+    .overview-section {
+      background: #fff;
+      padding: 60px 30px;
+      margin: -40px auto 40px;
+      max-width: 1200px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .overview-card {
+      text-align: center;
+      padding: 30px 20px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 2px solid #bfdbfe;
+    }
+    .overview-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      margin: 0 auto 20px;
+    }
+    .overview-card h3 {
+      color: #1e40af;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    .overview-card p {
+      color: #3730a3;
+      font-size: 0.95em;
+    }
+    
+    /* Main Content */
+    .content-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px 60px;
+    }
+    
+    /* Section Headers */
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .section-header h2 {
+      font-size: 2.5em;
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+    .section-header p {
+      font-size: 1.2em;
+      color: #64748b;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    /* Requirements Cards */
+    .requirements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    .requirement-card {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .requirement-header {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 25px;
+    }
+    .requirement-header h3 {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+    }
+    .requirement-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+    }
+    .requirement-body {
+      padding: 25px;
+    }
+    .requirement-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    .requirement-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+      padding-left: 30px;
+      position: relative;
+    }
+    .requirement-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .requirement-list li:last-child {
+      border-bottom: none;
+    }
+    
+    /* Integration Section */
+    .integration-section {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      padding: 80px 30px;
+      margin: 60px 0;
+    }
+    .integration-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .step-card {
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 15px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      font-weight: 800;
+      margin: 0 auto 20px;
+    }
+    .step-card h4 {
+      color: #1e3c72;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+    .step-card p {
+      color: #64748b;
+      font-size: 0.95em;
+      line-height: 1.5;
+    }
+    
+    /* Compliance Table */
+    .compliance-table {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin: 40px 0;
+    }
+    .compliance-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .compliance-table th {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #fff;
+      padding: 20px;
+      text-align: left;
+      font-weight: 700;
+    }
+    .compliance-table td {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .compliance-table tr:last-child td {
+      border-bottom: none;
+    }
+    .compliance-table tr:hover {
+      background: #f7fafc;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .status-required {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .status-recommended {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-optional {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    /* Benefits Section */
+    .benefits-section {
+      background: #fff;
+      padding: 60px 30px;
+    }
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .benefit-card {
+      padding: 30px;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border-radius: 15px;
+      border-left: 4px solid #10b981;
+    }
+    .benefit-card h3 {
+      color: #047857;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .benefit-icon {
+      width: 40px;
+      height: 40px;
+      background: #10b981;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+    }
+    .benefit-list {
+      list-style: none;
+      color: #15803d;
+    }
+    .benefit-list li {
+      padding: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .benefit-list li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 80px 30px;
+      text-align: center;
+      margin-top: 60px;
+    }
+    .cta-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .cta-section h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .cta-section p {
+      font-size: 1.2em;
+      margin-bottom: 40px;
+      opacity: 0.95;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.3s;
+      font-size: 1.1em;
+    }
+    .cta-btn-primary {
+      background: #fff;
+      color: #1e3c72;
+    }
+    .cta-btn-secondary {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .cta-btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    .footer a {
+      color: #cbd5e0;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #fff;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5em; }
+      .hero-stats { flex-direction: column; }
+      .requirements-grid { grid-template-columns: 1fr; }
+      .integration-steps { grid-template-columns: 1fr; }
+      .benefits-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific Insurance</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/services" class="nav-link">Services</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="/new-business" class="cta-button">
+          Partner With Us
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Insurance Partner Requirements</h1>
+      <p class="hero-subtitle">
+        Join New Zealand's leading claims management platform. FormanPacific provides insurers with 
+        comprehensive claims processing, supplier management, and emergency response coordination through 
+        our advanced technology platform and verified supplier network.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="number">25+</span>
+          <span class="label">Insurance Partners</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number">500+</span>
+          <span class="label">Verified Suppliers</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number">50,000+</span>
+          <span class="label">Claims Annually</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number">99.9%</span>
+          <span class="label">Platform Uptime</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview Section -->
+  <section class="overview-section">
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-icon">📋</div>
+        <h3>Full Integration</h3>
+        <p>API-first platform with complete claims lifecycle management</p>
+      </div>
+      <div class="overview-card">
+        <div class="overview-icon">✓</div>
+        <h3>Compliance Ready</h3>
+        <p>RBNZ compliant with ISO certifications and full audit trails</p>
+      </div>
+      <div class="overview-card">
+        <div class="overview-icon">⚡</div>
+        <h3>24/7 Operations</h3>
+        <p>Round-the-clock emergency response and claims processing</p>
+      </div>
+      <div class="overview-card">
+        <div class="overview-icon">🔒</div>
+        <h3>Data Security</h3>
+        <p>Bank-level encryption and Privacy Act 2020 compliance</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Requirements -->
+  <section class="content-container">
+    <div class="section-header">
+      <h2>Technical Requirements</h2>
+      <p>Integration standards and technical specifications for insurance partners</p>
+    </div>
+    
+    <div class="requirements-grid">
+      
+      <!-- API Integration -->
+      <div class="requirement-card">
+        <div class="requirement-header">
+          <h3>API Integration</h3>
+          <span class="requirement-badge">REQUIRED</span>
+        </div>
+        <div class="requirement-body">
+          <ul class="requirement-list">
+            <li>RESTful API v2.0 or higher</li>
+            <li>OAuth 2.0 authentication</li>
+            <li>JSON data format support</li>
+            <li>Webhook event handling</li>
+            <li>Rate limiting compliance (1000 req/min)</li>
+            <li>SSL/TLS encryption mandatory</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Data Standards -->
+      <div class="requirement-card">
+        <div class="requirement-header">
+          <h3>Data Standards</h3>
+          <span class="requirement-badge">REQUIRED</span>
+        </div>
+        <div class="requirement-body">
+          <ul class="requirement-list">
+            <li>ACORD data standards compliance</li>
+            <li>Real-time claim status updates</li>
+            <li>Document management API</li>
+            <li>Structured data formats</li>
+            <li>Unicode UTF-8 encoding</li>
+            <li>ISO 8601 date/time format</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Security Requirements -->
+      <div class="requirement-card">
+        <div class="requirement-header">
+          <h3>Security Standards</h3>
+          <span class="requirement-badge">REQUIRED</span>
+        </div>
+        <div class="requirement-body">
+          <ul class="requirement-list">
+            <li>ISO 27001 certification preferred</li>
+            <li>Data encryption at rest and in transit</li>
+            <li>Multi-factor authentication</li>
+            <li>Regular security audits</li>
+            <li>Incident response procedures</li>
+            <li>GDPR/Privacy Act compliance</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Performance Standards -->
+      <div class="requirement-card">
+        <div class="requirement-header">
+          <h3>Performance Standards</h3>
+          <span class="requirement-badge">REQUIRED</span>
+        </div>
+        <div class="requirement-body">
+          <ul class="requirement-list">
+            <li>99.9% API uptime SLA</li>
+            <li>&lt;200ms response time</li>
+            <li>Automatic failover capability</li>
+            <li>Load balancing support</li>
+            <li>Disaster recovery plan</li>
+            <li>24/7 technical support</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Business Requirements -->
+      <div class="requirement-card">
+        <div class="requirement-header">
+          <h3>Business Requirements</h3>
+          <span class="requirement-badge">REQUIRED</span>
+        </div>
+        <div class="requirement-body">
+          <ul class="requirement-list">
+            <li>Current insurance license (RBNZ)</li>
+            <li>Professional indemnity insurance</li>
+            <li>Minimum $1B annual premium</li>
+            <li>Established claims department</li>
+            <li>Dedicated integration team</li>
+            <li>Service level agreements</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Reporting Capabilities -->
+      <div class="requirement-card">
+        <div class="requirement-header">
+          <h3>Reporting Capabilities</h3>
+          <span class="requirement-badge">RECOMMENDED</span>
+        </div>
+        <div class="requirement-body">
+          <ul class="requirement-list">
+            <li>Real-time dashboard access</li>
+            <li>Custom report generation</li>
+            <li>Data export capabilities</li>
+            <li>Analytics API access</li>
+            <li>Automated report scheduling</li>
+            <li>Business intelligence integration</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Integration Process -->
+  <section class="integration-section">
+    <div class="content-container">
+      <div class="section-header">
+        <h2>Integration Process</h2>
+        <p>Streamlined onboarding with dedicated support at every step</p>
+      </div>
+      
+      <div class="integration-steps">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4>Initial Assessment</h4>
+          <p>Technical review and requirements validation</p>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4>Legal Agreement</h4>
+          <p>Contract negotiation and SLA establishment</p>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4>Technical Setup</h4>
+          <p>API credentials and sandbox environment</p>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h4>Integration Testing</h4>
+          <p>End-to-end testing and validation</p>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <h4>Training</h4>
+          <p>Platform training for your teams</p>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">6</div>
+          <h4>Go Live</h4>
+          <p>Production deployment with support</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compliance Requirements -->
+  <section class="content-container">
+    <div class="section-header">
+      <h2>Compliance & Regulatory</h2>
+      <p>Meeting New Zealand's insurance regulatory requirements</p>
+    </div>
+    
+    <div class="compliance-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Requirement</th>
+            <th>Description</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RBNZ License</strong></td>
+            <td>Current Reserve Bank of New Zealand insurance license</td>
+            <td><span class="status-badge status-required">Required</span></td>
+          </tr>
+          <tr>
+            <td><strong>Privacy Act 2020</strong></td>
+            <td>Full compliance with NZ privacy legislation</td>
+            <td><span class="status-badge status-required">Required</span></td>
+          </tr>
+          <tr>
+            <td><strong>AML/CFT</strong></td>
+            <td>Anti-money laundering and counter-terrorism financing</td>
+            <td><span class="status-badge status-required">Required</span></td>
+          </tr>
+          <tr>
+            <td><strong>ISO 9001</strong></td>
+            <td>Quality management system certification</td>
+            <td><span class="status-badge status-recommended">Recommended</span></td>
+          </tr>
+          <tr>
+            <td><strong>ISO 27001</strong></td>
+            <td>Information security management certification</td>
+            <td><span class="status-badge status-recommended">Recommended</span></td>
+          </tr>
+          <tr>
+            <td><strong>IFRS 17</strong></td>
+            <td>International financial reporting standards for insurance</td>
+            <td><span class="status-badge status-required">Required</span></td>
+          </tr>
+          <tr>
+            <td><strong>Consumer Protection</strong></td>
+            <td>Fair Trading Act and Consumer Guarantees Act compliance</td>
+            <td><span class="status-badge status-required">Required</span></td>
+          </tr>
+          <tr>
+            <td><strong>Solvency Standards</strong></td>
+            <td>RBNZ solvency standard compliance</td>
+            <td><span class="status-badge status-required">Required</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section">
+    <div class="content-container">
+      <div class="section-header">
+        <h2>Partnership Benefits</h2>
+        <p>Why leading insurers choose FormanPacific</p>
+      </div>
+      
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <h3>
+            <div class="benefit-icon">📈</div>
+            Operational Efficiency
+          </h3>
+          <ul class="benefit-list">
+            <li>40% reduction in claim processing time</li>
+            <li>Automated supplier dispatch</li>
+            <li>Real-time claim tracking</li>
+            <li>Paperless documentation</li>
+            <li>Streamlined approvals</li>
+          </ul>
+        </div>
+
+        <div class="benefit-card">
+          <h3>
+            <div class="benefit-icon">💰</div>
+            Cost Reduction
+          </h3>
+          <ul class="benefit-list">
+            <li>25% lower claim costs</li>
+            <li>Competitive supplier pricing</li>
+            <li>Reduced fraud through verification</li>
+            <li>Lower operational overhead</li>
+            <li>Volume-based discounts</li>
+          </ul>
+        </div>
+
+        <div class="benefit-card">
+          <h3>
+            <div class="benefit-icon">⭐</div>
+            Customer Satisfaction
+          </h3>
+          <ul class="benefit-list">
+            <li>4.8/5 average customer rating</li>
+            <li>24/7 emergency response</li>
+            <li>Transparent claim status</li>
+            <li>Quality guaranteed suppliers</li>
+            <li>Fast claim resolution</li>
+          </ul>
+        </div>
+
+        <div class="benefit-card">
+          <h3>
+            <div class="benefit-icon">🔧</div>
+            Supplier Network
+          </h3>
+          <ul class="benefit-list">
+            <li>500+ verified suppliers</li>
+            <li>100% geographic coverage</li>
+            <li>All trades and services</li>
+            <li>Performance monitoring</li>
+            <li>Quality guarantees</li>
+          </ul>
+        </div>
+
+        <div class="benefit-card">
+          <h3>
+            <div class="benefit-icon">📊</div>
+            Data & Analytics
+          </h3>
+          <ul class="benefit-list">
+            <li>Real-time dashboards</li>
+            <li>Predictive analytics</li>
+            <li>Fraud detection</li>
+            <li>Performance metrics</li>
+            <li>Custom reporting</li>
+          </ul>
+        </div>
+
+        <div class="benefit-card">
+          <h3>
+            <div class="benefit-icon">🛡️</div>
+            Risk Management
+          </h3>
+          <ul class="benefit-list">
+            <li>Supplier compliance monitoring</li>
+            <li>Quality control processes</li>
+            <li>Audit trails</li>
+            <li>Incident management</li>
+            <li>Regulatory compliance</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Transform Your Claims Management?</h2>
+      <p>
+        Join New Zealand's leading insurance companies on FormanPacific's platform. 
+        Get started with our integration team today.
+      </p>
+      <div class="cta-buttons">
+        <a href="/new-business" class="cta-btn cta-btn-primary">Start Partnership Application</a>
+        <a href="/contact" class="cta-btn cta-btn-secondary">Request Information Pack</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific Limited. Trusted by New Zealand's leading insurers.</p>
+    <p style="margin-top: 10px;">
+      <a href="/">Home</a> | 
+      <a href="/privacy">Privacy Policy</a> | 
+      <a href="/terms">Terms of Service</a> | 
+      <a href="/compliance-standards">Compliance</a>
+    </p>
+    <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+      FormanPacific Limited | NZBN: 9429042001234 | Wellington, New Zealand
+    </p>
+  </footer>
+
+</body>
+</html>
