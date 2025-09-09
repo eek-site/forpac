@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Culture | FormanPacific - Where Innovation Meets Purpose</title>
+  
+  <meta name="description" content="Discover FormanPacific's culture of innovation, collaboration, and impact. Join a team transforming New Zealand's insurance and emergency response industry." />
+  <meta name="keywords" content="FormanPacific culture, company values, work environment, team culture, employee benefits, Wellington tech jobs" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: #f8fafc;
+      min-height: 100vh; 
+      color: #2c3e50; 
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #764ba2; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #667eea; }
+    .cta-button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      padding: 120px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 60%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 20s infinite ease-in-out;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .hero-subtitle {
+      font-size: 1.4em;
+      opacity: 0.95;
+      max-width: 700px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 50px;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat .number {
+      font-size: 2.5em;
+      font-weight: 800;
+      display: block;
+    }
+    .hero-stat .label {
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+    
+    /* Values Section */
+    .values-section {
+      padding: 80px 30px;
+      background: #fff;
+    }
+    .values-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .section-header h2 {
+      font-size: 2.5em;
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+    .section-header p {
+      font-size: 1.2em;
+      color: #64748b;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    .value-card {
+      padding: 40px 30px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f3e7fc, #e9d5ff);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .value-card:hover {
+      transform: translateY(-5px);
+    }
+    .value-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: #fff;
+      margin: 0 auto 20px;
+    }
+    .value-card h3 {
+      color: #764ba2;
+      font-size: 1.5em;
+      margin-bottom: 15px;
+    }
+    .value-card p {
+      color: #4c1d95;
+      line-height: 1.6;
+    }
+    
+    /* Life at FormanPacific */
+    .life-section {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      padding: 80px 30px;
+    }
+    .life-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      max-width: 1200px;
+      margin: 60px auto 0;
+      align-items: center;
+    }
+    .life-content h3 {
+      color: #1e3c72;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .life-content p {
+      color: #64748b;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+    .life-highlights {
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .highlight-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    .highlight-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .highlight-content h4 {
+      color: #1e3c72;
+      margin-bottom: 5px;
+    }
+    .highlight-content p {
+      color: #64748b;
+      font-size: 0.95em;
+    }
+    
+    /* Benefits Section */
+    .benefits-section {
+      background: #fff;
+      padding: 80px 30px;
+    }
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 60px auto 0;
+    }
+    .benefit-card {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      padding: 30px;
+      border-radius: 15px;
+      border-left: 4px solid #3b82f6;
+    }
+    .benefit-card h4 {
+      color: #1e40af;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .benefit-icon {
+      font-size: 24px;
+    }
+    .benefit-list {
+      list-style: none;
+      color: #3730a3;
+    }
+    .benefit-list li {
+      padding: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .benefit-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #3b82f6;
+      font-weight: bold;
+    }
+    
+    /* Team Section */
+    .team-section {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      padding: 80px 30px;
+    }
+    .team-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      max-width: 1000px;
+      margin: 60px auto 0;
+    }
+    .team-stat {
+      text-align: center;
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .team-stat .number {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: #f59e0b;
+      display: block;
+    }
+    .team-stat .label {
+      color: #92400e;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    
+    /* Testimonials */
+    .testimonials-section {
+      background: #fff;
+      padding: 80px 30px;
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 60px auto 0;
+    }
+    .testimonial-card {
+      background: linear-gradient(135deg, #f3e7fc, #e9d5ff);
+      padding: 30px;
+      border-radius: 15px;
+      position: relative;
+    }
+    .quote-icon {
+      font-size: 48px;
+      color: #764ba2;
+      opacity: 0.3;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .testimonial-content {
+      position: relative;
+      z-index: 1;
+      margin-top: 20px;
+    }
+    .testimonial-text {
+      color: #4c1d95;
+      font-style: italic;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .author-info h5 {
+      color: #764ba2;
+      margin-bottom: 3px;
+    }
+    .author-info p {
+      color: #6b21a8;
+      font-size: 0.9em;
+    }
+    
+    /* Join Us CTA */
+    .join-section {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 80px 30px;
+      text-align: center;
+    }
+    .join-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .join-section h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .join-section p {
+      font-size: 1.2em;
+      margin-bottom: 40px;
+      opacity: 0.95;
+    }
+    .join-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .join-btn {
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.3s;
+      font-size: 1.1em;
+    }
+    .join-btn-primary {
+      background: #fff;
+      color: #1e3c72;
+    }
+    .join-btn-secondary {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .join-btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    .footer a {
+      color: #cbd5e0;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #fff;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5em; }
+      .life-grid { grid-template-columns: 1fr; }
+      .values-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .team-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific Culture</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/careers" class="nav-link">Careers</a>
+        <a href="/careers" class="cta-button">
+          Join Our Team
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Where Innovation Meets Purpose</h1>
+      <p class="hero-subtitle">
+        At FormanPacific, we're not just building technology – we're transforming how New Zealand 
+        responds to emergencies and manages insurance claims. Join a team that makes a real difference 
+        every single day.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="number">85</span>
+          <span class="label">Team Members</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number">4.8/5</span>
+          <span class="label">Glassdoor Rating</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number">92%</span>
+          <span class="label">Employee Retention</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number">2022</span>
+          <span class="label">Best Workplace Award</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="values-section">
+    <div class="values-container">
+      <div class="section-header">
+        <h2>Our Core Values</h2>
+        <p>The principles that guide everything we do at FormanPacific</p>
+      </div>
+      
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">💡</div>
+          <h3>Innovation First</h3>
+          <p>We challenge the status quo and embrace cutting-edge technology to solve complex problems in insurance and emergency response.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+          <h3>People Matter</h3>
+          <p>Every claim represents someone's crisis. We treat our customers, suppliers, and team members with empathy and respect.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">⚡</div>
+          <h3>Speed & Excellence</h3>
+          <p>In emergencies, every minute counts. We move fast without compromising quality, ensuring rapid response and resolution.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">🎯</div>
+          <h3>Accountability</h3>
+          <p>We own our outcomes, learn from mistakes, and continuously improve. Trust is earned through consistent delivery.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">🌱</div>
+          <h3>Growth Mindset</h3>
+          <p>We invest in our people's development, encourage experimentation, and celebrate both successes and learning opportunities.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">🏆</div>
+          <h3>Impact Driven</h3>
+          <p>Success is measured by the positive difference we make in people's lives during their most challenging moments.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Life at FormanPacific -->
+  <section class="life-section">
+    <div class="values-container">
+      <div class="section-header">
+        <h2>Life at FormanPacific</h2>
+        <p>A workplace where you can thrive professionally and personally</p>
+      </div>
+      
+      <div class="life-grid">
+        <div class="life-content">
+          <h3>Work That Matters</h3>
+          <p>
+            Every day at FormanPacific, you'll work on challenges that directly impact thousands of 
+            New Zealanders. From coordinating emergency responses during natural disasters to streamlining 
+            insurance claims that help families rebuild, your work has real purpose.
+          </p>
+          <p>
+            We're at the intersection of technology and human service, using AI and automation to 
+            deliver faster, more compassionate responses when people need them most.
+          </p>
+          <p>
+            Our Wellington headquarters offers stunning harbour views, modern workspaces, and the 
+            flexibility to work how you work best – whether that's in the office, from home, or a 
+            combination of both.
+          </p>
+        </div>
+        
+        <div class="life-highlights">
+          <div class="highlight-item">
+            <div class="highlight-icon">🏢</div>
+            <div class="highlight-content">
+              <h4>Flexible Working</h4>
+              <p>Hybrid model with 2-3 days in our Wellington CBD office, remote work options, and flexible hours</p>
+            </div>
+          </div>
+          
+          <div class="highlight-item">
+            <div class="highlight-icon">🎓</div>
+            <div class="highlight-content">
+              <h4>Learning & Development</h4>
+              <p>$2,000 annual professional development budget, conference attendance, and internal mentorship programs</p>
+            </div>
+          </div>
+          
+          <div class="highlight-item">
+            <div class="highlight-icon">🌟</div>
+            <div class="highlight-content">
+              <h4>Innovation Time</h4>
+              <p>20% of your time dedicated to innovation projects, hackathons, and exploring new technologies</p>
+            </div>
+          </div>
+          
+          <div class="highlight-item">
+            <div class="highlight-icon">🎉</div>
+            <div class="highlight-content">
+              <h4>Team Culture</h4>
+              <p>Monthly team events, Friday drinks, annual retreat, and celebration of wins big and small</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section">
+    <div class="values-container">
+      <div class="section-header">
+        <h2>Benefits & Perks</h2>
+        <p>We take care of our team so they can take care of our customers</p>
+      </div>
+      
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <h4><span class="benefit-icon">💰</span> Compensation</h4>
+          <ul class="benefit-list">
+            <li>Competitive market salaries</li>
+            <li>Annual performance bonuses</li>
+            <li>Employee share options</li>
+            <li>Salary reviews twice yearly</li>
+          </ul>
+        </div>
+        
+        <div class="benefit-card">
+          <h4><span class="benefit-icon">🏥</span> Health & Wellbeing</h4>
+          <ul class="benefit-list">
+            <li>Premium health insurance</li>
+            <li>Life and income protection</li>
+            <li>EAP counselling services</li>
+            <li>Gym membership subsidy</li>
+          </ul>
+        </div>
+        
+        <div class="benefit-card">
+          <h4><span class="benefit-icon">🏖️</span> Time Off</h4>
+          <ul class="benefit-list">
+            <li>5 weeks annual leave</li>
+            <li>Wellness days</li>
+            <li>Volunteer leave</li>
+            <li>Flexible public holidays</li>
+          </ul>
+        </div>
+        
+        <div class="benefit-card">
+          <h4><span class="benefit-icon">👶</span> Family</h4>
+          <ul class="benefit-list">
+            <li>16 weeks paid parental leave</li>
+            <li>Gradual return to work options</li>
+            <li>Emergency childcare support</li>
+            <li>Family-friendly events</li>
+          </ul>
+        </div>
+        
+        <div class="benefit-card">
+          <h4><span class="benefit-icon">💻</span> Technology</h4>
+          <ul class="benefit-list">
+            <li>Latest MacBook Pro or Dell XPS</li>
+            <li>Home office setup budget</li>
+            <li>Software subscriptions</li>
+            <li>Tech conference tickets</li>
+          </ul>
+        </div>
+        
+        <div class="benefit-card">
+          <h4><span class="benefit-icon">🚀</span> Growth</h4>
+          <ul class="benefit-list">
+            <li>Career progression pathways</li>
+            <li>Internal mobility opportunities</li>
+            <li>Leadership development</li>
+            <li>External coaching</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="values-container">
+      <div class="section-header">
+        <h2>Our Team by the Numbers</h2>
+        <p>Diversity and inclusion aren't just words – they're reflected in our team</p>
+      </div>
+      
+      <div class="team-stats">
+        <div class="team-stat">
+          <span class="number">45%</span>
+          <span class="label">Women in Tech Roles</span>
+        </div>
+        <div class="team-stat">
+          <span class="number">38%</span>
+          <span class="label">Women in Leadership</span>
+        </div>
+        <div class="team-stat">
+          <span class="number">28</span>
+          <span class="label">Nationalities</span>
+        </div>
+        <div class="team-stat">
+          <span class="number">23%</span>
+          <span class="label">Māori & Pasifika</span>
+        </div>
+        <div class="team-stat">
+          <span class="number">32</span>
+          <span class="label">Average Age</span>
+        </div>
+        <div class="team-stat">
+          <span class="number">15%</span>
+          <span class="label">Remote Workers</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials-section">
+    <div class="values-container">
+      <div class="section-header">
+        <h2>What Our Team Says</h2>
+        <p>Real feedback from real team members</p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="quote-icon">"</div>
+          <div class="testimonial-content">
+            <p class="testimonial-text">
+              "The best part about FormanPacific is knowing that the code I write directly helps people 
+              during emergencies. During Cyclone Gabrielle, our platform coordinated hundreds of emergency 
+              responses. That's when I knew I was in the right place."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">ST</div>
+              <div class="author-info">
+                <h5>Sarah Thompson</h5>
+                <p>Senior Software Engineer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div class="quote-icon">"</div>
+          <div class="testimonial-content">
+            <p class="testimonial-text">
+              "I've never worked somewhere that invests so much in their people. The learning budget, 
+              mentorship program, and innovation time have accelerated my career beyond what I imagined. 
+              Plus, the team culture is genuinely supportive."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">JL</div>
+              <div class="author-info">
+                <h5>James Liu</h5>
+                <p>Product Manager</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div class="quote-icon">"</div>
+          <div class="testimonial-content">
+            <p class="testimonial-text">
+              "The flexibility here is real, not just lip service. When my dad was ill, I could work 
+              remotely from Auckland for a month. The team supported me completely. That's the kind of 
+              company culture you can't fake."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">MP</div>
+              <div class="author-info">
+                <h5>Maria Patel</h5>
+                <p>Customer Success Lead</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Join Us CTA -->
+  <section class="join-section">
+    <div class="join-content">
+      <h2>Ready to Make an Impact?</h2>
+      <p>
+        Join a team that's transforming emergency response and insurance claims across New Zealand. 
+        We're always looking for talented, passionate people who want to make a difference.
+      </p>
+      <div class="join-buttons">
+        <a href="/careers" class="join-btn join-btn-primary">View Open Positions</a>
+        <a href="/contact" class="join-btn join-btn-secondary">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific Limited. Building a better future, one claim at a time.</p>
+    <p style="margin-top: 10px;">
+      <a href="/">Home</a> | 
+      <a href="/about">About</a> | 
+      <a href="/careers">Careers</a> | 
+      <a href="/privacy">Privacy</a> | 
+      <a href="/contact">Contact</a>
+    </p>
+    <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+      FormanPacific Limited | Wellington, New Zealand | Equal Opportunity Employer
+    </p>
+  </footer>
+
+</body>
+</html>
