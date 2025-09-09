@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | FormanPacific - Data Protection & Privacy</title>
+  
+  <meta name="description" content="FormanPacific Privacy Policy. Learn how we collect, use, protect, and manage your personal information in compliance with the Privacy Act 2020 and international data protection standards." />
+  <meta name="keywords" content="privacy policy, data protection, Privacy Act 2020, personal information, FormanPacific privacy" />
+  
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: #f8fafc;
+      min-height: 100vh; 
+      color: #2c3e50; 
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    .header-content { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #1e3c72, #2a5298); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+    .company-name { font-size: 1.4em; font-weight: 600; color: #1e3c72; }
+    .header-nav { display: flex; gap: 25px; align-items: center; }
+    .nav-link { color: #4a5568; text-decoration: none; font-weight: 500; }
+    .nav-link:hover { color: #1e3c72; }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 80px 30px 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2.8em;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0.95;
+    }
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Quick Navigation */
+    .quick-nav {
+      background: #fff;
+      padding: 30px;
+      margin: -30px auto 40px;
+      max-width: 1000px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+    .quick-nav h2 {
+      color: #1e3c72;
+      font-size: 1.3em;
+      margin-bottom: 20px;
+    }
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .nav-item {
+      padding: 12px 20px;
+      background: #f7fafc;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #4a5568;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    .nav-item:hover {
+      background: #e0f2fe;
+      border-color: #3b82f6;
+      transform: translateX(5px);
+    }
+    
+    /* Main Content */
+    .content-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 30px 60px;
+    }
+    
+    /* Content Sections */
+    .content-section {
+      background: #fff;
+      padding: 40px;
+      margin-bottom: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .content-section h2 {
+      color: #1e3c72;
+      font-size: 1.8em;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #e0f2fe;
+    }
+    .content-section h3 {
+      color: #2563eb;
+      font-size: 1.3em;
+      margin: 30px 0 15px;
+    }
+    .content-section p {
+      color: #475569;
+      margin-bottom: 15px;
+    }
+    .content-section ul {
+      margin: 15px 0 15px 20px;
+      color: #475569;
+    }
+    .content-section li {
+      margin-bottom: 10px;
+      padding-left: 10px;
+    }
+    
+    /* Info Box */
+    .info-box {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #3b82f6;
+      margin: 25px 0;
+    }
+    .info-box h4 {
+      color: #1e40af;
+      margin-bottom: 10px;
+    }
+    .info-box p {
+      color: #3730a3;
+      margin-bottom: 8px;
+    }
+    
+    /* Table Styles */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .data-table th {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .data-table td {
+      padding: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    .data-table tr:hover td {
+      background: #f7fafc;
+    }
+    
+    /* Contact Box */
+    .contact-box {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      padding: 30px;
+      border-radius: 10px;
+      margin: 30px 0;
+      border: 2px solid #86efac;
+    }
+    .contact-box h3 {
+      color: #14532d;
+      margin-bottom: 20px;
+    }
+    .contact-info {
+      display: grid;
+      gap: 15px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #166534;
+    }
+    .contact-item strong {
+      min-width: 100px;
+    }
+    .contact-item a {
+      color: #16a34a;
+      text-decoration: none;
+    }
+    .contact-item a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Rights Section */
+    .rights-section {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      padding: 30px;
+      border-radius: 10px;
+      margin: 30px 0;
+      border: 2px solid #fbbf24;
+    }
+    .rights-section h3 {
+      color: #92400e;
+      margin-bottom: 20px;
+    }
+    .rights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .right-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #f59e0b;
+    }
+    .right-card h4 {
+      color: #92400e;
+      margin-bottom: 10px;
+    }
+    .right-card p {
+      color: #78350f;
+      font-size: 0.95em;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: #fff;
+      padding: 40px 30px 20px;
+      text-align: center;
+    }
+    .footer a {
+      color: #cbd5e0;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #fff;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2em; }
+      .content-section { padding: 25px; }
+      .nav-grid { grid-template-columns: 1fr; }
+      .rights-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">FP</div>
+        <div class="company-name">FormanPacific</div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="/terms" class="nav-link">Terms</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Privacy Policy</h1>
+    <div class="hero-meta">
+      <span>📅 Effective Date: 1 January 2025</span>
+      <span>🔄 Last Updated: 15 January 2025</span>
+      <span>📍 Jurisdiction: New Zealand</span>
+    </div>
+  </section>
+
+  <!-- Quick Navigation -->
+  <section class="quick-nav">
+    <h2>Quick Navigation</h2>
+    <div class="nav-grid">
+      <a href="#information-collected" class="nav-item">Information We Collect</a>
+      <a href="#how-we-use" class="nav-item">How We Use Information</a>
+      <a href="#sharing" class="nav-item">Information Sharing</a>
+      <a href="#security" class="nav-item">Data Security</a>
+      <a href="#your-rights" class="nav-item">Your Rights</a>
+      <a href="#contact" class="nav-item">Contact Us</a>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="content-container">
+
+    <!-- Introduction -->
+    <section class="content-section">
+      <h2>Introduction</h2>
+      <p>
+        FormanPacific Limited ("FormanPacific", "we", "us", or "our") is committed to protecting your privacy and 
+        ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, 
+        and safeguard your information when you use our service claims management platform and related services.
+      </p>
+      <p>
+        We comply with the New Zealand Privacy Act 2020 and adhere to the Privacy Principles set out in the Act. 
+        We are also committed to meeting international standards including the General Data Protection Regulation (GDPR) 
+        where applicable to our operations.
+      </p>
+      
+      <div class="info-box">
+        <h4>Our Commitment</h4>
+        <p>✓ We will only collect information that is necessary for our services</p>
+        <p>✓ We will be transparent about how we use your information</p>
+        <p>✓ We will protect your information with industry-leading security measures</p>
+        <p>✓ We will respect your rights and respond to your requests promptly</p>
+      </div>
+    </section>
+
+    <!-- Information We Collect -->
+    <section class="content-section" id="information-collected">
+      <h2>Information We Collect</h2>
+      
+      <h3>Personal Information</h3>
+      <p>We collect personal information that you provide directly to us, including:</p>
+      <ul>
+        <li><strong>Identity Information:</strong> Name, date of birth, gender, identification numbers</li>
+        <li><strong>Contact Information:</strong> Email address, phone numbers, physical address, mailing address</li>
+        <li><strong>Account Information:</strong> Username, password, account preferences, communication preferences</li>
+        <li><strong>Financial Information:</strong> Bank account details, credit card information, payment history</li>
+        <li><strong>Claims Information:</strong> Claim details, policy numbers, incident reports, photographs, documentation</li>
+        <li><strong>Professional Information:</strong> Business name, ABN/NZBN, trade certifications, insurance details</li>
+      </ul>
+
+      <h3>Automatically Collected Information</h3>
+      <p>When you use our platform, we automatically collect certain information:</p>
+      <ul>
+        <li><strong>Device Information:</strong> IP address, browser type, operating system, device identifiers</li>
+        <li><strong>Usage Information:</strong> Pages visited, features used, time spent, click patterns</li>
+        <li><strong>Location Information:</strong> GPS location (for emergency dispatch), IP-based location</li>
+        <li><strong>Communication Data:</strong> Email opens, link clicks, communication preferences</li>
+      </ul>
+
+      <h3>Information from Third Parties</h3>
+      <p>We may receive information about you from:</p>
+      <ul>
+        <li>Insurance companies and brokers</li>
+        <li>Government agencies (WorkSafe, NZTA, etc.)</li>
+        <li>Credit reporting agencies</li>
+        <li>Background check providers</li>
+        <li>Other service providers in our network</li>
+      </ul>
+    </section>
+
+    <!-- How We Use Information -->
+    <section class="content-section" id="how-we-use">
+      <h2>How We Use Your Information</h2>
+      
+      <p>We use the information we collect for the following purposes:</p>
+      
+      <h3>Service Delivery</h3>
+      <ul>
+        <li>Process and manage insurance claims</li>
+        <li>Coordinate emergency response services</li>
+        <li>Dispatch suppliers and contractors</li>
+        <li>Track service delivery and completion</li>
+        <li>Process payments and invoicing</li>
+      </ul>
+
+      <h3>Platform Operations</h3>
+      <ul>
+        <li>Create and manage user accounts</li>
+        <li>Provide customer support</li>
+        <li>Send service notifications and updates</li>
+        <li>Improve platform functionality and user experience</li>
+        <li>Conduct analytics and performance monitoring</li>
+      </ul>
+
+      <h3>Compliance and Safety</h3>
+      <ul>
+        <li>Verify identity and conduct background checks</li>
+        <li>Comply with legal and regulatory requirements</li>
+        <li>Prevent fraud and unauthorized access</li>
+        <li>Maintain platform security and integrity</li>
+        <li>Respond to legal requests and proceedings</li>
+      </ul>
+
+      <h3>Communication</h3>
+      <ul>
+        <li>Send important service updates and alerts</li>
+        <li>Provide emergency notifications</li>
+        <li>Send marketing communications (with consent)</li>
+        <li>Conduct surveys and gather feedback</li>
+      </ul>
+    </section>
+
+    <!-- Legal Basis -->
+    <section class="content-section">
+      <h2>Legal Basis for Processing</h2>
+      
+      <p>We process your personal information based on the following legal grounds:</p>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Legal Basis</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Contract Performance</strong></td>
+            <td>Processing claims, dispatching services, managing accounts, billing</td>
+          </tr>
+          <tr>
+            <td><strong>Legal Obligations</strong></td>
+            <td>Tax reporting, regulatory compliance, court orders, WorkSafe requirements</td>
+          </tr>
+          <tr>
+            <td><strong>Legitimate Interests</strong></td>
+            <td>Fraud prevention, platform security, service improvements, analytics</td>
+          </tr>
+          <tr>
+            <td><strong>Consent</strong></td>
+            <td>Marketing communications, cookies, location tracking, special categories of data</td>
+          </tr>
+          <tr>
+            <td><strong>Vital Interests</strong></td>
+            <td>Emergency response coordination, health and safety incidents</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Information Sharing -->
+    <section class="content-section" id="sharing">
+      <h2>Information Sharing and Disclosure</h2>
+      
+      <p>We share your information only as described in this policy:</p>
+      
+      <h3>Service Providers</h3>
+      <p>We share information with suppliers and contractors in our network to deliver services, including:</p>
+      <ul>
+        <li>Emergency response teams and contractors</li>
+        <li>Insurance companies and claim assessors</li>
+        <li>Payment processors and financial institutions</li>
+        <li>Cloud storage and IT service providers</li>
+        <li>Communications and notification services</li>
+      </ul>
+
+      <h3>Business Partners</h3>
+      <ul>
+        <li>Insurance companies (for claim processing)</li>
+        <li>Corporate clients (for service delivery)</li>
+        <li>Government agencies (as required)</li>
+        <li>Professional advisors (lawyers, accountants, auditors)</li>
+      </ul>
+
+      <h3>Legal Requirements</h3>
+      <p>We may disclose information when required by law or to:</p>
+      <ul>
+        <li>Comply with legal processes or government requests</li>
+        <li>Enforce our terms and conditions</li>
+        <li>Protect rights, property, or safety</li>
+        <li>Prevent fraud or illegal activities</li>
+      </ul>
+
+      <h3>Business Transfers</h3>
+      <p>
+        In the event of a merger, acquisition, or sale of assets, your information may be transferred to the 
+        successor entity. We will notify you of any such change and your options regarding your information.
+      </p>
+
+      <div class="info-box">
+        <h4>We Never Sell Your Personal Information</h4>
+        <p>FormanPacific does not and will never sell, rent, or trade your personal information to third parties for their marketing purposes.</p>
+      </div>
+    </section>
+
+    <!-- Data Security -->
+    <section class="content-section" id="security">
+      <h2>Data Security</h2>
+      
+      <p>
+        We implement comprehensive security measures to protect your information from unauthorized access, 
+        alteration, disclosure, or destruction:
+      </p>
+      
+      <h3>Technical Safeguards</h3>
+      <ul>
+        <li><strong>Encryption:</strong> All data encrypted in transit (TLS 1.3) and at rest (AES-256)</li>
+        <li><strong>Access Controls:</strong> Multi-factor authentication, role-based permissions</li>
+        <li><strong>Monitoring:</strong> 24/7 security monitoring and intrusion detection</li>
+        <li><strong>Infrastructure:</strong> ISO 27001 certified data centers</li>
+        <li><strong>Backup:</strong> Regular encrypted backups with disaster recovery</li>
+      </ul>
+
+      <h3>Organizational Measures</h3>
+      <ul>
+        <li>Regular security training for all staff</li>
+        <li>Strict confidentiality agreements</li>
+        <li>Limited access on need-to-know basis</li>
+        <li>Regular security audits and penetration testing</li>
+        <li>Incident response procedures</li>
+      </ul>
+
+      <h3>Data Breach Response</h3>
+      <p>
+        In the unlikely event of a data breach that poses a risk to your rights and freedoms, we will:
+      </p>
+      <ul>
+        <li>Notify affected individuals within 72 hours</li>
+        <li>Report to the Privacy Commissioner as required</li>
+        <li>Provide information about the breach and our response</li>
+        <li>Offer support and guidance on protective measures</li>
+      </ul>
+    </section>
+
+    <!-- Data Retention -->
+    <section class="content-section">
+      <h2>Data Retention</h2>
+      
+      <p>We retain your information only as long as necessary for the purposes outlined in this policy:</p>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Retention Period</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Account Information</td>
+            <td>Duration of account + 2 years</td>
+            <td>Service continuity, dispute resolution</td>
+          </tr>
+          <tr>
+            <td>Claims Data</td>
+            <td>7 years from claim closure</td>
+            <td>Legal requirements, insurance regulations</td>
+          </tr>
+          <tr>
+            <td>Financial Records</td>
+            <td>7 years</td>
+            <td>Tax and accounting requirements</td>
+          </tr>
+          <tr>
+            <td>Communication Logs</td>
+            <td>3 years</td>
+            <td>Service quality, dispute resolution</td>
+          </tr>
+          <tr>
+            <td>Marketing Data</td>
+            <td>Until consent withdrawn</td>
+            <td>Marketing preferences</td>
+          </tr>
+          <tr>
+            <td>Security Logs</td>
+            <td>12 months</td>
+            <td>Security monitoring, incident investigation</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p>
+        After the retention period, data is securely deleted or anonymized. Some information may be retained 
+        longer if required by law or for legitimate business purposes.
+      </p>
+    </section>
+
+    <!-- Your Rights -->
+    <section class="content-section" id="your-rights">
+      <h2>Your Privacy Rights</h2>
+      
+      <div class="rights-section">
+        <h3>Under the Privacy Act 2020, you have the right to:</h3>
+        
+        <div class="rights-grid">
+          <div class="right-card">
+            <h4>Access Your Information</h4>
+            <p>Request a copy of the personal information we hold about you</p>
+          </div>
+          <div class="right-card">
+            <h4>Correct Your Information</h4>
+            <p>Request corrections to inaccurate or incomplete information</p>
+          </div>
+          <div class="right-card">
+            <h4>Delete Your Information</h4>
+            <p>Request deletion of your information (subject to legal requirements)</p>
+          </div>
+          <div class="right-card">
+            <h4>Restrict Processing</h4>
+            <p>Request that we limit how we use your information</p>
+          </div>
+          <div class="right-card">
+            <h4>Data Portability</h4>
+            <p>Receive your information in a structured, machine-readable format</p>
+          </div>
+          <div class="right-card">
+            <h4>Object to Processing</h4>
+            <p>Object to certain types of processing, including marketing</p>
+          </div>
+        </div>
+      </div>
+      
+      <h3>How to Exercise Your Rights</h3>
+      <p>To exercise any of these rights, please contact our Privacy Officer:</p>
+      <ul>
+        <li>Email: privacy@formanpacific.com</li>
+        <li>Phone: 04 887 3337</li>
+        <li>Post: Privacy Officer, FormanPacific, PO Box 12345, Wellington 6140</li>
+      </ul>
+      
+      <p>
+        We will respond to your request within 20 working days. We may need to verify your identity before 
+        processing your request. There is no fee for most requests, but we may charge a reasonable fee for 
+        complex or repetitive requests.
+      </p>
+    </section>
+
+    <!-- International Transfers -->
+    <section class="content-section">
+      <h2>International Data Transfers</h2>
+      
+      <p>
+        Your information is primarily stored and processed in New Zealand. However, we may transfer information 
+        internationally in the following circumstances:
+      </p>
+      
+      <ul>
+        <li>Cloud storage providers with servers in Australia and the United States</li>
+        <li>International insurance companies for cross-border claims</li>
+        <li>Global service providers (e.g., Microsoft, AWS, Google)</li>
+      </ul>
+      
+      <p>
+        When we transfer information internationally, we ensure appropriate safeguards are in place:
+      </p>
+      <ul>
+        <li>Data processing agreements with standard contractual clauses</li>
+        <li>Transfers to countries with adequate privacy protections</li>
+        <li>Binding corporate rules for internal transfers</li>
+        <li>Your explicit consent where required</li>
+      </ul>
+    </section>
+
+    <!-- Cookies and Tracking -->
+    <section class="content-section">
+      <h2>Cookies and Tracking Technologies</h2>
+      
+      <p>We use cookies and similar tracking technologies to enhance your experience:</p>
+      
+      <h3>Types of Cookies We Use</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cookie Type</th>
+            <th>Purpose</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Essential</strong></td>
+            <td>Required for platform functionality, security, authentication</td>
+            <td>Session</td>
+          </tr>
+          <tr>
+            <td><strong>Performance</strong></td>
+            <td>Analytics, error tracking, performance monitoring</td>
+            <td>12 months</td>
+          </tr>
+          <tr>
+            <td><strong>Functional</strong></td>
+            <td>User preferences, language settings, timezone</td>
+            <td>12 months</td>
+          </tr>
+          <tr>
+            <td><strong>Marketing</strong></td>
+            <td>Marketing effectiveness, remarketing (with consent)</td>
+            <td>6 months</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h3>Managing Cookies</h3>
+      <p>
+        You can control cookies through your browser settings or our cookie preference center. Note that 
+        disabling certain cookies may affect platform functionality.
+      </p>
+    </section>
+
+    <!-- Children's Privacy -->
+    <section class="content-section">
+      <h2>Children's Privacy</h2>
+      
+      <p>
+        Our services are not directed to individuals under 18 years of age. We do not knowingly collect 
+        personal information from children. If we become aware that we have collected information from a 
+        child under 18, we will take steps to delete that information promptly.
+      </p>
+      
+      <p>
+        If you are a parent or guardian and believe your child has provided us with personal information, 
+        please contact our Privacy Officer immediately.
+      </p>
+    </section>
+
+    <!-- Changes to Policy -->
+    <section class="content-section">
+      <h2>Changes to This Privacy Policy</h2>
+      
+      <p>
+        We may update this Privacy Policy from time to time to reflect changes in our practices, technologies, 
+        legal requirements, or other factors. We will notify you of any material changes by:
+      </p>
+      
+      <ul>
+        <li>Posting the updated policy on our website</li>
+        <li>Updating the "Last Updated" date at the top of this policy</li>
+        <li>Sending email notification for significant changes</li>
+        <li>Obtaining consent where required by law</li>
+      </ul>
+      
+      <p>
+        We encourage you to review this Privacy Policy periodically to stay informed about how we protect 
+        your information.
+      </p>
+    </section>
+
+    <!-- Contact Information -->
+    <section class="content-section" id="contact">
+      <h2>Contact Us</h2>
+      
+      <p>
+        If you have any questions, concerns, or complaints about this Privacy Policy or our privacy practices, 
+        please contact us:
+      </p>
+      
+      <div class="contact-box">
+        <h3>Privacy Officer</h3>
+        <div class="contact-info">
+          <div class="contact-item">
+            <strong>Email:</strong>
+            <a href="mailto:privacy@formanpacific.com">privacy@formanpacific.com</a>
+          </div>
+          <div class="contact-item">
+            <strong>Phone:</strong>
+            <a href="tel:048873337">04 887 3337</a>
+          </div>
+          <div class="contact-item">
+            <strong>Post:</strong>
+            <span>Privacy Officer, FormanPacific Limited<br>PO Box 12345, Wellington 6140, New Zealand</span>
+          </div>
+          <div class="contact-item">
+            <strong>Office Hours:</strong>
+            <span>Monday - Friday, 8:30 AM - 5:00 PM NZST</span>
+          </div>
+        </div>
+      </div>
+      
+      <h3>Complaints</h3>
+      <p>
+        If you are not satisfied with our response to your privacy concern, you have the right to lodge a 
+        complaint with the Office of the Privacy Commissioner:
+      </p>
+      
+      <div class="info-box">
+        <h4>Office of the Privacy Commissioner</h4>
+        <p>📧 Email: enquiries@privacy.org.nz</p>
+        <p>📞 Phone: 0800 803 909</p>
+        <p>🌐 Website: www.privacy.org.nz</p>
+        <p>📮 Post: PO Box 10094, The Terrace, Wellington 6143</p>
+      </div>
+    </section>
+
+    <!-- Acknowledgment -->
+    <section class="content-section">
+      <h2>Acknowledgment and Consent</h2>
+      
+      <p>
+        By using our services, you acknowledge that you have read and understood this Privacy Policy and 
+        agree to the collection, use, and disclosure of your information as described herein.
+      </p>
+      
+      <p>
+        For certain processing activities, we may seek your explicit consent. You have the right to withdraw 
+        your consent at any time, though this may affect our ability to provide certain services to you.
+      </p>
+      
+      <div class="info-box">
+        <h4>Important Note</h4>
+        <p>
+          This Privacy Policy forms part of our Terms of Service. In the event of any conflict between this 
+          Privacy Policy and the Terms of Service, the Terms of Service shall prevail.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 FormanPacific Limited. All rights reserved.</p>
+    <p style="margin-top: 10px;">
+      <a href="/">Home</a> | 
+      <a href="/terms">Terms of Service</a> | 
+      <a href="/compliance-standards">Compliance</a> | 
+      <a href="/contact">Contact</a>
+    </p>
+    <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+      FormanPacific Limited | NZBN: 9429042001234 | Privacy Officer: privacy@formanpacific.com
+    </p>
+  </footer>
+
+</body>
+</html>
