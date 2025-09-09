@@ -92,41 +92,112 @@ layout: none
   </div>
 
   <script>
-    // Redirect database (all go to unified Microsoft Form)
+    // Redirect database - routes to either Microsoft Form or Admin portal
     const redirectDatabase = {
-      '/new-business':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/contact-form':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      // Contact and general inquiries -> Microsoft Form
       '/contact':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier-inquiry':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/emergency-service':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/emergency':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier-registration':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier-portal':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier-payments':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier-compliance':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/training':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/documentation':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/compliance':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/support':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/about':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/insurance-partners':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/corporate-services':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/careers':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/news':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/admin':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/admin/login':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/dashboard':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/claim':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/insurance-claim':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/claim-status':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/escalation':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/contact-form':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/new-business':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
       '/feedback':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
       '/complaint':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-      '/supplier-relations':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
-
-      /* case variants */
-      '/new-business':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u'
+      '/careers':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      
+      // Emergency services -> Microsoft Form
+      '/emergency':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/emergency-service':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/emergency-procedures':'https://www.formanpacific.com/admin',
+      '/report-emergency':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/emergency-resources':'https://www.formanpacific.com/admin',
+      
+      // Claims -> Microsoft Form
+      '/claim':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/insurance-claim':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/claim-status':'https://www.formanpacific.com/admin',
+      '/track-response':'https://www.formanpacific.com/admin',
+      
+      // Supplier registration -> Microsoft Form
+      '/supplier-registration':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/become-supplier':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      '/supplier-application':'https://forms.office.com/Pages/ResponsePage.aspx?id=vMb_Yc7Zi0WBINMhh8N3DSnleyJD3nBGm0qPafV8nlFUREpQSDdMOVE4NFhNOEpZSEpEUzFaUVZJTy4u',
+      
+      // All supplier portal functions -> Admin
+      '/supplier':'https://www.formanpacific.com/admin',
+      '/supplier-portal':'https://www.formanpacific.com/admin',
+      '/supplier-payments':'https://www.formanpacific.com/admin',
+      '/supplier-compliance':'https://www.formanpacific.com/admin',
+      '/supplier-inquiry':'https://www.formanpacific.com/admin',
+      '/supplier-activation':'https://www.formanpacific.com/admin',
+      '/supplier-relations':'https://www.formanpacific.com/admin',
+      '/supplier-support':'https://www.formanpacific.com/admin',
+      '/supplier-terms':'https://www.formanpacific.com/admin',
+      
+      // Admin and dashboard -> Admin portal
+      '/admin':'https://www.formanpacific.com/admin',
+      '/admin/login':'https://www.formanpacific.com/admin',
+      '/dashboard':'https://www.formanpacific.com/admin',
+      '/portal':'https://www.formanpacific.com/admin',
+      '/login':'https://www.formanpacific.com/admin',
+      
+      // Documentation and compliance -> Admin
+      '/documentation':'https://www.formanpacific.com/admin',
+      '/compliance':'https://www.formanpacific.com/admin',
+      '/compliance-standards':'https://www.formanpacific.com/admin',
+      '/compliance-docs':'https://www.formanpacific.com/admin',
+      '/training':'https://www.formanpacific.com/admin',
+      '/support':'https://www.formanpacific.com/admin',
+      
+      // News and updates -> Admin
+      '/news':'https://www.formanpacific.com/admin',
+      '/news/auckland-flooding-2023':'https://www.formanpacific.com/admin',
+      '/news/cyclone-gabrielle-response':'https://www.formanpacific.com/admin',
+      '/news/technology-upgrade-2024':'https://www.formanpacific.com/admin',
+      '/news/supplier-network-expansion':'https://www.formanpacific.com/admin',
+      '/news/compliance-certification-2024':'https://www.formanpacific.com/admin',
+      '/news/emergency-response-excellence':'https://www.formanpacific.com/admin',
+      
+      // Services pages -> Admin
+      '/services':'https://www.formanpacific.com/admin',
+      '/insurance-partners':'https://www.formanpacific.com/admin',
+      '/corporate-services':'https://www.formanpacific.com/admin',
+      '/escalation':'https://www.formanpacific.com/admin',
+      
+      // Legal pages - these stay public but redirect to actual pages if they exist
+      '/privacy':'https://www.formanpacific.com/privacy',
+      '/terms':'https://www.formanpacific.com/terms',
+      
+      // About pages -> Admin
+      '/about':'https://www.formanpacific.com/admin',
+      '/about-us':'https://www.formanpacific.com/admin',
+      '/our-story':'https://www.formanpacific.com/admin',
+      '/our-team':'https://www.formanpacific.com/admin',
+      '/our-values':'https://www.formanpacific.com/admin',
+      
+      // Case studies -> Admin
+      '/case-studies':'https://www.formanpacific.com/admin',
+      '/success-stories':'https://www.formanpacific.com/admin',
+      
+      // Resources -> Admin
+      '/resources':'https://www.formanpacific.com/admin',
+      '/blog':'https://www.formanpacific.com/admin',
+      '/insights':'https://www.formanpacific.com/admin',
+      
+      // Partner pages -> Admin
+      '/partners':'https://www.formanpacific.com/admin',
+      '/brokers':'https://www.formanpacific.com/admin',
+      
+      // Other common paths -> Admin
+      '/api':'https://www.formanpacific.com/admin',
+      '/reports':'https://www.formanpacific.com/admin',
+      '/analytics':'https://www.formanpacific.com/admin',
+      '/settings':'https://www.formanpacific.com/admin',
+      '/profile':'https://www.formanpacific.com/admin',
+      '/account':'https://www.formanpacific.com/admin',
+      
+      // Downloads -> Admin
+      '/downloads':'https://www.formanpacific.com/admin',
+      '/documents':'https://www.formanpacific.com/admin',
+      '/forms':'https://www.formanpacific.com/admin',
+      '/templates':'https://www.formanpacific.com/admin'
     };
 
     function handleRedirect(){
@@ -167,17 +238,37 @@ layout: none
 
     function getServiceInfo(url, path){
       const p = path.toLowerCase();
+      
+      // Forms redirects
       if (p === '/new-business') return {title:'New Business Registration', description:'Taking you to our secure new business application form.'};
-      if (p === '/contact-form') return {title:'General Inquiry Form', description:'Connecting you to our secure contact form.'};
+      if (p === '/contact' || p === '/contact-form') return {title:'General Inquiry Form', description:'Connecting you to our secure contact form.'};
       if (p === '/supplier-registration') return {title:'Supplier Registration', description:'Join 500+ verified service providers across New Zealand.'};
-      if (p === '/supplier-portal') return {title:'Supplier Portal Access', description:'Access job management, invoicing, and performance tracking.'};
       if (p === '/emergency' || p === '/emergency-service') return {title:'Emergency Service Request', description:'Connecting you to our 24/7 emergency dispatch system.'};
       if (p === '/claim' || p === '/insurance-claim') return {title:'Insurance Claim Processing', description:'Fast-track your insurance claim with our streamlined process.'};
-      if (p === '/admin' || p === '/dashboard') return {title:'Administrator Access', description:'Redirecting to the secure admin portal.'};
-      if (p === '/training') return {title:'Training Resources', description:'Access training for suppliers and partners.'};
-      if (p === '/compliance') return {title:'Compliance Center', description:'Compliance documentation and certification resources.'};
-      if (url.includes('sharepoint.com')) return {title:'Secure Document Access', description:'Accessing FormanPacific document portal.'};
-      if (url.includes('forms.office.com') || url.includes('forms.microsoft')) return {title:'Secure Form Access', description:'Protected Microsoft Forms platform for submission.'};
+      if (p === '/report-emergency') return {title:'Report Emergency', description:'Immediate emergency incident reporting system.'};
+      if (p === '/feedback') return {title:'Feedback Form', description:'Share your experience with FormanPacific services.'};
+      if (p === '/complaint') return {title:'Complaint Form', description:'Submit a formal complaint for investigation.'};
+      if (p === '/careers') return {title:'Career Opportunities', description:'Explore career opportunities at FormanPacific.'};
+      
+      // Admin portal redirects
+      if (url.includes('formanpacific.com/admin')) {
+        if (p.includes('supplier')) return {title:'Supplier Portal Access', description:'Redirecting to secure supplier management portal.'};
+        if (p.includes('news')) return {title:'News & Updates', description:'Access latest FormanPacific news and updates.'};
+        if (p.includes('compliance')) return {title:'Compliance Center', description:'Access compliance documentation and standards.'};
+        if (p.includes('admin') || p.includes('dashboard')) return {title:'Administrator Access', description:'Redirecting to the secure admin portal.'};
+        if (p.includes('training')) return {title:'Training Resources', description:'Access training for suppliers and partners.'};
+        if (p.includes('about')) return {title:'About FormanPacific', description:'Learn more about our company and services.'};
+        return {title:'Secure Portal Access', description:'Redirecting to FormanPacific secure portal.'};
+      }
+      
+      // Legal pages
+      if (p === '/privacy') return {title:'Privacy Policy', description:'Accessing FormanPacific privacy policy.'};
+      if (p === '/terms') return {title:'Terms of Service', description:'Accessing FormanPacific terms of service.'};
+      
+      // Microsoft Forms default
+      if (url.includes('forms.office.com') || url.includes('forms.microsoft')) 
+        return {title:'Secure Form Access', description:'Protected Microsoft Forms platform for submission.'};
+      
       return {title:'Connecting You Securely', description:'Taking you to the requested FormanPacific service.'};
     }
 
