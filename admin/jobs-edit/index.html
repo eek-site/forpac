@@ -10,7 +10,7 @@
   <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
 
   <!-- AG Grid Community -->
@@ -915,6 +915,117 @@
 
     /* =============== BOOT =============== */
     window.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+  
+  <!-- Custom command handling for Edit Jobs page -->
+  <script>
+    // Handle commands specific to the Edit Jobs page
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Triage Form':
+          window.location.href = '/admin/triage';
+          break;
+        case 'Update Job':
+          const selectedRows = state.gridApi?.getSelectedRows();
+          if (selectedRows && selectedRows.length > 0) {
+            showToast(`Updating ${selectedRows.length} selected job(s)`, 'info');
+            // Here you could implement specific update logic
+          } else {
+            showToast('Please select one or more jobs to update', 'warning');
+          }
+          break;
+        case 'Job Complete':
+          const selectedJobsForCompletion = state.gridApi?.getSelectedRows();
+          if (selectedJobsForCompletion && selectedJobsForCompletion.length > 0) {
+            if (confirm(`Mark ${selectedJobsForCompletion.length} selected job(s) as complete?`)) {
+              selectedJobsForCompletion.forEach(job => {
+                // Update the status field if it exists
+                const statusField = Object.keys(job).find(k => /status/i.test(k));
+                if (statusField) {
+                  job[statusField] = 'Completed';
+                  // Mark as pending update
+                  if (!String(job.ID).startsWith('NEW_')) {
+                    const updates = state.pendingChanges.updates.get(job.ID) || {};
+                    updates[statusField] = 'Completed';
+                    state.pendingChanges.updates.set(job.ID, updates);
+                  }
+                }
+              });
+              state.gridApi.refreshCells();
+              updateChangeCount();
+              showToast(`${selectedJobsForCompletion.length} job(s) marked as complete`, 'success');
+            }
+          } else {
+            showToast('Please select one or more jobs to complete', 'warning');
+          }
+          break;
+        case 'Close Job':
+          const selectedJobsForClosing = state.gridApi?.getSelectedRows();
+          if (selectedJobsForClosing && selectedJobsForClosing.length > 0) {
+            if (confirm(`Close ${selectedJobsForClosing.length} selected job(s)?`)) {
+              selectedJobsForClosing.forEach(job => {
+                const statusField = Object.keys(job).find(k => /status/i.test(k));
+                if (statusField) {
+                  job[statusField] = 'Closed';
+                  if (!String(job.ID).startsWith('NEW_')) {
+                    const updates = state.pendingChanges.updates.get(job.ID) || {};
+                    updates[statusField] = 'Closed';
+                    state.pendingChanges.updates.set(job.ID, updates);
+                  }
+                }
+              });
+              state.gridApi.refreshCells();
+              updateChangeCount();
+              showToast(`${selectedJobsForClosing.length} job(s) closed`, 'success');
+            }
+          } else {
+            showToast('Please select one or more jobs to close', 'warning');
+          }
+          break;
+        case 'Add Supplier':
+          window.location.href = '/admin/suppliers/add';
+          break;
+        case 'Generate ANZ Batch File':
+          // Use existing export functionality
+          if (state.gridApi) {
+            const allRows = [];
+            state.gridApi.forEachNode(n => allRows.push(n.data));
+            if (allRows.length > 0) {
+              exportToCSV(allRows, 'anz_batch_file');
+            } else {
+              showToast('No data to export for ANZ batch file', 'warning');
+            }
+          }
+          break;
+        case 'Save Changes':
+          if (state.isDirty) {
+            saveChanges();
+          } else {
+            showToast('No changes to save', 'info');
+          }
+          break;
+        case 'Add Row':
+          // Use existing add row functionality
+          const newRow = { ID: `NEW_${Date.now()}`, Title: 'New Job' };
+          state.pendingChanges.creates.push(newRow);
+          state.gridApi.applyTransaction({ add: [newRow], addIndex: 0 });
+          updateChangeCount();
+          showToast('New row added via command menu', 'info');
+          break;
+        case 'Export Selected':
+          if (state.gridApi) {
+            const selected = state.gridApi.getSelectedRows();
+            if (selected.length > 0) {
+              exportToCSV(selected, 'jobs_selected');
+            } else {
+              showToast('No rows selected for export', 'warning');
+            }
+          }
+          break;
+        default:
+          showToast(`Command: ${command}`, 'info');
+      }
+    };
   </script>
 </body>
 </html>
