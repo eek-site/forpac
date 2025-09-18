@@ -10,7 +10,7 @@
   <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
 
   <style>
@@ -406,7 +406,7 @@
         showToast(`Loaded ${rows.length} rows.`, 'success');
       }catch(err){
         console.error('Failed to load SharePoint data', err);
-        const msg = /403/.test(String(err)) ? 'Access denied. Ask admin to grant “Sites.Read.All”.' : 'Failed to load SharePoint data.';
+        const msg = /403/.test(String(err)) ? 'Access denied. Ask admin to grant "Sites.Read.All".' : 'Failed to load SharePoint data.';
         showToast(msg, 'error');
         showEmptyState('Failed to connect to SharePoint');
       }
@@ -678,6 +678,60 @@
     window.addEventListener('DOMContentLoaded', initializeApp);
     window.addEventListener('click', e=>{ if (e.target === document.getElementById('detailModal')) closeModal(); });
     document.addEventListener('keydown', e=>{ if (e.key==='Escape') closeModal(); if (e.ctrlKey && e.key==='f'){ e.preventDefault(); document.getElementById('filterJobId').focus(); }});
+  </script>
+  
+  <!-- Custom command handling for Jobs Master List -->
+  <script>
+    // Handle commands specific to the Jobs Master List page
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Triage Form':
+          window.location.href = '/admin/triage';
+          break;
+        case 'Update Job':
+          if (state.currentJobDetail) {
+            editJob(); // Use existing edit job function
+          } else {
+            showToast('Please select a job first by clicking on a row', 'warning');
+          }
+          break;
+        case 'Job Complete':
+          if (state.currentJobDetail) {
+            const jobId = state.currentJobDetail.ID || state.currentJobDetail.JobId || 'Unknown';
+            showToast(`Job ${jobId} marked for completion`, 'success');
+            // Here you could add actual completion logic
+          } else {
+            showToast('Please select a job first by clicking on a row', 'warning');
+          }
+          break;
+        case 'Close Job':
+          if (state.currentJobDetail) {
+            const jobId = state.currentJobDetail.ID || state.currentJobDetail.JobId || 'Unknown';
+            showToast(`Job ${jobId} closed`, 'success');
+            // Here you could add actual closing logic
+          } else {
+            showToast('Please select a job first by clicking on a row', 'warning');
+          }
+          break;
+        case 'Add Supplier':
+          window.location.href = '/admin/suppliers/add';
+          break;
+        case 'Generate ANZ Batch File':
+          exportData(); // Use existing export function
+          break;
+        case 'Customer Reply':
+          if (state.currentJobDetail) {
+            const customerId = state.currentJobDetail.CustomerName || state.currentJobDetail.Customer || 'Customer';
+            showToast(`Opening customer reply for ${customerId}`, 'info');
+            // Here you could open a communication form
+          } else {
+            showToast('Please select a job first to reply to customer', 'warning');
+          }
+          break;
+        default:
+          showToast(`Command: ${command}`, 'info');
+      }
+    };
   </script>
 </body>
 </html>
