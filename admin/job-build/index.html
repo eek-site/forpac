@@ -10,9 +10,8 @@
   <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
-
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -1149,6 +1148,108 @@
         e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
       }
     });
+  </script>
+  
+  <!-- Custom command handling for New Job Form -->
+  <script>
+    // Handle commands specific to the New Job Form page
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Triage Form':
+          // This IS the triage form, so maybe switch to a specific section
+          document.getElementById('typeSelector').scrollIntoView({ behavior: 'smooth' });
+          showSuccess('Showing job type selection for triage');
+          break;
+        case 'Submit Job':
+          // Submit the current form
+          document.getElementById('jobForm').requestSubmit();
+          break;
+        case 'Clear Form':
+          if (confirm('Clear all form data?')) {
+            clearForm();
+            showSuccess('Form cleared');
+          }
+          break;
+        case 'Save Draft':
+          saveDraft();
+          break;
+        case 'Load Draft':
+          loadDraft();
+          break;
+        case 'Switch to EEK':
+          selectClient('eek');
+          break;
+        case 'Switch to Coolth':
+          selectClient('coolth');
+          break;
+        case 'Quick Fill Tyre Change':
+          quickFill('tyre-change');
+          break;
+        case 'Quick Fill Jump Start':
+          quickFill('jump-start');
+          break;
+        case 'Quick Fill Fuel Delivery':
+          quickFill('fuel-delivery');
+          break;
+        case 'Quick Fill Lockout':
+          quickFill('lockout');
+          break;
+        case 'Quick Fill Towing':
+          quickFill('towing');
+          break;
+        case 'Quick Fill Fridge Emergency':
+          if (currentClient === 'coolth') {
+            quickFill('fridge-emergency');
+          } else {
+            selectClient('coolth');
+            setTimeout(() => quickFill('fridge-emergency'), 100);
+          }
+          break;
+        case 'Set Job Type Billable':
+          selectType('Billable');
+          break;
+        case 'Set Job Type Supplier':
+          selectType('Supplier');
+          break;
+        case 'Set Job Type Warranty':
+          selectType('Warranty');
+          break;
+        case 'Focus Customer Name':
+          document.getElementById('customerName').focus();
+          break;
+        case 'Focus Customer Phone':
+          document.getElementById('customerPhone').focus();
+          break;
+        case 'Focus Fault Description':
+          document.getElementById('fault').focus();
+          break;
+        case 'Generate New Identifier':
+          if (currentClient === 'coolth') {
+            generateCoolthIdentifier();
+            showSuccess('New Coolth identifier generated');
+          } else {
+            showWarning('Identifier generation only available for Coolth Tech');
+          }
+          break;
+        case 'Calculate GST':
+          const amountField = document.getElementById('amount');
+          if (amountField.value) {
+            const event = new Event('input', { bubbles: true });
+            amountField.dispatchEvent(event);
+            showSuccess('GST calculated');
+          } else {
+            showWarning('Enter an amount first');
+          }
+          break;
+        case 'Add Supplier':
+          selectType('Supplier');
+          document.getElementById('supplierName').focus();
+          showSuccess('Switched to supplier job type');
+          break;
+        default:
+          showSuccess(`Command: ${command}`);
+      }
+    };
   </script>
 </body>
 </html>
