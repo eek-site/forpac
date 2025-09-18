@@ -14,6 +14,13 @@
     // Configuration
     const MENU_URL = '/admin/command-menu.html';
 
+    // Device detection
+    function isTouchOnlyDevice() {
+        return ('ontouchstart' in window) && 
+               (navigator.maxTouchPoints > 0) && 
+               !window.matchMedia('(any-hover: hover)').matches;
+    }
+
     // Create overlay and iframe
     function createMenuOverlay() {
         let overlay = document.getElementById('fp-menu-overlay');
@@ -78,6 +85,53 @@
         });
 
         return overlay;
+    }
+
+    // Create mobile floating action button
+    function createMobileButton() {
+        if (document.getElementById('fp-mobile-menu-btn')) return;
+        
+        const button = document.createElement('button');
+        button.id = 'fp-mobile-menu-btn';
+        button.innerHTML = 'FP';
+        button.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999998;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            touch-action: manipulation;
+        `;
+        
+        // Add hover effect for devices that support it
+        button.addEventListener('mouseenter', () => {
+            button.style.transform = 'scale(1.1)';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = 'scale(1)';
+        });
+        
+        button.addEventListener('click', showMenu);
+        button.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            button.style.transform = 'scale(0.95)';
+        });
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            button.style.transform = 'scale(1)';
+        });
+        
+        document.body.appendChild(button);
     }
 
     function showMenu() {
@@ -181,10 +235,20 @@
         document.addEventListener('keydown', handleKeydown);
         window.addEventListener('message', handleMessage);
         
-        // Show welcome notification
-        setTimeout(() => {
-            showNotification('Press Ctrl+M for quick command access', 'info');
-        }, 2000);
+        // Create mobile button only for touch-only devices (no keyboard/mouse)
+        if (isTouchOnlyDevice()) {
+            createMobileButton();
+            
+            // Show mobile-specific notification
+            setTimeout(() => {
+                showNotification('Tap the FP button for quick commands', 'info');
+            }, 2000);
+        } else {
+            // Show desktop notification
+            setTimeout(() => {
+                showNotification('Press Ctrl+M for quick command access', 'info');
+            }, 2000);
+        }
     }
 
     // Expose public API
