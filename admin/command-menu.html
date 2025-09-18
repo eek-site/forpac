@@ -18,17 +18,170 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .loading-text{color:#718096;font-size:14px}
 .menu-container{display:none}
 .menu-container.authenticated{display:block}
-.header{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:8px 15px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:2px;padding:8px;height:calc(100vh - 40px);overflow-y:auto}
-.item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;min-height:32px;font-size:12px}
-.item:hover{background:#1e3c72;color:#fff;transform:translateX(2px)}
-.num{background:#fff;border:1px solid #e2e8f0;border-radius:3px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:monospace;font-weight:700;font-size:10px;flex-shrink:0;color:#2d3748}
-.item:hover .num{background:rgba(255,255,255,.95);color:#1e3c72}
-.icon{width:12px;font-size:10px;flex-shrink:0}
-.name{font-weight:500;line-height:1.2}
-.cmd{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);background:#1e3c72;color:#fff;padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;font-weight:600;display:none}
+.header{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:12px 16px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid rgba(255,255,255,0.1)}
+.header-title{font-size:16px;font-weight:700}
+.header-hint{font-size:12px;opacity:0.9}
+
+/* Responsive grid that reads vertically (down columns) */
+.grid{
+    display:grid;
+    gap:3px;
+    padding:12px;
+    height:calc(100vh - 60px);
+    overflow-y:auto;
+    grid-auto-flow:column;
+    grid-template-rows:repeat(auto-fit,minmax(42px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+}
+
+.item{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:6px;
+    padding:8px 12px;
+    cursor:pointer;
+    transition:all .2s ease;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    min-height:42px;
+    width:100%;
+}
+
+.item:hover{
+    background:#1e3c72;
+    color:#fff;
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(30,60,114,.3);
+}
+
+.num{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:4px;
+    width:26px;
+    height:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:monospace;
+    font-weight:700;
+    font-size:11px;
+    flex-shrink:0;
+    color:#2d3748;
+}
+
+.item:hover .num{
+    background:rgba(255,255,255,.95);
+    color:#1e3c72;
+}
+
+.icon{
+    font-size:16px;
+    flex-shrink:0;
+    width:18px;
+    text-align:center;
+}
+
+.name{
+    font-weight:500;
+    line-height:1.3;
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.cmd{
+    position:fixed;
+    bottom:12px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#1e3c72;
+    color:#fff;
+    padding:8px 16px;
+    border-radius:6px;
+    font-family:monospace;
+    font-size:13px;
+    font-weight:600;
+    display:none;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+
 .cmd.show{display:block}
-@media (max-width:600px){.grid{grid-template-columns:1fr 1fr}.item{min-height:36px;font-size:13px}}
+
+/* Responsive breakpoints */
+@media (min-width: 1200px) {
+    .grid {
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+    }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+    .grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+    }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(11, 1fr);
+    }
+}
+
+@media (min-width: 400px) and (max-width: 599px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(16, 1fr);
+    }
+    .item {
+        font-size: 12px;
+        padding: 6px 10px;
+        min-height: 40px;
+    }
+    .name {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 399px) {
+    .grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(31, 1fr);
+        grid-auto-flow: row;
+    }
+    .item {
+        font-size: 13px;
+        padding: 10px 12px;
+        min-height: 44px;
+    }
+    .header-hint {
+        display: none;
+    }
+}
+
+/* Fold phone support */
+@media (max-width: 280px) {
+    .grid {
+        padding: 8px;
+        gap: 2px;
+    }
+    .item {
+        padding: 8px 10px;
+        gap: 8px;
+        font-size: 12px;
+        min-height: 40px;
+    }
+    .num {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+    }
+}
 </style>
 </head>
 <body>
@@ -42,8 +195,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- Menu Container -->
 <div class="menu-container" id="menuContainer">
 <div class="header">
-<span>Service Management Menu</span>
-<span style="font-size:11px;opacity:.9">Type number or click</span>
+<span class="header-title">Service Management Menu</span>
+<span class="header-hint">Type number or click</span>
 </div>
 <div class="grid">
 <div class="item" onclick="executeFunction('Mark DNC Job')" data-number="0"><div class="num">0</div><div class="icon">🚫</div><div class="name">Mark DNC Job</div></div>
