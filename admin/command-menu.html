@@ -237,7 +237,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="menu-container" id="menuContainer">
 <div class="header">
 <span class="header-title">Service Management Menu</span>
-<span class="header-hint">Type number or click</span>
+<span class="header-hint">Type number + Enter or click</span>
 </div>
 <div class="grid">
 <div class="item" onclick="executeFunction('Mark DNC Job')" data-number="0"><div class="num">0</div><div class="icon">🚫</div><div class="name">Mark DNC Job</div></div>
@@ -357,7 +357,7 @@ function executeFunction(f){
 function u(){
   const d=document.getElementById('commandDisplay');
   if(c){
-    d.textContent=`Command: ${c}`;
+    d.textContent=`Command: ${c} (Press Enter to execute)`;
     d.classList.add('show')
   }else{
     d.classList.remove('show')
@@ -367,23 +367,20 @@ function u(){
 function e(n){
   const f=k[n];
   if(f){
+    c=''; // Clear command after execution
+    u();
     executeFunction(f);
     return true
   }
   return false
 }
 
-// Keyboard handling
+// Keyboard handling - requires Enter to execute
 document.addEventListener('keydown',function(ev){
   if(ev.key>='0'&&ev.key<='9'){
     ev.preventDefault();
     c+=ev.key;
     u();
-    if(c.length===1&&k[c]){
-      e(c)
-    }else if(c.length===2){
-      e(c)
-    }
     return
   }
   if(ev.key==='Enter'&&c){
@@ -398,6 +395,8 @@ document.addEventListener('keydown',function(ev){
     return
   }
   if(ev.key==='Escape'){
+    c='';
+    u();
     if(window.parent!==window){
       window.parent.postMessage({type:'fp-close-menu'},'*')
     }else if(window.opener){
