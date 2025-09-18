@@ -54,8 +54,6 @@
     .footer-links{display:flex;justify-content:center;gap:24px;margin-top:24px;padding-top:24px;border-top:1px solid var(--border-color)}
     .footer-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;transition:color .2s ease}
     .footer-links a:hover{color:var(--primary-color)}
-    .popup-notice{background:var(--info-message);padding:12px;border-radius:8px;margin-top:16px;font-size:13px;color:var(--text-primary);display:none}
-    .popup-notice.show{display:block}
     .session-warning{position:fixed;top:20px;right:20px;background:var(--warning-color);color:#fff;padding:16px 20px;border-radius:10px;display:none;animation:slideInRight .3s ease;box-shadow:0 10px 25px -5px rgba(245,158,11,.3)}
     @keyframes slideInRight{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
     @media (max-width:480px){.login-container{padding:32px 24px}h1{font-size:28px}.security-features{grid-template-columns:1fr}.footer-links{flex-direction:column;align-items:center;gap:12px}}
@@ -91,10 +89,6 @@
         </svg>
         Microsoft Forms Portal
       </button>
-    </div>
-
-    <div id="popupNotice" class="popup-notice">
-      <strong>Popup blocked?</strong> Please allow popups for this site or click the sign-in button again to use redirect.
     </div>
 
     <div id="errorMessage" class="message error-message"></div>
@@ -142,9 +136,10 @@
     const LogLevel = (window.msal && window.msal.LogLevel) ? window.msal.LogLevel
       : { Error: 0, Warning: 1, Info: 2, Verbose: 3 };
 
-    let msalInstance=null, authInProgress=false, popupBlocked=false;
+    let msalInstance=null, authInProgress=false;
     let sessionTimer, warningTimer;
 
+    // FIXED: Redirect-only MSAL config (eliminates CORS popup errors)
     const msalConfig={
       auth:{
         clientId:'d67be044-6aaa-4d01-ada2-da0cc50d2034',
@@ -152,19 +147,22 @@
         redirectUri: window.location.origin + '/admin',
         navigateToLoginRequestUrl:false
       },
-      cache:{cacheLocation:'sessionStorage',storeAuthStateInCookie:true},
+      cache:{
+        cacheLocation:'sessionStorage',
+        storeAuthStateInCookie:true
+      },
       system:{
-        windowHashTimeout:60000,iframeHashTimeout:60000,loadFrameTimeout:10000,
+        allowNativeBroker: false, // Prevents popup issues
+        windowHashTimeout:60000,
+        iframeHashTimeout:60000,
+        loadFrameTimeout:10000,
         loggerOptions:{
           loggerCallback:(level,message,containsPii)=>{
             if(containsPii) return;
-            if(message?.includes('monitorPopupForHash') && message?.includes('window closed')){
-              if(!popupBlocked){ showWarning('Sign-in window was closed. Please try again.'); }
-              authInProgress=false; enableButtons(); return;
-            }
+            // Suppress popup-related error messages
+            if(message?.includes('popup') || message?.includes('window closed') || message?.includes('Cross-Origin')) return;
             if(level===LogLevel.Error) console.error('[MSAL Error]',message);
             else if(level===LogLevel.Warning) console.warn('[MSAL Warning]',message);
-            else if(level===LogLevel.Info) console.info('[MSAL Info]',message);
           },
           logLevel: LogLevel.Warning
         }
@@ -226,42 +224,27 @@
       }
     }
 
+    // FIXED: Redirect-only authentication (eliminates CORS popup errors)
     async function signIn(){
       if(authInProgress){ showInfo('Authentication already in progress. Please wait...'); return; }
-      hideAllMessages(); document.getElementById('popupNotice').classList.remove('show');
+      hideAllMessages();
 
       if(!window.msal || !msalInstance){
         showError('Sign-in is unavailable (MSAL not loaded). Please refresh and try again.');
         return;
       }
 
-      authInProgress=true; popupBlocked=false; disableButtons();
+      authInProgress=true; disableButtons();
       const loadingDiv=document.getElementById('loadingIndicator'); loadingDiv.classList.add('active');
 
       try{
-        const popupResponse=await attemptPopupLogin();
-        if(popupResponse){ handleResponse(popupResponse); }
+        // Use redirect authentication only (eliminates CORS popup errors)
+        await msalInstance.loginRedirect(loginRequest);
       }catch(error){
-        if(error?.errorCode==='popup_window_error' || popupBlocked){
-          try{ await msalInstance.loginRedirect(loginRequest); }catch(re){ handleAuthError(re); }
-        }else{
-          handleAuthError(error);
-        }
-      }finally{
+        handleAuthError(error);
         loadingDiv.classList.remove('active');
         authInProgress=false; enableButtons();
       }
-    }
-
-    async function attemptPopupLogin(){
-      // Test for popup blockers
-      const testPopup=window.open('','_blank','width=1,height=1,left=10000,top=10000');
-      if(!testPopup || testPopup.closed || typeof testPopup.closed==='undefined'){
-        popupBlocked=true; document.getElementById('popupNotice').classList.add('show');
-        const err = new Error('popup_window_error'); err.errorCode='popup_window_error'; throw err;
-      }
-      testPopup.close();
-      return await msalInstance.loginPopup(loginRequest);
     }
 
     function handleAuthError(error){
@@ -273,9 +256,6 @@
         showWarning('Sign-in cancelled. Please try again when ready.');
       }else if(code==='interaction_in_progress'){
         showWarning('Another sign-in is in progress. Please wait…');
-      }else if(code==='popup_window_error' || popupBlocked){
-        showInfo('Popup was blocked. Click the sign-in button again to use redirect method.');
-        document.getElementById('popupNotice').classList.add('show');
       }else if(code==='network_error' || msg.includes('network')){
         showError('Network error. Please check your internet connection.');
       }else if(code==='consent_required'){
