@@ -4,9 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FP Command Menu</title>
+
+<!-- Microsoft Authentication Library -->
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;height:100vh;overflow:hidden}
+.loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999}
+.loading.authenticated{display:none}
+.spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top:3px solid #1e3c72;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:#718096;font-size:14px}
+.menu-container{display:none}
+.menu-container.authenticated{display:block}
 .header{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:8px 15px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:2px;padding:8px;height:calc(100vh - 40px);overflow-y:auto}
 .item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;min-height:32px;font-size:12px}
@@ -17,10 +28,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .name{font-weight:500;line-height:1.2}
 .cmd{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);background:#1e3c72;color:#fff;padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;font-weight:600;display:none}
 .cmd.show{display:block}
-@media (max-width:600px){.grid{grid-template-columns:1fr}.item{min-height:36px;font-size:13px}}
+@media (max-width:600px){.grid{grid-template-columns:1fr 1fr}.item{min-height:36px;font-size:13px}}
 </style>
 </head>
 <body>
+
+<!-- Loading Screen -->
+<div class="loading" id="loadingScreen">
+  <div class="spinner"></div>
+  <div class="loading-text">Verifying access...</div>
+</div>
+
+<!-- Menu Container -->
+<div class="menu-container" id="menuContainer">
 <div class="header">
 <span>Service Management Menu</span>
 <span style="font-size:11px;opacity:.9">Type number or click</span>
@@ -59,14 +79,146 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="item" onclick="executeFunction('Send Manual Text')" data-number="30"><div class="num">30</div><div class="icon">💬</div><div class="name">Send Manual Text</div></div>
 </div>
 <div id="commandDisplay" class="cmd"></div>
+</div>
+
 <script>
+// MSAL Configuration (same as other admin pages)
+let msalInstance = null;
+
+const msalConfig = {
+  auth: {
+    clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+    authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+    redirectUri: window.location.origin + '/admin'
+  },
+  cache: {
+    cacheLocation: 'sessionStorage',
+    storeAuthStateInCookie: false
+  }
+};
+
+async function initAuth(){
+  try{
+    if(!window.msal || !window.msal.PublicClientApplication){
+      console.error('MSAL failed to load.');
+      return false;
+    }
+
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    const redirectResponse = await msalInstance.handleRedirectPromise();
+    if (redirectResponse && redirectResponse.account){
+      msalInstance.setActiveAccount(redirectResponse.account);
+    }
+
+    const active = msalInstance.getActiveAccount();
+    const accounts = msalInstance.getAllAccounts();
+    const account = active || accounts[0];
+
+    if (account){
+      msalInstance.setActiveAccount(account);
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e){
+    console.error('Auth init error:', e);
+    return false;
+  }
+}
+
+function showMenu(){
+  document.getElementById('loadingScreen').classList.add('authenticated');
+  document.getElementById('menuContainer').classList.add('authenticated');
+}
+
+function showUnauthorized(){
+  // If not authenticated, close the menu
+  if(window.parent !== window){
+    window.parent.postMessage({type:'fp-close-menu'},'*');
+  } else if(window.opener){
+    window.close();
+  }
+}
+
+// Menu functionality
 const k={'0':'Mark DNC Job','1':'Triage Form','2':'Booking Form','3':'Send Manual Payment Gateway','4':'Add Supplier','5':'Update Job','6':'Open Customer Address in Google Maps','7':'Customer Reply','8':'Call Customer','9':'Send Job to Supplier','10':'Send Message To Supplier','11':'Call Supplier','12':'Update Supplier Details','13':'Driver en route','14':'Revised ETA','15':'Cancellation','16':'Bad Debt Notice','17':'Job Complete','18':'Close Job','19':'Send Invoice','20':'Complaint Response','21':'Generate ANZ Batch File','22':'Add to Blacklist','23':'API Call Menu','24':'Profit and Loss','25':'Generate Customer Refund File','26':'Run Stripe and Job Updates','27':'Update Job Address by Rego','28':'Send Location Request','29':'Prepurchase Inspection Menu','30':'Send Manual Text'};
 let c='';
-function executeFunction(f){if(window.parent!==window){window.parent.postMessage({type:'fp-command',command:f},'*')}else if(window.opener){window.opener.postMessage({type:'fp-command',command:f},'*');window.close()}else{alert(`Executing: ${f}`)}}
-function u(){const d=document.getElementById('commandDisplay');if(c){d.textContent=`Command: ${c}`;d.classList.add('show')}else{d.classList.remove('show')}}
-function e(n){const f=k[n];if(f){executeFunction(f);return true}return false}
-document.addEventListener('keydown',function(ev){if(ev.key>='0'&&ev.key<='9'){ev.preventDefault();c+=ev.key;u();if(c.length===1&&k[c]){e(c)}else if(c.length===2){e(c)}return}if(ev.key==='Enter'&&c){ev.preventDefault();e(c);return}if(ev.key==='Backspace'){ev.preventDefault();c=c.slice(0,-1);u();return}if(ev.key==='Escape'){if(window.parent!==window){window.parent.postMessage({type:'fp-close-menu'},'*')}else if(window.opener){window.close()}}});
-window.addEventListener('load',function(){document.body.focus();document.body.setAttribute('tabindex','0')});
+
+function executeFunction(f){
+  if(window.parent!==window){
+    window.parent.postMessage({type:'fp-command',command:f},'*')
+  }else if(window.opener){
+    window.opener.postMessage({type:'fp-command',command:f},'*');
+    window.close()
+  }else{
+    alert(`Executing: ${f}`)
+  }
+}
+
+function u(){
+  const d=document.getElementById('commandDisplay');
+  if(c){
+    d.textContent=`Command: ${c}`;
+    d.classList.add('show')
+  }else{
+    d.classList.remove('show')
+  }
+}
+
+function e(n){
+  const f=k[n];
+  if(f){
+    executeFunction(f);
+    return true
+  }
+  return false
+}
+
+// Keyboard handling
+document.addEventListener('keydown',function(ev){
+  if(ev.key>='0'&&ev.key<='9'){
+    ev.preventDefault();
+    c+=ev.key;
+    u();
+    if(c.length===1&&k[c]){
+      e(c)
+    }else if(c.length===2){
+      e(c)
+    }
+    return
+  }
+  if(ev.key==='Enter'&&c){
+    ev.preventDefault();
+    e(c);
+    return
+  }
+  if(ev.key==='Backspace'){
+    ev.preventDefault();
+    c=c.slice(0,-1);
+    u();
+    return
+  }
+  if(ev.key==='Escape'){
+    if(window.parent!==window){
+      window.parent.postMessage({type:'fp-close-menu'},'*')
+    }else if(window.opener){
+      window.close()
+    }
+  }
+});
+
+// Initialize
+window.addEventListener('DOMContentLoaded', async function(){
+  const authenticated = await initAuth();
+  if(authenticated){
+    showMenu();
+    // Focus for keyboard input
+    document.body.focus();
+    document.body.setAttribute('tabindex','0');
+  } else {
+    showUnauthorized();
+  }
+});
 </script>
 </body>
 </html>
