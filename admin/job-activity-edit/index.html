@@ -10,7 +10,7 @@
   <!-- MSAL -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
 
   <!-- AG Grid Community v31 -->
@@ -1172,6 +1172,227 @@
 
     // ===== INIT =====
     window.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+  
+  <!-- Custom command handling for Job Activity Edit -->
+  <script>
+    // Handle commands specific to the Job Activity Edit page
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Triage Form':
+          window.location.href = '/admin/triage';
+          break;
+        case 'Add Activity':
+          const now = new Date(Date.now() - (new Date()).getTimezoneOffset()*60000).toISOString().slice(0,16);
+          $('#actWhen').value = now;
+          openActivityModal();
+          break;
+        case 'Save Changes':
+          if (state.isDirty) {
+            saveChanges();
+          } else {
+            showToast('No changes to save', 'info');
+          }
+          break;
+        case 'Discard Changes':
+          if (state.isDirty) {
+            if (confirm('Discard all pending changes?')) {
+              state.pendingChanges.updates.clear();
+              state.pendingChanges.creates = [];
+              state.pendingChanges.deletes.clear();
+              state.gridApi.setRowData(JSON.parse(JSON.stringify(state.originalData)));
+              updateChangeCount();
+              showToast('Changes discarded','info');
+            }
+          } else {
+            showToast('No changes to discard', 'info');
+          }
+          break;
+        case 'Refresh Data':
+          if (state.isDirty && !confirm('You have unsaved changes. Refresh anyway?')) return;
+          window.location.reload();
+          break;
+        case 'Delete Selected':
+          const sel = state.gridApi?.getSelectedRows();
+          if (!sel || !sel.length) {
+            showToast('No rows selected','warning');
+            return;
+          }
+          if (!confirm(`Delete ${sel.length} selected rows?`)) return;
+
+          sel.forEach(r=>{
+            if (String(r.ID).startsWith('NEW_')){
+              state.pendingChanges.creates = state.pendingChanges.creates.filter(x=> x.ID !== r.ID);
+            } else {
+              state.pendingChanges.deletes.add(r.ID);
+            }
+          });
+          state.gridApi.applyTransaction({ remove: sel });
+          updateChangeCount();
+          showToast(`${sel.length} rows marked for deletion`,'warning');
+          break;
+        case 'Duplicate Selected':
+          const selectedForDup = state.gridApi?.getSelectedRows();
+          if (!selectedForDup || !selectedForDup.length) {
+            showToast('No rows selected','warning');
+            return;
+          }
+
+          const dups = selectedForDup.map(r=>{
+            const copy = { ...r };
+            copy.ID = `NEW_${Date.now()}_${Math.random()}`;
+            delete copy.__selection__;
+            state.pendingChanges.creates.push(copy);
+            return copy;
+          });
+          state.gridApi.applyTransaction({ add: dups, addIndex: 0 });
+          updateChangeCount();
+          showToast(`${dups.length} rows duplicated`,'success');
+          break;
+        case 'Export Selected':
+          const selectedForExport = state.gridApi?.getSelectedRows();
+          if (!selectedForExport || !selectedForExport.length) {
+            showToast('No rows selected','warning');
+            return;
+          }
+          exportToCSV(selectedForExport, 'job_activity_selected');
+          break;
+        case 'Export All':
+          const allRows = [];
+          state.gridApi?.forEachNode(n => allRows.push(n.data));
+          exportToCSV(allRows, 'job_activity_all');
+          break;
+        case 'Import CSV':
+          openImport();
+          break;
+        case 'Add Column':
+          openColumnModal();
+          break;
+        case 'Quick Fill Update':
+          if (!state.currentActivity && document.getElementById('activityModal').classList.contains('active')) {
+            $('#actType').value = 'Update';
+            $('#actStatus').value = 'In Progress';
+            $('#actNotes').value = 'Status update provided to customer';
+            showToast('Quick filled with update template', 'info');
+          } else {
+            showToast('Open the Add Activity modal first', 'warning');
+          }
+          break;
+        case 'Quick Fill Call':
+          if (!state.currentActivity && document.getElementById('activityModal').classList.contains('active')) {
+            $('#actType').value = 'Call';
+            $('#actStatus').value = 'Completed';
+            $('#actDuration').value = '10';
+            $('#actNotes').value = 'Phone call made to customer';
+            showToast('Quick filled with call template', 'info');
+          } else {
+            showToast('Open the Add Activity modal first', 'warning');
+          }
+          break;
+        case 'Quick Fill Email':
+          if (!state.currentActivity && document.getElementById('activityModal').classList.contains('active')) {
+            $('#actType').value = 'Email';
+            $('#actStatus').value = 'Completed';
+            $('#actDuration').value = '5';
+            $('#actNotes').value = 'Email sent to customer with details';
+            showToast('Quick filled with email template', 'info');
+          } else {
+            showToast('Open the Add Activity modal first', 'warning');
+          }
+          break;
+        case 'Quick Fill Resolution':
+          if (!state.currentActivity && document.getElementById('activityModal').classList.contains('active')) {
+            $('#actType').value = 'Resolution';
+            $('#actStatus').value = 'Completed';
+            $('#actNotes').value = 'Issue resolved successfully';
+            showToast('Quick filled with resolution template', 'info');
+          } else {
+            showToast('Open the Add Activity modal first', 'warning');
+          }
+          break;
+        case 'Search Activities':
+          document.getElementById('quickSearch').focus();
+          showToast('Enter search term to filter activities', 'info');
+          break;
+        case 'Filter by Job':
+          const searchField = document.getElementById('quickSearch');
+          searchField.focus();
+          searchField.placeholder = 'Enter job ID or rego to filter...';
+          showToast('Enter job ID or rego to filter activities', 'info');
+          break;
+        case 'Show Only Open':
+          state.gridApi?.setFilterModel({
+            Status: {
+              filterType: 'text',
+              type: 'equals',
+              filter: 'Open'
+            }
+          });
+          showToast('Filtered to show only open activities', 'info');
+          break;
+        case 'Show Only Completed':
+          state.gridApi?.setFilterModel({
+            Status: {
+              filterType: 'text',
+              type: 'equals',
+              filter: 'Completed'
+            }
+          });
+          showToast('Filtered to show only completed activities', 'info');
+          break;
+        case 'Clear Filters':
+          state.gridApi?.setFilterModel(null);
+          showToast('All filters cleared', 'info');
+          break;
+        case 'Sort by Date':
+          // Find the date column and sort by it
+          const dateFields = ['When', 'Created', 'Modified', 'DateTime'];
+          let dateField = null;
+          for (const field of dateFields) {
+            if (state.gridApi?.getColumn(field)) {
+              dateField = field;
+              break;
+            }
+          }
+          if (dateField) {
+            state.gridApi.applyColumnState({
+              state: [{ colId: dateField, sort: 'desc' }],
+              defaultState: { sort: null }
+            });
+            showToast(`Sorted by ${dateField} (newest first)`, 'info');
+          } else {
+            showToast('No date column found to sort by', 'warning');
+          }
+          break;
+        case 'Show Column Config':
+          document.getElementById('columnMenu').classList.toggle('show');
+          break;
+        case 'Mark as Completed':
+          const selectedToComplete = state.gridApi?.getSelectedRows();
+          if (!selectedToComplete || !selectedToComplete.length) {
+            showToast('No rows selected','warning');
+            return;
+          }
+          selectedToComplete.forEach(row => {
+            if (String(row.ID).startsWith('NEW_')) {
+              row.Status = 'Completed';
+            } else {
+              const updates = state.pendingChanges.updates.get(row.ID) || {};
+              updates.Status = 'Completed';
+              state.pendingChanges.updates.set(row.ID, updates);
+            }
+          });
+          state.gridApi.refreshCells();
+          updateChangeCount();
+          showToast(`${selectedToComplete.length} activities marked as completed`, 'success');
+          break;
+        case 'View Only Mode':
+          window.location.href = '/admin/job-activity';
+          break;
+        default:
+          showToast(`Command: ${command}`, 'info');
+      }
+    };
   </script>
 </body>
 </html>
