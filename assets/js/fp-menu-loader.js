@@ -14,9 +14,9 @@
     // Configuration
     const MENU_URL = '/admin/command-menu.html';
 
-    // Device detection - temporarily simplified for testing
+    // Device detection - simplified to show on all touch devices
     function isTouchOnlyDevice() {
-        return ('ontouchstart' in window) && (navigator.maxTouchPoints > 0);
+        return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
 
     // Create overlay and iframe
