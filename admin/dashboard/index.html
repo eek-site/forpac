@@ -117,9 +117,18 @@
     .unauthorized-message{color:#718096;margin-bottom:30px}
     .btn-login{background:#1e3c72;color:#fff;padding:12px 30px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:600;transition:.25s}
     .btn-login:hover{background:#2a5298;transform:translateY(-2px)}
+    
+    /* Toast notifications */
+    .toast-container{position:fixed;top:20px;right:20px;z-index:9999}
+    .toast{background:#fff;padding:14px 18px;border-radius:10px;box-shadow:0 5px 20px rgba(0,0,0,.15);margin-bottom:10px;display:flex;align-items:center;gap:12px;min-width:300px;animation:slideInRight .3s ease;border-left:4px solid}
+    .toast.success{border-left-color:#48bb78}.toast.error{border-left-color:#f56565}.toast.warning{border-left-color:#ed8936}.toast.info{border-left-color:#4299e1}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
   </style>
 </head>
 <body>
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <!-- Loading -->
   <div class="loading-screen" id="loadingScreen">
     <div class="spinner"></div>
@@ -162,22 +171,22 @@
       <div class="stats-grid">
         <div class="stat-card emergency">
           <div class="stat-label">Active Emergency Jobs</div>
-          <div class="stat-value">12</div>
+          <div class="stat-value" id="emergencyJobs">12</div>
           <div class="stat-change positive">↑ 15% from yesterday</div>
         </div>
         <div class="stat-card claims">
           <div class="stat-label">Claims Processing</div>
-          <div class="stat-value">47</div>
+          <div class="stat-value" id="claimsProcessing">47</div>
           <div class="stat-change positive">↑ 8% from last week</div>
         </div>
         <div class="stat-card suppliers">
           <div class="stat-label">Active Suppliers</div>
-          <div class="stat-value">523</div>
+          <div class="stat-value" id="activeSuppliers">523</div>
           <div class="stat-change positive">↑ 12 this month</div>
         </div>
         <div class="stat-card compliance">
           <div class="stat-label">Avg Response Time</div>
-          <div class="stat-value">32m</div>
+          <div class="stat-value" id="avgResponseTime">32m</div>
           <div class="stat-change positive">↓ 5 min improvement</div>
         </div>
       </div>
@@ -205,7 +214,7 @@
             <h2 class="panel-title">Active Claims</h2>
             <a href="/admin/jobs-master" class="view-all">View All →</a>
           </div>
-          <ul class="job-list">
+          <ul class="job-list" id="activeJobsList">
             <li class="job-item urgent insurance">
               <div class="job-info">
                 <h3>Water Damage - Commercial Property</h3>
@@ -265,7 +274,7 @@
             <h2 class="panel-title">Supplier Status</h2>
             <a href="#" class="view-all">Manage All →</a>
           </div>
-          <div class="supplier-grid">
+          <div class="supplier-grid" id="supplierGrid">
             <div class="supplier-card"><div class="supplier-avatar available">JB</div><div class="supplier-name">John Brown</div><div class="supplier-specialty">Plumbing</div><div class="supplier-status positive">Available</div></div>
             <div class="supplier-card"><div class="supplier-avatar busy">SK</div><div class="supplier-name">Sarah Kim</div><div class="supplier-specialty">Electrical</div><div class="supplier-status negative">On Job</div></div>
             <div class="supplier-card"><div class="supplier-avatar available">MT</div><div class="supplier-name">Mike Taylor</div><div class="supplier-specialty">HVAC</div><div class="supplier-status positive">Available</div></div>
@@ -285,19 +294,19 @@
         <div class="stats-grid" style="margin-top:20px">
           <div style="background:#f8fafc;padding:20px;border-radius:12px;text-align:center">
             <div style="font-size:.9em;color:#718096;margin-bottom:10px">Phone System</div>
-            <div style="font-size:1.5em;font-weight:700;color:#48bb78">ACTIVE</div>
+            <div style="font-size:1.5em;font-weight:700;color:#48bb78" id="phoneSystemStatus">ACTIVE</div>
           </div>
           <div style="background:#f8fafc;padding:20px;border-radius:12px;text-align:center">
             <div style="font-size:.9em;color:#718096;margin-bottom:10px">API Status</div>
-            <div style="font-size:1.5em;font-weight:700;color:#48bb78">OPERATIONAL</div>
+            <div style="font-size:1.5em;font-weight:700;color:#48bb78" id="apiStatus">OPERATIONAL</div>
           </div>
           <div style="background:#f8fafc;padding:20px;border-radius:12px;text-align:center">
             <div style="font-size:.9em;color:#718096;margin-bottom:10px">Response Rate</div>
-            <div style="font-size:1.5em;font-weight:700;color:#4299e1">98.5%</div>
+            <div style="font-size:1.5em;font-weight:700;color:#4299e1" id="responseRate">98.5%</div>
           </div>
           <div style="background:#f8fafc;padding:20px;border-radius:12px;text-align:center">
             <div style="font-size:.9em;color:#718096;margin-bottom:10px">Active Users</div>
-            <div style="font-size:1.5em;font-weight:700;color:#9f7aea">47</div>
+            <div style="font-size:1.5em;font-weight:700;color:#9f7aea" id="activeUsers">47</div>
           </div>
         </div>
       </div>
@@ -325,6 +334,17 @@
         storeAuthStateInCookie: false
       }
     };
+
+    // Toast notifications
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const icons = {success:'✓',error:'✖',warning:'⚠',info:'ℹ'};
+      toast.innerHTML = `<span style="font-size:18px">${icons[type]}</span><span style="flex:1">${message}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:18px">×</button>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    }
 
     function showDashboard(account){
       document.getElementById('userName').textContent = account.name || account.username || 'Administrator';
@@ -393,28 +413,122 @@
       }
     }
 
-    // Quick action stubs
-    function createNewClaim(){ alert('Opening new claim form…'); }
-    function dispatchSupplier(){ alert('Opening supplier dispatch panel…'); }
-    function viewReports(){ alert('Opening reports dashboard…'); }
-    function manageSuppliers(){ alert('Opening supplier management…'); }
-    function systemStatus(){ alert('System Status:\n\n✅ All systems operational\n✅ API endpoints responding\n✅ Database connected\n✅ Phone system active'); }
-    function togglePhoneSystem(){ if(confirm('Toggle phone system status?')) alert('Phone system status toggled.'); }
+    // Enhanced quick action functions with better feedback
+    function createNewClaim(){ 
+      showToast('Opening new claim form...', 'info');
+      // In a real app, this would navigate to a claim creation form
+      setTimeout(() => showToast('This would open the claim creation interface', 'info'), 1000);
+    }
 
-    // Simple demo stat animation
+    function dispatchSupplier(){ 
+      showToast('Opening supplier dispatch panel...', 'info');
+      setTimeout(() => showToast('This would open the dispatch interface', 'info'), 1000);
+    }
+
+    function viewReports(){ 
+      showToast('Loading reports dashboard...', 'info');
+      setTimeout(() => showToast('This would display comprehensive reports', 'info'), 1000);
+    }
+
+    function manageSuppliers(){ 
+      showToast('Opening supplier management...', 'info');
+      setTimeout(() => showToast('This would open supplier management tools', 'info'), 1000);
+    }
+
+    function systemStatus(){ 
+      showToast('System Status:\n\n✅ All systems operational\n✅ API endpoints responding\n✅ Database connected\n✅ Phone system active', 'success');
+    }
+
+    function togglePhoneSystem(){ 
+      if(confirm('Toggle phone system status?')) {
+        const statusEl = document.getElementById('phoneSystemStatus');
+        const isActive = statusEl.textContent === 'ACTIVE';
+        statusEl.textContent = isActive ? 'INACTIVE' : 'ACTIVE';
+        statusEl.style.color = isActive ? '#f56565' : '#48bb78';
+        showToast(`Phone system ${isActive ? 'deactivated' : 'activated'}`, isActive ? 'warning' : 'success');
+      }
+    }
+
+    // Enhanced stat animation with more realistic variations
     function updateStats(){
-      document.querySelectorAll('.stat-value').forEach((el,i)=>{
-        const raw = el.textContent.trim();
-        const isMinutes = /m$/.test(raw);
-        const n = parseInt(raw,10);
-        if (Number.isFinite(n) && Math.random() > 0.7){
-          const delta = Math.random() > 0.5 ? 1 : -1;
-          const next = Math.max(0, n + delta);
-          el.style.transform='scale(1.1)';
-          el.textContent = isMinutes ? `${next}m` : `${next}`;
-          setTimeout(()=>{ el.style.transform='scale(1)'; }, 300);
+      const stats = [
+        { id: 'emergencyJobs', min: 8, max: 15, suffix: '' },
+        { id: 'claimsProcessing', min: 40, max: 55, suffix: '' },
+        { id: 'activeSuppliers', min: 500, max: 550, suffix: '' },
+        { id: 'avgResponseTime', min: 25, max: 40, suffix: 'm' }
+      ];
+
+      stats.forEach(stat => {
+        const el = document.getElementById(stat.id);
+        if (el && Math.random() > 0.8) { // Less frequent updates
+          const currentVal = parseInt(el.textContent.replace(/\D/g, ''), 10);
+          const variance = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+          const newVal = Math.max(stat.min, Math.min(stat.max, currentVal + variance));
+          
+          el.style.transform = 'scale(1.05)';
+          el.style.transition = 'transform 0.2s ease';
+          el.textContent = newVal + stat.suffix;
+          
+          setTimeout(() => {
+            el.style.transform = 'scale(1)';
+          }, 200);
         }
       });
+    }
+
+    // Enhanced supplier status updates
+    function updateSupplierStatuses() {
+      const suppliers = document.querySelectorAll('.supplier-card');
+      suppliers.forEach(card => {
+        if (Math.random() > 0.95) { // Very infrequent status changes
+          const avatar = card.querySelector('.supplier-avatar');
+          const status = card.querySelector('.supplier-status');
+          const statuses = [
+            { class: 'available', text: 'Available', color: 'positive' },
+            { class: 'busy', text: 'On Job', color: 'negative' },
+            { class: 'busy', text: 'Driving', color: 'negative' },
+            { class: 'offline', text: 'Offline', color: '' }
+          ];
+          
+          const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+          avatar.className = `supplier-avatar ${newStatus.class}`;
+          status.textContent = newStatus.text;
+          status.className = `supplier-status ${newStatus.color}`;
+        }
+      });
+    }
+
+    // Job status simulation
+    function simulateJobUpdates() {
+      const jobs = document.querySelectorAll('.job-item');
+      jobs.forEach(job => {
+        if (Math.random() > 0.98) { // Very rare updates
+          const statusBadge = job.querySelector('.status-badge');
+          const responseTime = job.querySelector('.response-time');
+          
+          // Simulate progression through statuses
+          if (statusBadge.textContent === 'Pending') {
+            statusBadge.textContent = 'Assigned';
+            statusBadge.className = 'status-badge status-assigned';
+            responseTime.textContent = 'ETA: ' + (Math.floor(Math.random() * 30) + 10) + ' min';
+            showToast('Job status updated: Assigned to supplier', 'info');
+          } else if (statusBadge.textContent === 'Assigned') {
+            statusBadge.textContent = 'In Progress';
+            statusBadge.className = 'status-badge status-in-progress';
+            responseTime.textContent = 'Started: ' + (Math.floor(Math.random() * 15) + 5) + ' min ago';
+            showToast('Job status updated: Work in progress', 'info');
+          }
+        }
+      });
+    }
+
+    // Enhanced timer with multiple update types
+    function startEnhancedTimer() {
+      setInterval(() => {
+        updateStats();
+        updateSupplierStatuses();
+        simulateJobUpdates();
+      }, 15000); // Every 15 seconds
     }
 
     window.addEventListener('DOMContentLoaded', initAuth);
@@ -428,24 +542,115 @@
         case 'Triage Form':
           window.location.href = '/admin/triage';
           break;
+        case 'New Claim':
+          createNewClaim();
+          break;
+        case 'Dispatch Supplier':
+          dispatchSupplier();
+          break;
+        case 'View Reports':
+          viewReports();
+          break;
+        case 'Manage Suppliers':
+          manageSuppliers();
+          break;
+        case 'System Status':
+          systemStatus();
+          break;
+        case 'Toggle Phone System':
+          togglePhoneSystem();
+          break;
+        case 'Jobs Master':
+          window.location.href = '/admin/jobs-master';
+          break;
+        case 'Job Activity':
+          window.location.href = '/admin/job-activity';
+          break;
+        case 'Edit Activity':
+          window.location.href = '/admin/job-activity-edit';
+          break;
+        case 'Refresh Dashboard':
+          updateStats();
+          updateSupplierStatuses();
+          simulateJobUpdates();
+          showToast('Dashboard refreshed', 'success');
+          break;
+        case 'Emergency Alert':
+          showToast('🚨 Emergency jobs require immediate attention', 'warning');
+          document.querySelector('.stat-card.emergency').style.animation = 'pulse 1s ease-in-out 3';
+          break;
+        case 'Show Active Jobs':
+          document.querySelector('.service-panel').scrollIntoView({ behavior: 'smooth' });
+          showToast('Showing active jobs section', 'info');
+          break;
+        case 'Show Suppliers':
+          document.querySelectorAll('.service-panel')[1].scrollIntoView({ behavior: 'smooth' });
+          showToast('Showing supplier status section', 'info');
+          break;
+        case 'Quick Stats':
+          const emergency = document.getElementById('emergencyJobs').textContent;
+          const claims = document.getElementById('claimsProcessing').textContent;
+          const suppliers = document.getElementById('activeSuppliers').textContent;
+          const response = document.getElementById('avgResponseTime').textContent;
+          showToast(`Quick Stats: ${emergency} emergency jobs, ${claims} claims processing, ${suppliers} active suppliers, ${response} avg response`, 'info');
+          break;
+        case 'System Health':
+          const phone = document.getElementById('phoneSystemStatus').textContent;
+          const api = document.getElementById('apiStatus').textContent;
+          const rate = document.getElementById('responseRate').textContent;
+          const users = document.getElementById('activeUsers').textContent;
+          showToast(`System Health: Phone ${phone}, API ${api}, Response rate ${rate}, ${users} active users`, 'info');
+          break;
         case 'Job Complete':
-          // Use existing dashboard function if available
-          if (typeof completeJob === 'function') {
-            completeJob();
+          // Simulate completing the first in-progress job
+          const inProgressJob = document.querySelector('.status-in-progress');
+          if (inProgressJob) {
+            inProgressJob.textContent = 'Complete';
+            inProgressJob.className = 'status-badge status-complete';
+            const responseTime = inProgressJob.parentElement.querySelector('.response-time');
+            responseTime.textContent = 'Completed: Just now';
+            showToast('Job marked as complete', 'success');
           } else {
-            alert('Job completion functionality');
+            showToast('No in-progress jobs to complete', 'warning');
           }
           break;
         case 'Add Supplier':
-          manageSuppliers(); // Call existing function
+          manageSuppliers();
           break;
         case 'Update Job':
-          alert('Update job functionality');
+          showToast('Job update functionality would open here', 'info');
+          break;
+        case 'Emergency Response':
+          showToast('🚨 Activating emergency response protocol', 'warning');
+          // Highlight emergency jobs
+          document.querySelectorAll('.job-item.urgent').forEach(job => {
+            job.style.boxShadow = '0 0 20px rgba(245, 101, 101, 0.5)';
+            setTimeout(() => job.style.boxShadow = '', 3000);
+          });
           break;
         default:
+          showToast(`Command: ${command}`, 'info');
           console.log('Dashboard received command:', command);
       }
     };
+
+    // Add pulse animation for emergency alerts
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Start enhanced updates when dashboard loads
+    setTimeout(() => {
+      if (document.getElementById('dashboardContainer').classList.contains('authenticated')) {
+        startEnhancedTimer();
+      }
+    }, 2000);
   </script>
 </body>
 </html>
