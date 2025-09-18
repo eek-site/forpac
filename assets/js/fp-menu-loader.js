@@ -169,6 +169,14 @@
     }
 
     function showMenu() {
+        // Check if user is authenticated first
+        if (!isAuthenticated()) {
+            // Not authenticated - redirect to login
+            window.location.href = '/admin';
+            return;
+        }
+        
+        // Authenticated - show menu
         const overlay = createMenuOverlay();
         overlay.style.display = 'flex';
         menuOpen = true;
@@ -179,6 +187,19 @@
                 menuFrame.focus();
             }
         }, 100);
+    }
+    
+    function isAuthenticated() {
+        // Check for active MSAL session
+        if (window.msal && msalInstance) {
+            const account = msalInstance.getActiveAccount() || msalInstance.getAllAccounts()[0];
+            return !!account;
+        }
+        
+        // Fallback: check for session storage indicators
+        return sessionStorage.getItem('msal.account.keys') || 
+               sessionStorage.getItem('msalAccount') ||
+               document.cookie.includes('msal');
     }
 
     function hideMenu() {
