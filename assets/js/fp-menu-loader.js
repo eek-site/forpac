@@ -16,10 +16,11 @@
 
     // Create overlay and iframe
     function createMenuOverlay() {
-        if (document.getElementById('fp-menu-overlay')) return;
+        let overlay = document.getElementById('fp-menu-overlay');
+        if (overlay) return overlay; // Return existing overlay instead of undefined
 
         // Create overlay
-        const overlay = document.createElement('div');
+        overlay = document.createElement('div');
         overlay.id = 'fp-menu-overlay';
         overlay.style.cssText = `
             position: fixed;
