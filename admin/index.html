@@ -10,11 +10,10 @@
   <!-- Microsoft Authentication Library -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
   
   <style>
-    /* (styles unchanged) */
     *{margin:0;padding:0;box-sizing:border-box}
     :root{--primary-color:#1e3c72;--primary-dark:#152a52;--secondary-color:#2a5298;--success-color:#22c55e;--error-color:#ef4444;--warning-color:#f59e0b;--text-primary:#1e293b;--text-secondary:#64748b;--border-color:#e2e8f0;--bg-light:#f8fafc}
     body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:linear-gradient(135deg,var(--primary-color) 0%,var(--secondary-color) 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
@@ -199,7 +198,7 @@
         }
         msalInstance=new msal.PublicClientApplication(msalConfig);
 
-        // initialize() exists on newer versions; guard in case it’s undefined
+        // initialize() exists on newer versions; guard in case it's undefined
         if (typeof msalInstance.initialize === 'function') {
           await msalInstance.initialize();
         }
@@ -316,6 +315,37 @@
     window.addEventListener('beforeunload',()=>{ try{ sessionStorage.removeItem('msal.interaction.status'); }catch{} });
 
     window.addEventListener('DOMContentLoaded',()=>{ initializeMsal(); });
+  </script>
+  
+  <!-- Custom command handling for login page -->
+  <script>
+    // Handle commands specific to the login page
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Triage Form':
+          // Check if user is authenticated first
+          if (msalInstance && msalInstance.getActiveAccount()) {
+            window.location.href = '/admin/triage';
+          } else {
+            showInfo('Please sign in first to access the triage form');
+          }
+          break;
+        case 'Job Complete':
+          showInfo('Please sign in to access job management features');
+          break;
+        case 'Add Supplier':
+          showInfo('Please sign in to access supplier management');
+          break;
+        case 'Update Job':
+          showInfo('Please sign in to access job updates');
+          break;
+        case 'Login':
+          signIn(); // Call existing sign-in function
+          break;
+        default:
+          showInfo('Please sign in to access FormanPacific admin features');
+      }
+    };
   </script>
 </body>
 </html>
