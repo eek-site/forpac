@@ -344,6 +344,7 @@ function handleJobPickerMessage(event) {
 // Job selection functions
 function selectJob() {
   console.log('Opening job picker...');
+  console.log('Iframe contentWindow:', iframe.contentWindow);
   
   // Get the iframe
   const iframe = document.getElementById('jobPickerFrame');
