@@ -146,7 +146,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="page-container" id="pageContainer">
     <div class="header">
         <div class="header-left">
-            <a href="command-menu.html" class="back-btn">← Back to Menu</a>
+            <a href="fp-command-menu.html" class="back-btn">← Back to Menu</a>
             <div class="page-icon">❌</div>
             <div class="page-title">Cancel Job (DNC)</div>
         </div>
@@ -242,7 +242,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <!-- Include Job Picker Modal -->
 <iframe 
-    src="job-picker-modal.html" 
+    id="jobPickerFrame"
+    src="job-picker-modal-fixed.html" 
     style="display: none;" 
     onload="initJobPicker()"
 ></iframe>
@@ -323,22 +324,36 @@ function showAlert(message, type = 'info'){
   setTimeout(() => alertDiv.remove(), 5000);
 }
 
-// Initialize job picker from iframe
+// Initialize job picker iframe communication
 function initJobPicker() {
-  // Job picker is loaded in iframe - we'll use postMessage communication
+  console.log('Job picker iframe loaded');
+  // Listen for messages from job picker iframe
   window.addEventListener('message', handleJobPickerMessage);
 }
 
 function handleJobPickerMessage(event) {
+  console.log('Received message:', event.data);
+  
   if (event.data.type === 'JOB_SELECTED') {
     handleJobSelection(event.data.job);
+  } else if (event.data.type === 'JOB_PICKER_CLOSED') {
+    console.log('Job picker closed');
   }
 }
 
 // Job selection functions
 function selectJob() {
-  // Send message to job picker iframe to open
-  const iframe = document.querySelector('iframe');
+  console.log('Opening job picker...');
+  
+  // Get the iframe
+  const iframe = document.getElementById('jobPickerFrame');
+  
+  if (!iframe) {
+    showAlert('Job picker not available', 'error');
+    return;
+  }
+  
+  // Send message to iframe to open picker
   iframe.contentWindow.postMessage({
     type: 'OPEN_PICKER',
     options: { filterPPI: false }
@@ -346,6 +361,7 @@ function selectJob() {
 }
 
 function handleJobSelection(job) {
+  console.log('Job selected:', job);
   selectedJob = job;
   displaySelectedJob(job);
   document.getElementById('cancellationForm').style.display = 'block';
@@ -438,8 +454,9 @@ async function confirmCancellation() {
       originalData: selectedJob
     };
     
-    // Call Power Automate flow (replace with your actual endpoint)
-    await callCancellationFlow(cancellationData);
+    // Call Power Automate flow
+    const result = await callCancellationFlow(cancellationData);
+    console.log('Cancellation result:', result);
     
     showAlert('Job successfully cancelled (DNC)', 'success');
     
@@ -475,7 +492,8 @@ async function callCancellationFlow(data) {
   });
   
   if (!response.ok) {
-    throw new Error(`Flow failed: ${response.status} ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Flow failed: ${response.status} ${response.statusText} - ${errorText}`);
   }
   
   return response.json();
