@@ -246,7 +246,12 @@ const msalConfig = {
   },
   cache: {
     cacheLocation: 'sessionStorage',
-    storeAuthStateInCookie: false
+    storeAuthStateInCookie: true  // Important for iframe contexts
+  },
+  system: {
+    allowNativeBroker: false,  // Disable native broker in iframe
+    windowHashTimeout: 10000,
+    iframeHashTimeout: 10000
   }
 };
 
