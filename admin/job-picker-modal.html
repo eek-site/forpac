@@ -203,7 +203,8 @@ let jobPickerState = {
   selectedJob: null,
   isPPIMode: false,
   onJobSelected: null,
-  isLoading: false
+  isLoading: false,
+  isInIframe: false
 };
 
 // MSAL Configuration
@@ -217,6 +218,11 @@ const MSAL_CONFIG = {
 };
 
 const GRAPH_SCOPES = ['https://graph.microsoft.com/Sites.Read.All'];
+
+// Detect if running in iframe
+function detectIframe() {
+  jobPickerState.isInIframe = window.self !== window.top;
+}
 
 // Initialize MSAL
 async function initJobPickerAuth() {
@@ -287,8 +293,6 @@ async function fetchJobsFromSharePoint() {
     const listId = listsData.value[0].id;
 
     // Get items - focusing on open jobs
-    // In the VBA, yellow highlighting indicated "open" jobs
-    // We'll filter for jobs that aren't closed/completed
     const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
     const itemsResponse = await fetch(itemsUrl, {
       headers: { Authorization: `Bearer ${token}` }
@@ -316,7 +320,7 @@ async function fetchJobsFromSharePoint() {
     
   } catch (error) {
     console.error('Failed to load jobs:', error);
-    showJobPickerError('Failed to load jobs from SharePoint');
+    showJobPickerError('Failed to load jobs from SharePoint: ' + error.message);
   } finally {
     jobPickerState.isLoading = false;
     updateJobsDisplay();
@@ -384,7 +388,7 @@ function updateJobsDisplay() {
     <div class="jobs-list">
       ${jobs.map((job, index) => {
         const rego = job.Rego || 'Unknown';
-        const customer = job.CustomerName || job.FirstName + ' ' + job.LastName || 'Unknown Customer';
+        const customer = job.CustomerName || (job.FirstName + ' ' + job.LastName) || 'Unknown Customer';
         const service = job.ServiceType || job.ServiceRequired || 'Service';
         const isPPI = String(service).toLowerCase().includes('pre purchase') || 
                      String(service).toLowerCase().includes('ppi');
@@ -470,15 +474,25 @@ function confirmSelection() {
   sessionStorage.setItem('selectedJobRego', rego);
   sessionStorage.setItem('selectedJobData', JSON.stringify(jobPickerState.selectedJob));
   
-  // Call callback if provided
-  if (jobPickerState.onJobSelected) {
-    jobPickerState.onJobSelected(jobPickerState.selectedJob);
+  // Handle callback or postMessage based on context
+  if (jobPickerState.isInIframe) {
+    // Send message to parent window
+    window.parent.postMessage({
+      type: 'JOB_SELECTED',
+      job: jobPickerState.selectedJob,
+      rego: rego
+    }, '*');
+  } else {
+    // Call callback if provided
+    if (jobPickerState.onJobSelected) {
+      jobPickerState.onJobSelected(jobPickerState.selectedJob);
+    }
+    
+    // Show confirmation (like VBA MsgBox)
+    alert(`You selected: ${rego}`);
   }
   
   closeJobPicker();
-  
-  // Show confirmation (like VBA MsgBox)
-  alert(`You selected: ${rego}`);
 }
 
 // Open job picker
@@ -513,6 +527,13 @@ function closeJobPicker() {
   document.getElementById('jobPickerModal').classList.remove('active');
   jobPickerState.selectedJob = null;
   jobPickerState.onJobSelected = null;
+  
+  if (jobPickerState.isInIframe) {
+    // Send close message to parent
+    window.parent.postMessage({
+      type: 'JOB_PICKER_CLOSED'
+    }, '*');
+  }
 }
 
 // Show error
@@ -529,6 +550,13 @@ function showJobPickerError(message) {
   `;
 }
 
+// Listen for messages from parent window (iframe mode)
+window.addEventListener('message', function(event) {
+  if (event.data.type === 'OPEN_PICKER') {
+    openJobPicker(event.data.options || {});
+  }
+});
+
 // Close modal when clicking outside
 document.addEventListener('click', (event) => {
   if (event.target.id === 'jobPickerModal') {
@@ -543,33 +571,19 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// Export functions for global use
-window.openJobPicker = openJobPicker;
-window.closeJobPicker = closeJobPicker;
-window.selectedJobRego = null;
-</script>
-
-<!-- Example usage in other pages:
-<script src="job-picker-modal.html"></script>
-<script>
-// Open standard job picker
-openJobPicker({
-  onJobSelected: function(job) {
-    console.log('Selected job:', job);
-    // Handle job selection
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  detectIframe();
+  
+  // Export functions for global use (non-iframe mode)
+  if (!jobPickerState.isInIframe) {
+    window.openJobPicker = openJobPicker;
+    window.closeJobPicker = closeJobPicker;
+    window.selectedJobRego = null;
   }
 });
 
-// Open PPI-only job picker
-openJobPicker({
-  filterPPI: true,
-  onJobSelected: function(job) {
-    console.log('Selected PPI job:', job);
-    // Handle PPI job selection
-  }
-});
 </script>
--->
 
 </body>
 </html>
