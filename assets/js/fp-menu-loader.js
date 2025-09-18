@@ -14,17 +14,15 @@
     // Configuration
     const MENU_URL = '/admin/command-menu.html';
 
-    // Device detection
+    // Device detection - temporarily simplified for testing
     function isTouchOnlyDevice() {
-        return ('ontouchstart' in window) && 
-               (navigator.maxTouchPoints > 0) && 
-               !window.matchMedia('(any-hover: hover)').matches;
+        return ('ontouchstart' in window) && (navigator.maxTouchPoints > 0);
     }
 
     // Create overlay and iframe
     function createMenuOverlay() {
         let overlay = document.getElementById('fp-menu-overlay');
-        if (overlay) return overlay; // Return existing overlay instead of undefined
+        if (overlay) return overlay; // Return existing overlay
 
         // Create overlay
         overlay = document.createElement('div');
@@ -61,19 +59,22 @@
         overlay.appendChild(iframe);
         document.body.appendChild(overlay);
 
-        // Add CSS animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fpFadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            @keyframes fpSlideUp {
-                from { transform: translateY(30px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
+        // Add CSS animations only once
+        if (!document.getElementById('fp-menu-animations')) {
+            const style = document.createElement('style');
+            style.id = 'fp-menu-animations';
+            style.textContent = `
+                @keyframes fpFadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes fpSlideUp {
+                    from { transform: translateY(30px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
 
         menuFrame = iframe;
 
@@ -241,7 +242,7 @@
             
             // Show mobile-specific notification
             setTimeout(() => {
-                showNotification('Tap the FP button for quick commands', 'info');
+                showNotification('Tap the menu button for quick commands', 'info');
             }, 2000);
         } else {
             // Show desktop notification
