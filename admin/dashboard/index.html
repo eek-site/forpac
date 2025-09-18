@@ -9,7 +9,7 @@
   <!-- Microsoft Authentication Library -->
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
 
   <style>
@@ -418,6 +418,34 @@
     }
 
     window.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+  
+  <!-- Custom command handling for dashboard -->
+  <script>
+    // Handle commands specific to the dashboard
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Triage Form':
+          window.location.href = '/admin/triage';
+          break;
+        case 'Job Complete':
+          // Use existing dashboard function if available
+          if (typeof completeJob === 'function') {
+            completeJob();
+          } else {
+            alert('Job completion functionality');
+          }
+          break;
+        case 'Add Supplier':
+          manageSuppliers(); // Call existing function
+          break;
+        case 'Update Job':
+          alert('Update job functionality');
+          break;
+        default:
+          console.log('Dashboard received command:', command);
+      }
+    };
   </script>
 </body>
 </html>
