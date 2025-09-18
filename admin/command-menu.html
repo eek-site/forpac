@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FP Command Menu</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;height:100vh;overflow:hidden}
+.header{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:8px 15px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:2px;padding:8px;height:calc(100vh - 40px);overflow-y:auto}
+.item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;min-height:32px;font-size:12px}
+.item:hover{background:#1e3c72;color:#fff;transform:translateX(2px)}
+.num{background:#fff;border:1px solid #e2e8f0;border-radius:3px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:monospace;font-weight:700;font-size:10px;flex-shrink:0;color:#2d3748}
+.item:hover .num{background:rgba(255,255,255,.95);color:#1e3c72}
+.icon{width:12px;font-size:10px;flex-shrink:0}
+.name{font-weight:500;line-height:1.2}
+.cmd{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);background:#1e3c72;color:#fff;padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;font-weight:600;display:none}
+.cmd.show{display:block}
+@media (max-width:600px){.grid{grid-template-columns:1fr}.item{min-height:36px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="header">
+<span>Service Management Menu</span>
+<span style="font-size:11px;opacity:.9">Type number or click</span>
+</div>
+<div class="grid">
+<div class="item" onclick="executeFunction('Mark DNC Job')" data-number="0"><div class="num">0</div><div class="icon">🚫</div><div class="name">Mark DNC Job</div></div>
+<div class="item" onclick="executeFunction('Triage Form')" data-number="1"><div class="num">1</div><div class="icon">🔍</div><div class="name">Triage Form</div></div>
+<div class="item" onclick="executeFunction('Booking Form')" data-number="2"><div class="num">2</div><div class="icon">📅</div><div class="name">Booking Form</div></div>
+<div class="item" onclick="executeFunction('Send Manual Payment Gateway')" data-number="3"><div class="num">3</div><div class="icon">💳</div><div class="name">Send Payment Gateway</div></div>
+<div class="item" onclick="executeFunction('Add Supplier')" data-number="4"><div class="num">4</div><div class="icon">➕</div><div class="name">Add Supplier</div></div>
+<div class="item" onclick="executeFunction('Update Job')" data-number="5"><div class="num">5</div><div class="icon">✏️</div><div class="name">Update Job</div></div>
+<div class="item" onclick="executeFunction('Open Customer Address in Google Maps')" data-number="6"><div class="num">6</div><div class="icon">🗺️</div><div class="name">Open Customer Address</div></div>
+<div class="item" onclick="executeFunction('Customer Reply')" data-number="7"><div class="num">7</div><div class="icon">💬</div><div class="name">Customer Reply</div></div>
+<div class="item" onclick="executeFunction('Call Customer')" data-number="8"><div class="num">8</div><div class="icon">📞</div><div class="name">Call Customer</div></div>
+<div class="item" onclick="executeFunction('Send Job to Supplier')" data-number="9"><div class="num">9</div><div class="icon">📤</div><div class="name">Send Job to Supplier</div></div>
+<div class="item" onclick="executeFunction('Send Message To Supplier')" data-number="10"><div class="num">10</div><div class="icon">✉️</div><div class="name">Send Message To Supplier</div></div>
+<div class="item" onclick="executeFunction('Call Supplier')" data-number="11"><div class="num">11</div><div class="icon">📞</div><div class="name">Call Supplier</div></div>
+<div class="item" onclick="executeFunction('Update Supplier Details')" data-number="12"><div class="num">12</div><div class="icon">👤</div><div class="name">Update Supplier Details</div></div>
+<div class="item" onclick="executeFunction('Driver en route')" data-number="13"><div class="num">13</div><div class="icon">🚗</div><div class="name">Driver en route</div></div>
+<div class="item" onclick="executeFunction('Revised ETA')" data-number="14"><div class="num">14</div><div class="icon">⏰</div><div class="name">Revised ETA</div></div>
+<div class="item" onclick="executeFunction('Cancellation')" data-number="15"><div class="num">15</div><div class="icon">❌</div><div class="name">Cancellation</div></div>
+<div class="item" onclick="executeFunction('Bad Debt Notice')" data-number="16"><div class="num">16</div><div class="icon">⚠️</div><div class="name">Bad Debt Notice</div></div>
+<div class="item" onclick="executeFunction('Job Complete')" data-number="17"><div class="num">17</div><div class="icon">✅</div><div class="name">Job Complete</div></div>
+<div class="item" onclick="executeFunction('Close Job')" data-number="18"><div class="num">18</div><div class="icon">🔒</div><div class="name">Close Job</div></div>
+<div class="item" onclick="executeFunction('Send Invoice')" data-number="19"><div class="num">19</div><div class="icon">🧾</div><div class="name">Send Invoice</div></div>
+<div class="item" onclick="executeFunction('Complaint Response')" data-number="20"><div class="num">20</div><div class="icon">📞</div><div class="name">Complaint Response</div></div>
+<div class="item" onclick="executeFunction('Generate ANZ Batch File')" data-number="21"><div class="num">21</div><div class="icon">📄</div><div class="name">Generate ANZ Batch File</div></div>
+<div class="item" onclick="executeFunction('Add to Blacklist')" data-number="22"><div class="num">22</div><div class="icon">🚫</div><div class="name">Add to Blacklist</div></div>
+<div class="item" onclick="executeFunction('API Call Menu')" data-number="23"><div class="num">23</div><div class="icon">⚙️</div><div class="name">API Call Menu</div></div>
+<div class="item" onclick="executeFunction('Profit and Loss')" data-number="24"><div class="num">24</div><div class="icon">📊</div><div class="name">Profit and Loss</div></div>
+<div class="item" onclick="executeFunction('Generate Customer Refund File')" data-number="25"><div class="num">25</div><div class="icon">💰</div><div class="name">Generate Refund File</div></div>
+<div class="item" onclick="executeFunction('Run Stripe and Job Updates')" data-number="26"><div class="num">26</div><div class="icon">🔄</div><div class="name">Run Stripe Updates</div></div>
+<div class="item" onclick="executeFunction('Update Job Address by Rego')" data-number="27"><div class="num">27</div><div class="icon">🚗</div><div class="name">Update Job Address</div></div>
+<div class="item" onclick="executeFunction('Send Location Request')" data-number="28"><div class="num">28</div><div class="icon">📍</div><div class="name">Send Location Request</div></div>
+<div class="item" onclick="executeFunction('Prepurchase Inspection Menu')" data-number="29"><div class="num">29</div><div class="icon">🔍</div><div class="name">Prepurchase Inspection</div></div>
+<div class="item" onclick="executeFunction('Send Manual Text')" data-number="30"><div class="num">30</div><div class="icon">💬</div><div class="name">Send Manual Text</div></div>
+</div>
+<div id="commandDisplay" class="cmd"></div>
+<script>
+const k={'0':'Mark DNC Job','1':'Triage Form','2':'Booking Form','3':'Send Manual Payment Gateway','4':'Add Supplier','5':'Update Job','6':'Open Customer Address in Google Maps','7':'Customer Reply','8':'Call Customer','9':'Send Job to Supplier','10':'Send Message To Supplier','11':'Call Supplier','12':'Update Supplier Details','13':'Driver en route','14':'Revised ETA','15':'Cancellation','16':'Bad Debt Notice','17':'Job Complete','18':'Close Job','19':'Send Invoice','20':'Complaint Response','21':'Generate ANZ Batch File','22':'Add to Blacklist','23':'API Call Menu','24':'Profit and Loss','25':'Generate Customer Refund File','26':'Run Stripe and Job Updates','27':'Update Job Address by Rego','28':'Send Location Request','29':'Prepurchase Inspection Menu','30':'Send Manual Text'};
+let c='';
+function executeFunction(f){if(window.parent!==window){window.parent.postMessage({type:'fp-command',command:f},'*')}else if(window.opener){window.opener.postMessage({type:'fp-command',command:f},'*');window.close()}else{alert(`Executing: ${f}`)}}
+function u(){const d=document.getElementById('commandDisplay');if(c){d.textContent=`Command: ${c}`;d.classList.add('show')}else{d.classList.remove('show')}}
+function e(n){const f=k[n];if(f){executeFunction(f);return true}return false}
+document.addEventListener('keydown',function(ev){if(ev.key>='0'&&ev.key<='9'){ev.preventDefault();c+=ev.key;u();if(c.length===1&&k[c]){e(c)}else if(c.length===2){e(c)}return}if(ev.key==='Enter'&&c){ev.preventDefault();e(c);return}if(ev.key==='Backspace'){ev.preventDefault();c=c.slice(0,-1);u();return}if(ev.key==='Escape'){if(window.parent!==window){window.parent.postMessage({type:'fp-close-menu'},'*')}else if(window.opener){window.close()}}});
+window.addEventListener('load',function(){document.body.focus();document.body.setAttribute('tabindex','0')});
+</script>
+</body>
+</html>
