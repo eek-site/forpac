@@ -97,21 +97,24 @@
         button.innerHTML = 'FP';
         button.style.cssText = `
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
+            bottom: 16px;
+            right: 16px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             border: none;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             z-index: 999998;
             cursor: pointer;
             transition: transform 0.2s ease;
             touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         `;
         
         // Add hover effect for devices that support it
@@ -130,6 +133,36 @@
         button.addEventListener('touchend', (e) => {
             e.preventDefault();
             button.style.transform = 'scale(1)';
+        });
+        
+        // Ensure button stays on screen by adjusting for viewport
+        function adjustButtonPosition() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // For very narrow screens (like fold phones), move button more inward
+            if (viewportWidth < 350) {
+                button.style.right = '12px';
+                button.style.bottom = '12px';
+                button.style.width = '48px';
+                button.style.height = '48px';
+                button.style.fontSize = '14px';
+            } else if (viewportWidth < 500) {
+                button.style.right = '14px';
+                button.style.bottom = '14px';
+            }
+            
+            // For short screens, move button up a bit
+            if (viewportHeight < 600) {
+                button.style.bottom = '12px';
+            }
+        }
+        
+        // Adjust position on load and resize
+        adjustButtonPosition();
+        window.addEventListener('resize', adjustButtonPosition);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(adjustButtonPosition, 100);
         });
         
         document.body.appendChild(button);
