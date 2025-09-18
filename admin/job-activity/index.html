@@ -8,7 +8,7 @@
   <meta name="robots" content="noindex, nofollow">
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-  <!-- ADD THIS LINE: Command Menu -->
+  <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
 
   <style>
@@ -272,7 +272,7 @@
     // Default to the live list name you've used elsewhere:
     const SPO_LIST_TITLE = 'JobBuildNotes';
 
-    // Fallback aliases we’ll try if the exact title isn’t found
+    // Fallback aliases we'll try if the exact title isn't found
     const SPO_LIST_ALIASES = [
       'JobBuildNotes',
       'Job Activity Log',
@@ -696,6 +696,137 @@
       if (e.key==='Escape') closeModal();
       if (e.ctrlKey && e.key==='f'){ e.preventDefault(); document.getElementById('filterJobId').focus(); }
     });
+  </script>
+  
+  <!-- Custom command handling for Job Activity Log -->
+  <script>
+    // Handle commands specific to the Job Activity Log page
+    window.fpHandleCommand = function(command) {
+      switch(command) {
+        case 'Refresh Data':
+          refreshData();
+          break;
+        case 'Clear Filters':
+          clearFilters();
+          break;
+        case 'Apply Filters':
+          applyFilters();
+          break;
+        case 'Export CSV':
+          exportData();
+          break;
+        case 'Export Selected':
+          exportData(); // Same as export all since this is read-only
+          break;
+        case 'Search by Job ID':
+          document.getElementById('filterJobId').focus();
+          showToast('Enter job ID or rego to search', 'info');
+          break;
+        case 'Filter by Activity Type':
+          document.getElementById('filterTypeText').focus();
+          showToast('Enter activity type to filter', 'info');
+          break;
+        case 'Filter by User':
+          document.getElementById('filterActor').focus();
+          showToast('Enter username or email to filter', 'info');
+          break;
+        case 'Show Active Only':
+          document.getElementById('filterStatus').value = 'active';
+          applyFilters();
+          break;
+        case 'Show Completed Only':
+          document.getElementById('filterStatus').value = 'completed';
+          applyFilters();
+          break;
+        case 'Show This Month':
+          const now = new Date();
+          const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+          const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+          document.getElementById('filterDateFrom').value = firstDay;
+          document.getElementById('filterDateTo').value = lastDay;
+          applyFilters();
+          break;
+        case 'Show Today':
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById('filterDateFrom').value = today;
+          document.getElementById('filterDateTo').value = today;
+          applyFilters();
+          break;
+        case 'Filter High Value':
+          document.getElementById('filterPriceMin').value = '500';
+          applyFilters();
+          break;
+        case 'View Details':
+          if (state.currentRecord) {
+            showDetails(state.currentRecord);
+          } else {
+            showToast('Click on a row first to select it', 'warning');
+          }
+          break;
+        case 'Close Modal':
+          closeModal();
+          break;
+        case 'First Page':
+          firstPage();
+          break;
+        case 'Last Page':
+          lastPage();
+          break;
+        case 'Next Page':
+          nextPage();
+          break;
+        case 'Previous Page':
+          previousPage();
+          break;
+        case 'Show 25 Records':
+          document.getElementById('pageSizeSelect').value = '25';
+          changePageSize();
+          break;
+        case 'Show 100 Records':
+          document.getElementById('pageSizeSelect').value = '100';
+          changePageSize();
+          break;
+        case 'Sort by Date':
+          const dateKey = Object.keys(state.allJobsData[0] || {}).find(k=>/when|created|date|datetime/i.test(k));
+          if (dateKey) {
+            sortTable(dateKey);
+          } else {
+            showToast('No date column found to sort by', 'warning');
+          }
+          break;
+        case 'Sort by Type':
+          const typeKey = Object.keys(state.allJobsData[0] || {}).find(k=>/activity.?type|type/i.test(k));
+          if (typeKey) {
+            sortTable(typeKey);
+          } else {
+            showToast('No type column found to sort by', 'warning');
+          }
+          break;
+        case 'Sort by User':
+          const userKey = Object.keys(state.allJobsData[0] || {}).find(k=>/actor|user|author|created.?by|modified.?by|owner/i.test(k));
+          if (userKey) {
+            sortTable(userKey);
+          } else {
+            showToast('No user column found to sort by', 'warning');
+          }
+          break;
+        case 'Search Text':
+          document.getElementById('filterContains').focus();
+          showToast('Enter text to search across all fields', 'info');
+          break;
+        case 'Triage Form':
+          window.location.href = '/admin/triage';
+          break;
+        case 'Edit Activity':
+          window.location.href = '/admin/job-activity-edit';
+          break;
+        case 'View Jobs Master':
+          window.location.href = '/admin/jobs-master';
+          break;
+        default:
+          showToast(`Command: ${command}`, 'info');
+      }
+    };
   </script>
 </body>
 </html>
