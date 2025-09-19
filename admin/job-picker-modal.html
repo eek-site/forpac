@@ -552,7 +552,12 @@ function showJobPickerError(message) {
 
 // Listen for messages from parent window (iframe mode)
 window.addEventListener('message', function(event) {
+  console.log('Job picker received message:', event.data);
+  console.log('Message origin:', event.origin);
+  console.log('isInIframe:', jobPickerState.isInIframe);
+  
   if (event.data.type === 'OPEN_PICKER') {
+    console.log('Opening picker with options:', event.data.options);
     openJobPicker(event.data.options || {});
   }
 });
