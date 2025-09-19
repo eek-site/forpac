@@ -3,586 +3,536 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Job Picker - FP Service Management</title>
+<title>Cancel Job (DNC) - FP Service Management</title>
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
 
-/* Modal Styles */
-.job-picker-modal { 
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; 
-  display: flex; align-items: center; justify-content: center; 
-  backdrop-filter: blur(4px); opacity: 0; visibility: hidden; 
-  transition: all 0.3s ease; 
-}
-.job-picker-modal.active { opacity: 1; visibility: visible; }
-
-.modal-content { 
-  background: #fff; border-radius: 16px; padding: 0; 
-  width: 90%; max-width: 800px; max-height: 85vh; 
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); 
-  transform: scale(0.9); transition: transform 0.3s ease; 
-}
-.job-picker-modal.active .modal-content { transform: scale(1); }
-
-.modal-header { 
-  background: linear-gradient(135deg, #1e3c72, #2a5298); 
-  color: #fff; padding: 20px 24px; border-radius: 16px 16px 0 0; 
-  display: flex; justify-content: space-between; align-items: center; 
-}
-.modal-title { font-size: 1.4em; font-weight: 700; }
-.close-btn { 
-  background: rgba(255,255,255,0.2); color: #fff; border: none; 
-  padding: 8px; border-radius: 6px; cursor: pointer; font-size: 18px; 
-  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; 
-}
-.close-btn:hover { background: rgba(255,255,255,0.3); }
-
-.modal-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
-
-/* Search Section */
-.search-section { 
-  background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; 
-  padding: 20px; margin-bottom: 20px; 
-}
-.search-header { font-weight: 600; color: #374151; margin-bottom: 12px; }
-.search-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
-.search-input { 
-  padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; 
-  font-size: 14px; background: #fff; 
-}
-.search-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
-.search-btn { 
-  background: #1e3c72; color: #fff; border: none; padding: 12px 20px; 
-  border-radius: 8px; cursor: pointer; font-weight: 600; 
-}
-.search-btn:hover { background: #1a3260; }
-
-.filter-toggle { 
-  margin-top: 12px; display: flex; align-items: center; gap: 8px; 
-}
-.checkbox { width: 18px; height: 18px; cursor: pointer; }
-
-/* Jobs List */
-.jobs-section { }
-.section-header { 
-  font-weight: 600; color: #374151; margin-bottom: 16px; 
-  display: flex; justify-content: space-between; align-items: center; 
-}
-.job-count { 
-  background: #e2e8f0; color: #64748b; padding: 4px 12px; 
-  border-radius: 16px; font-size: 0.85em; 
-}
-
-.jobs-list { max-height: 300px; overflow-y: auto; }
-.job-item { 
-  background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; 
-  padding: 16px; margin-bottom: 12px; cursor: pointer; 
-  transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; 
-}
-.job-item:hover { border-color: #1e3c72; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.job-item.selected { border-color: #10b981; background: #ecfdf5; }
-
-.job-info { }
-.job-rego { font-weight: 700; font-size: 1.1em; color: #1e3c72; margin-bottom: 4px; }
-.job-details { font-size: 0.9em; color: #64748b; }
-.job-badge { 
-  background: #fef3c7; color: #92400e; padding: 4px 8px; 
-  border-radius: 12px; font-size: 0.8em; font-weight: 600; 
-}
-.job-badge.ppi { background: #dbeafe; color: #1e40af; }
-
-.loading-spinner { 
-  display: flex; align-items: center; justify-content: center; 
-  padding: 40px; color: #64748b; 
-}
-.spinner { 
-  width: 32px; height: 32px; border: 3px solid #e2e8f0; 
-  border-top: 3px solid #1e3c72; border-radius: 50%; 
-  animation: spin 1s linear infinite; margin-right: 12px; 
-}
+.loading { position: fixed; inset: 0; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+.loading.authenticated { display: none; }
+.spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #1e3c72; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: #718096; font-size: 14px; }
 
-.empty-state { 
-  text-align: center; padding: 40px; color: #64748b; 
-}
-.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.page-container { display: none; min-height: 100vh; }
+.page-container.authenticated { display: block; }
 
-.modal-footer { 
-  padding: 20px 24px; background: #f8fafc; border-radius: 0 0 16px 16px; 
-  display: flex; justify-content: flex-end; gap: 12px; border-top: 2px solid #e2e8f0; 
+.header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.back-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.back-btn:hover { background: rgba(255,255,255,0.3); color: #fff; text-decoration: none; }
+.page-title { font-size: 20px; font-weight: 700; }
+.page-icon { font-size: 24px; }
+
+.main-content { padding: 24px; max-width: 800px; margin: 0 auto; }
+.content-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; }
+.form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.2s; }
+.form-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
+.form-textarea { min-height: 100px; resize: vertical; }
+.form-select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: #fff; }
+
+.btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: #1e3c72; color: #fff; }
+.btn-primary:hover { background: #1a3260; }
+.btn-secondary { background: #6b7280; color: #fff; }
+.btn-secondary:hover { background: #5b6370; }
+.btn-success { background: #10b981; color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-warning { background: #f59e0b; color: #fff; }
+.btn-warning:hover { background: #d97706; }
+
+.alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; border: 1px solid; }
+.alert-success { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.alert-error { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.alert-info { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+.alert-warning { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.loading-overlay.show { display: flex; }
+.loading-card { background: #fff; padding: 30px; border-radius: 8px; text-align: center; }
+
+.job-info-card { 
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe); 
+  border: 2px solid #0ea5e9; 
+  border-radius: 12px; 
+  padding: 20px; 
+  margin-bottom: 20px; 
 }
-.btn-cancel { 
-  background: #6b7280; color: #fff; border: none; padding: 12px 24px; 
-  border-radius: 8px; cursor: pointer; font-weight: 600; 
+.job-info-header { 
+  display: flex; justify-content: space-between; align-items: center; 
+  margin-bottom: 16px; 
 }
-.btn-select { 
-  background: #10b981; color: #fff; border: none; padding: 12px 24px; 
-  border-radius: 8px; cursor: pointer; font-weight: 600; 
+.job-rego { 
+  font-size: 1.4em; font-weight: 700; 
+  color: #0c4a6e; 
 }
-.btn-select:disabled { background: #d1d5db; cursor: not-allowed; }
+.job-status { 
+  background: #fbbf24; color: #92400e; 
+  padding: 6px 12px; border-radius: 16px; 
+  font-size: 0.85em; font-weight: 600; 
+}
+.job-details-grid { 
+  display: grid; grid-template-columns: 1fr 1fr; 
+  gap: 12px; 
+}
+.job-detail { 
+  display: flex; flex-direction: column; 
+}
+.detail-label { 
+  font-size: 0.85em; color: #64748b; 
+  font-weight: 500; margin-bottom: 2px; 
+}
+.detail-value { 
+  color: #1e293b; font-weight: 500; 
+}
+
+.cancellation-reasons { 
+  display: grid; grid-template-columns: 1fr 1fr; 
+  gap: 12px; margin-bottom: 16px; 
+}
+.reason-option { 
+  background: #f8fafc; border: 2px solid #e2e8f0; 
+  border-radius: 8px; padding: 12px; cursor: pointer; 
+  transition: all 0.2s ease; text-align: center; 
+}
+.reason-option:hover { border-color: #1e3c72; }
+.reason-option.selected { 
+  background: #dbeafe; border-color: #1e3c72; 
+  color: #1e3c72; font-weight: 600; 
+}
+
+.consequences-warning { 
+  background: #fef3c7; border: 2px solid #f59e0b; 
+  border-radius: 8px; padding: 16px; margin-bottom: 20px; 
+}
+.warning-header { 
+  font-weight: 700; color: #92400e; 
+  margin-bottom: 8px; 
+}
+.warning-list { 
+  color: #92400e; font-size: 0.9em; 
+}
 
 @media (max-width: 768px) {
-  .modal-content { width: 95%; margin: 20px; }
-  .search-row { grid-template-columns: 1fr; }
-  .modal-body { padding: 20px; }
+  .header { padding: 12px 16px; }
+  .page-title { font-size: 18px; }
+  .main-content { padding: 16px; }
+  .content-card { padding: 20px; }
+  .job-details-grid { grid-template-columns: 1fr; }
+  .cancellation-reasons { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- Job Picker Modal -->
-<div class="job-picker-modal" id="jobPickerModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <div class="modal-title">Select Job Registration</div>
-      <button class="close-btn" onclick="closeJobPicker()">&times;</button>
-    </div>
-    
-    <div class="modal-body">
-      <!-- Direct Search Section -->
-      <div class="search-section">
-        <div class="search-header">Enter Job Registration Number</div>
-        <div class="search-row">
-          <input 
-            type="text" 
-            id="manualRegoInput" 
-            class="search-input" 
-            placeholder="Type job registration number..."
-            onkeypress="handleManualRegoKeypress(event)"
-          >
-          <button class="search-btn" onclick="selectManualRego()">Select</button>
-        </div>
-        
-        <div class="filter-toggle">
-          <input type="checkbox" id="ppiFilter" class="checkbox" onchange="togglePPIFilter()">
-          <label for="ppiFilter">Show only PPI (Pre Purchase Inspection) jobs</label>
-        </div>
-      </div>
-      
-      <!-- Available Jobs List -->
-      <div class="jobs-section">
-        <div class="section-header">
-          <span>Available Open Jobs</span>
-          <span class="job-count" id="jobCount">0 jobs</span>
-        </div>
-        
-        <div id="jobsContainer">
-          <div class="loading-spinner">
-            <div class="spinner"></div>
-            Loading jobs from SharePoint...
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeJobPicker()">Cancel</button>
-      <button class="btn-select" id="selectBtn" onclick="confirmSelection()" disabled>
-        Select Job
-      </button>
-    </div>
-  </div>
+<div class="loading" id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="loading-text">Verifying access...</div>
 </div>
 
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner"></div>
+        <div style="margin-top: 15px;">Processing cancellation...</div>
+    </div>
+</div>
+
+<div class="page-container" id="pageContainer">
+    <div class="header">
+        <div class="header-left">
+            <a href="fp-command-menu.html" class="back-btn">← Back to Menu</a>
+            <div class="page-icon">❌</div>
+            <div class="page-title">Cancel Job (DNC)</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Job Selection Section -->
+        <div class="content-card">
+            <h2>Select Job to Cancel</h2>
+            <p style="color: #64748b; margin-bottom: 20px;">
+                Choose a job registration number to cancel. DNC stands for "Do Not Continue" - 
+                this will permanently cancel the job and update all related records.
+            </p>
+            
+            <button class="btn btn-primary" onclick="selectJob()">
+                📋 Select Job Registration
+            </button>
+            
+            <div id="selectedJobInfo" style="display: none;"></div>
+        </div>
+        
+        <!-- Cancellation Form -->
+        <div class="content-card" id="cancellationForm" style="display: none;">
+            <h2>Cancellation Details</h2>
+            
+            <!-- Cancellation Reason -->
+            <div class="form-group">
+                <label class="form-label">Reason for Cancellation *</label>
+                <div class="cancellation-reasons">
+                    <div class="reason-option" onclick="selectReason('customer-request')">
+                        Customer Request
+                    </div>
+                    <div class="reason-option" onclick="selectReason('unable-to-service')">
+                        Unable to Service
+                    </div>
+                    <div class="reason-option" onclick="selectReason('duplicate-booking')">
+                        Duplicate Booking
+                    </div>
+                    <div class="reason-option" onclick="selectReason('payment-issue')">
+                        Payment Issue
+                    </div>
+                    <div class="reason-option" onclick="selectReason('outside-coverage')">
+                        Outside Coverage
+                    </div>
+                    <div class="reason-option" onclick="selectReason('other')">
+                        Other Reason
+                    </div>
+                </div>
+                <input type="hidden" id="cancellationReason" required>
+            </div>
+            
+            <!-- Additional Notes -->
+            <div class="form-group">
+                <label for="cancellationNotes" class="form-label">
+                    Cancellation Notes 
+                    <span style="color: #64748b; font-weight: normal;">(optional)</span>
+                </label>
+                <textarea 
+                    id="cancellationNotes" 
+                    class="form-input form-textarea" 
+                    placeholder="Provide additional details about the cancellation..."
+                ></textarea>
+            </div>
+            
+            <!-- Warning about consequences -->
+            <div class="consequences-warning">
+                <div class="warning-header">⚠️ Cancellation Consequences</div>
+                <div class="warning-list">
+                    This action will:
+                    <ul style="margin: 8px 0 0 20px;">
+                        <li>Mark the job as "DNC" (Do Not Continue)</li>
+                        <li>Set job status to Cancelled/Closed</li>
+                        <li>Update payment status to unpaid</li>
+                        <li>Delete related supplier assignments</li>
+                        <li>Log the cancellation in system records</li>
+                        <li><strong>This action cannot be easily undone</strong></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="cancelCancellation()">
+                    Cancel
+                </button>
+                <button class="btn btn-danger" onclick="confirmCancellation()" disabled id="cancelJobBtn">
+                    ❌ Cancel Job (DNC)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Job Picker Modal -->
+<iframe 
+    id="jobPickerFrame"
+    src="job-picker-modal-fixed.html" 
+    style="display: none;" 
+    onload="initJobPicker()"
+></iframe>
+
 <script>
-// Job Picker Configuration
-const JOB_PICKER_CONFIG = {
-  SPO_HOST: 'roadandrescue.sharepoint.com',
-  SPO_SITE_PATH: '/sites/rar',
-  SPO_LIST_TITLE: 'Forman Pacific Consolidated Brand Data',
-  PPI_JOB_TYPE: 'Pre Purchase Vehicle Inspection'
-};
+let msalInstance = null;
+let selectedJob = null;
+let selectedReason = null;
 
-// State
-let jobPickerState = {
-  msalInstance: null,
-  allJobs: [],
-  filteredJobs: [],
-  selectedJob: null,
-  isPPIMode: false,
-  onJobSelected: null,
-  isLoading: false,
-  isInIframe: false
-};
-
-// MSAL Configuration
-const MSAL_CONFIG = {
+const msalConfig = {
   auth: {
     clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
     authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
     redirectUri: window.location.origin + '/admin'
   },
-  cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: true }
+  cache: {
+    cacheLocation: 'sessionStorage',
+    storeAuthStateInCookie: true
+  },
+  system: {
+    allowNativeBroker: false,
+    windowHashTimeout: 10000,
+    iframeHashTimeout: 10000
+  }
 };
 
-const GRAPH_SCOPES = ['https://graph.microsoft.com/Sites.Read.All'];
-
-// Detect if running in iframe
-function detectIframe() {
-  jobPickerState.isInIframe = window.self !== window.top;
-}
-
-// Initialize MSAL
-async function initJobPickerAuth() {
-  if (jobPickerState.msalInstance) return true;
-  
-  try {
-    if (!window.msal || !window.msal.PublicClientApplication) {
-      throw new Error('MSAL library not loaded');
+async function initAuth(){
+  try{
+    if(!window.msal || !window.msal.PublicClientApplication){
+      console.error('MSAL failed to load.');
+      return false;
     }
 
-    jobPickerState.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
-    await jobPickerState.msalInstance.initialize();
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    const redirectResponse = await msalInstance.handleRedirectPromise();
+    if (redirectResponse && redirectResponse.account){
+      msalInstance.setActiveAccount(redirectResponse.account);
+    }
 
-    const accounts = jobPickerState.msalInstance.getAllAccounts();
-    if (!accounts.length) throw new Error('No authenticated account');
+    const active = msalInstance.getActiveAccount();
+    const accounts = msalInstance.getAllAccounts();
+    const account = active || accounts[0];
 
-    return true;
-  } catch (error) {
-    console.error('Job picker auth failed:', error);
+    if (account){
+      msalInstance.setActiveAccount(account);
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e){
+    console.error('Auth init error:', e);
     return false;
   }
 }
 
-// Get Graph API token
-async function getJobPickerToken() {
-  const account = jobPickerState.msalInstance.getActiveAccount() || 
-                 jobPickerState.msalInstance.getAllAccounts()[0];
-  if (!account) throw new Error('No signed-in account');
+function showPage(){
+  document.getElementById('loadingScreen').classList.add('authenticated');
+  document.getElementById('pageContainer').classList.add('authenticated');
+}
 
-  const request = { scopes: GRAPH_SCOPES, account };
-  try {
-    const { accessToken } = await jobPickerState.msalInstance.acquireTokenSilent(request);
-    return accessToken;
-  } catch (err) {
-    console.warn('Silent token failed; attempting interactive', err);
-    const resp = await jobPickerState.msalInstance.acquireTokenPopup({ scopes: GRAPH_SCOPES });
-    return resp?.accessToken || '';
+function showUnauthorized(){
+  window.location.href = '/admin';
+}
+
+function showLoading(){
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading(){
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+function showAlert(message, type = 'info'){
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type}`;
+  alertDiv.textContent = message;
+  document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.content-card'));
+  setTimeout(() => alertDiv.remove(), 5000);
+}
+
+// Initialize job picker iframe communication
+function initJobPicker() {
+  console.log('Job picker iframe loaded');
+  // Listen for messages from job picker iframe
+  window.addEventListener('message', handleJobPickerMessage);
+}
+
+function handleJobPickerMessage(event) {
+  console.log('Received message:', event.data);
+  
+  if (event.data.type === 'JOB_SELECTED') {
+    handleJobSelection(event.data.job);
+  } else if (event.data.type === 'JOB_PICKER_CLOSED') {
+    console.log('Job picker closed');
   }
 }
 
-// Fetch jobs from SharePoint
-async function fetchJobsFromSharePoint() {
-  jobPickerState.isLoading = true;
-  updateJobsDisplay();
-
-  try {
-    const token = await getJobPickerToken();
-    
-    // Get site
-    const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
-    const siteResponse = await fetch(siteUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const site = await siteResponse.json();
-
-    // Get list
-    const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
-    const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
-    const listsResponse = await fetch(listsUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const listsData = await listsResponse.json();
-    
-    if (!listsData.value?.length) {
-      throw new Error(`List not found: ${JOB_PICKER_CONFIG.SPO_LIST_TITLE}`);
-    }
-    
-    const listId = listsData.value[0].id;
-
-    // Get items - focusing on open jobs
-    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
-    const itemsResponse = await fetch(itemsUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const itemsData = await itemsResponse.json();
-
-    // Process jobs - filter for "open" jobs (equivalent to yellow highlighting)
-    const allJobs = (itemsData.value || []).map(item => item.fields);
-    
-    // Filter for open jobs (not closed, cancelled, or completed)
-    jobPickerState.allJobs = allJobs.filter(job => {
-      const status = String(job.Status || job.JobStatus || job.BookingStatus || '').toLowerCase();
-      const closed = String(job.CloseAndPost || job.Closed || '').toLowerCase();
-      
-      // Exclude closed, cancelled, completed jobs
-      return !status.includes('closed') && 
-             !status.includes('cancelled') && 
-             !status.includes('completed') &&
-             closed !== 'yes' &&
-             closed !== 'true' &&
-             job.Rego; // Must have a registration number
-    });
-
-    applyJobFilters();
-    
-  } catch (error) {
-    console.error('Failed to load jobs:', error);
-    showJobPickerError('Failed to load jobs from SharePoint: ' + error.message);
-  } finally {
-    jobPickerState.isLoading = false;
-    updateJobsDisplay();
-  }
-}
-
-// Apply filters to jobs
-function applyJobFilters() {
-  let filtered = [...jobPickerState.allJobs];
+// Job selection functions
+function selectJob() {
+  console.log('Opening job picker...');
   
-  // PPI filter
-  if (jobPickerState.isPPIMode) {
-    filtered = filtered.filter(job => {
-      const jobType = String(job.ServiceType || job.JobType || '');
-      return jobType.toLowerCase().includes('pre purchase') || 
-             jobType.toLowerCase().includes('ppi') ||
-             jobType.toLowerCase().includes('inspection');
-    });
-  }
+  // Get the iframe
+  const iframe = document.getElementById('jobPickerFrame');
   
-  jobPickerState.filteredJobs = filtered;
-  updateJobsDisplay();
-}
-
-// Toggle PPI filter
-function togglePPIFilter() {
-  jobPickerState.isPPIMode = document.getElementById('ppiFilter').checked;
-  applyJobFilters();
-}
-
-// Update jobs display
-function updateJobsDisplay() {
-  const container = document.getElementById('jobsContainer');
-  const countEl = document.getElementById('jobCount');
-  
-  if (jobPickerState.isLoading) {
-    container.innerHTML = `
-      <div class="loading-spinner">
-        <div class="spinner"></div>
-        Loading jobs from SharePoint...
-      </div>
-    `;
-    countEl.textContent = 'Loading...';
+  if (!iframe) {
+    showAlert('Job picker not available', 'error');
     return;
   }
   
-  const jobs = jobPickerState.filteredJobs;
-  countEl.textContent = `${jobs.length} job${jobs.length !== 1 ? 's' : ''}`;
+  console.log('Iframe contentWindow:', iframe.contentWindow);
   
-  if (!jobs.length) {
-    const filterText = jobPickerState.isPPIMode ? 'PPI ' : '';
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div>No ${filterText}jobs available</div>
-        <div style="font-size: 0.9em; margin-top: 8px;">
-          ${jobPickerState.isPPIMode ? 'Try unchecking the PPI filter' : 'All jobs may be closed or completed'}
+  // Send message to iframe to open picker
+  iframe.contentWindow.postMessage({
+    type: 'OPEN_PICKER',
+    options: { filterPPI: false }
+  }, '*');
+}
+
+function handleJobSelection(job) {
+  console.log('Job selected:', job);
+  selectedJob = job;
+  displaySelectedJob(job);
+  document.getElementById('cancellationForm').style.display = 'block';
+}
+
+function displaySelectedJob(job) {
+  const container = document.getElementById('selectedJobInfo');
+  const rego = job.Rego || 'Unknown';
+  const customer = job.CustomerName || (job.FirstName + ' ' + job.LastName) || 'Unknown Customer';
+  const service = job.ServiceType || job.ServiceRequired || 'Service';
+  const price = job.Price || job.TotalPrice || job.Amount || 0;
+  const status = job.Status || job.JobStatus || 'Active';
+  
+  container.innerHTML = `
+    <div class="job-info-card">
+      <div class="job-info-header">
+        <div class="job-rego">Job: ${rego}</div>
+        <div class="job-status">${status}</div>
+      </div>
+      <div class="job-details-grid">
+        <div class="job-detail">
+          <div class="detail-label">Customer</div>
+          <div class="detail-value">${customer}</div>
+        </div>
+        <div class="job-detail">
+          <div class="detail-label">Service Type</div>
+          <div class="detail-value">${service}</div>
+        </div>
+        <div class="job-detail">
+          <div class="detail-label">Price</div>
+          <div class="detail-value">$${Number(price).toLocaleString()}</div>
+        </div>
+        <div class="job-detail">
+          <div class="detail-label">Email</div>
+          <div class="detail-value">${job.Email || 'Not provided'}</div>
         </div>
       </div>
-    `;
-    return;
-  }
-  
-  container.innerHTML = `
-    <div class="jobs-list">
-      ${jobs.map((job, index) => {
-        const rego = job.Rego || 'Unknown';
-        const customer = job.CustomerName || (job.FirstName + ' ' + job.LastName) || 'Unknown Customer';
-        const service = job.ServiceType || job.ServiceRequired || 'Service';
-        const isPPI = String(service).toLowerCase().includes('pre purchase') || 
-                     String(service).toLowerCase().includes('ppi');
-        
-        return `
-          <div class="job-item" onclick="selectJob(${index})" data-index="${index}">
-            <div class="job-info">
-              <div class="job-rego">${index + 1}. ${rego}</div>
-              <div class="job-details">${customer} - ${service}</div>
-            </div>
-            ${isPPI ? '<div class="job-badge ppi">PPI</div>' : '<div class="job-badge">Service</div>'}
-          </div>
-        `;
-      }).join('')}
     </div>
   `;
+  
+  container.style.display = 'block';
 }
 
-// Select job from list
-function selectJob(index) {
-  // Clear previous selection
-  document.querySelectorAll('.job-item').forEach(item => {
-    item.classList.remove('selected');
+// Cancellation reason selection
+function selectReason(reason) {
+  // Clear previous selections
+  document.querySelectorAll('.reason-option').forEach(option => {
+    option.classList.remove('selected');
   });
   
-  // Select new job
-  const jobItem = document.querySelector(`[data-index="${index}"]`);
-  if (jobItem) {
-    jobItem.classList.add('selected');
-    jobPickerState.selectedJob = jobPickerState.filteredJobs[index];
-    document.getElementById('selectBtn').disabled = false;
-  }
-}
-
-// Handle manual rego entry
-function handleManualRegoKeypress(event) {
-  if (event.key === 'Enter') {
-    selectManualRego();
-  }
-}
-
-function selectManualRego() {
-  const input = document.getElementById('manualRegoInput');
-  const rego = input.value.trim();
+  // Select new reason
+  event.target.classList.add('selected');
+  selectedReason = reason;
+  document.getElementById('cancellationReason').value = reason;
   
-  if (!rego) {
-    alert('Please enter a job registration number');
+  // Enable cancel button if job is selected
+  updateCancelButton();
+}
+
+function updateCancelButton() {
+  const btn = document.getElementById('cancelJobBtn');
+  btn.disabled = !selectedJob || !selectedReason;
+}
+
+// Cancellation process
+async function confirmCancellation() {
+  if (!selectedJob || !selectedReason) {
+    showAlert('Please select a job and cancellation reason', 'error');
     return;
   }
   
-  // First check if rego exists in filtered list
-  const foundInList = jobPickerState.filteredJobs.find(job => 
-    String(job.Rego || '').toLowerCase() === rego.toLowerCase()
+  const confirmation = confirm(
+    `Are you sure you want to cancel job ${selectedJob.Rego}?\n\n` +
+    `This will mark it as DNC (Do Not Continue) and cannot be easily undone.`
   );
   
-  if (foundInList) {
-    jobPickerState.selectedJob = foundInList;
-  } else if (jobPickerState.isPPIMode) {
-    // In PPI mode, reject unknown regos (matching VBA behavior)
-    alert('That registration number is not in the available PPI jobs list.');
-    return;
-  } else {
-    // In standard mode, accept unknown rego (matching VBA fallback behavior)
-    jobPickerState.selectedJob = { Rego: rego, isManualEntry: true };
-  }
+  if (!confirmation) return;
   
-  confirmSelection();
-}
-
-// Confirm job selection
-function confirmSelection() {
-  if (!jobPickerState.selectedJob) {
-    alert('Please select a job first');
-    return;
-  }
+  showLoading();
   
-  const rego = jobPickerState.selectedJob.Rego;
-  
-  // Store selected job in global variable (like VBA's selectedJobRego)
-  window.selectedJobRego = rego;
-  
-  // Store in session storage for persistence
-  sessionStorage.setItem('selectedJobRego', rego);
-  sessionStorage.setItem('selectedJobData', JSON.stringify(jobPickerState.selectedJob));
-  
-  // Handle callback or postMessage based on context
-  if (jobPickerState.isInIframe) {
-    // Send message to parent window
-    window.parent.postMessage({
-      type: 'JOB_SELECTED',
-      job: jobPickerState.selectedJob,
-      rego: rego
-    }, '*');
-  } else {
-    // Call callback if provided
-    if (jobPickerState.onJobSelected) {
-      jobPickerState.onJobSelected(jobPickerState.selectedJob);
-    }
+  try {
+    // Prepare cancellation data
+    const cancellationData = {
+      jobId: selectedJob.Id || selectedJob.ID,
+      rego: selectedJob.Rego,
+      reason: selectedReason,
+      notes: document.getElementById('cancellationNotes').value,
+      cancelledBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+      cancelledAt: new Date().toISOString(),
+      originalData: selectedJob
+    };
     
-    // Show confirmation (like VBA MsgBox)
-    alert(`You selected: ${rego}`);
-  }
-  
-  closeJobPicker();
-}
-
-// Open job picker
-async function openJobPicker(options = {}) {
-  const { filterPPI = false, onJobSelected = null } = options;
-  
-  jobPickerState.selectedJob = null;
-  jobPickerState.isPPIMode = filterPPI;
-  jobPickerState.onJobSelected = onJobSelected;
-  
-  // Set UI state
-  document.getElementById('ppiFilter').checked = filterPPI;
-  document.getElementById('manualRegoInput').value = '';
-  document.getElementById('selectBtn').disabled = true;
-  
-  // Initialize auth if needed
-  const authOk = await initJobPickerAuth();
-  if (!authOk) {
-    alert('Authentication failed. Please sign in again.');
-    return;
-  }
-  
-  // Show modal
-  document.getElementById('jobPickerModal').classList.add('active');
-  
-  // Load jobs
-  await fetchJobsFromSharePoint();
-}
-
-// Close job picker
-function closeJobPicker() {
-  document.getElementById('jobPickerModal').classList.remove('active');
-  jobPickerState.selectedJob = null;
-  jobPickerState.onJobSelected = null;
-  
-  if (jobPickerState.isInIframe) {
-    // Send close message to parent
-    window.parent.postMessage({
-      type: 'JOB_PICKER_CLOSED'
-    }, '*');
+    // Call Power Automate flow
+    const result = await callCancellationFlow(cancellationData);
+    console.log('Cancellation result:', result);
+    
+    showAlert('Job successfully cancelled (DNC)', 'success');
+    
+    // Reset form
+    resetForm();
+    
+    // Optional: redirect back to menu after a delay
+    setTimeout(() => {
+      window.location.href = 'fp-command-menu.html';
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Cancellation failed:', error);
+    showAlert('Failed to cancel job: ' + error.message, 'error');
+  } finally {
+    hideLoading();
   }
 }
 
-// Show error
-function showJobPickerError(message) {
-  const container = document.getElementById('jobsContainer');
-  container.innerHTML = `
-    <div class="empty-state">
-      <div class="empty-icon">⚠️</div>
-      <div>Error Loading Jobs</div>
-      <div style="font-size: 0.9em; margin-top: 8px; color: #ef4444;">
-        ${message}
-      </div>
-    </div>
-  `;
+async function callCancellationFlow(data) {
+  // Power Automate flow endpoint
+  const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1';
+  
+  const response = await fetch(flowEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      action: 'CANCEL_JOB_DNC',
+      data: data
+    })
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Flow failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+  
+  return response.json();
 }
 
-// Listen for messages from parent window (iframe mode)
-window.addEventListener('message', function(event) {
-  if (event.data.type === 'OPEN_PICKER') {
-    openJobPicker(event.data.options || {});
+function cancelCancellation() {
+  const confirmation = confirm('Are you sure you want to cancel this cancellation?');
+  if (confirmation) {
+    resetForm();
   }
-});
+}
 
-// Close modal when clicking outside
-document.addEventListener('click', (event) => {
-  if (event.target.id === 'jobPickerModal') {
-    closeJobPicker();
-  }
-});
-
-// Close modal on Escape key
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && document.getElementById('jobPickerModal').classList.contains('active')) {
-    closeJobPicker();
-  }
-});
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-  detectIframe();
+function resetForm() {
+  selectedJob = null;
+  selectedReason = null;
   
-  // Export functions for global use (non-iframe mode)
-  if (!jobPickerState.isInIframe) {
-    window.openJobPicker = openJobPicker;
-    window.closeJobPicker = closeJobPicker;
-    window.selectedJobRego = null;
+  document.getElementById('selectedJobInfo').style.display = 'none';
+  document.getElementById('cancellationForm').style.display = 'none';
+  document.getElementById('cancellationNotes').value = '';
+  document.getElementById('cancellationReason').value = '';
+  
+  document.querySelectorAll('.reason-option').forEach(option => {
+    option.classList.remove('selected');
+  });
+  
+  updateCancelButton();
+}
+
+// Initialize page
+window.addEventListener('DOMContentLoaded', async function(){
+  const authenticated = await initAuth();
+  if(authenticated){
+    showPage();
+  } else {
+    showUnauthorized();
   }
 });
-
 </script>
 
 </body>
