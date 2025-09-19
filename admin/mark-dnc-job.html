@@ -243,7 +243,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <!-- Include Job Picker Modal -->
 <iframe 
     id="jobPickerFrame"
-    src="job-picker-modal.html" 
+    src="job-picker-modal-fixed.html" 
     style="display: none;" 
     onload="initJobPicker()"
 ></iframe>
@@ -344,7 +344,6 @@ function handleJobPickerMessage(event) {
 // Job selection functions
 function selectJob() {
   console.log('Opening job picker...');
-  console.log('Iframe contentWindow:', iframe.contentWindow);
   
   // Get the iframe
   const iframe = document.getElementById('jobPickerFrame');
@@ -353,6 +352,8 @@ function selectJob() {
     showAlert('Job picker not available', 'error');
     return;
   }
+  
+  console.log('Iframe contentWindow:', iframe.contentWindow);
   
   // Send message to iframe to open picker
   iframe.contentWindow.postMessage({
