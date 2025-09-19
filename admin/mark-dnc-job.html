@@ -335,9 +335,13 @@ function handleJobPickerMessage(event) {
   console.log('Received message:', event.data);
   
   if (event.data.type === 'JOB_SELECTED') {
+    // Hide the iframe
+    document.getElementById('jobPickerFrame').style.display = 'none';
     handleJobSelection(event.data.job);
   } else if (event.data.type === 'JOB_PICKER_CLOSED') {
     console.log('Job picker closed');
+    // Hide the iframe
+    document.getElementById('jobPickerFrame').style.display = 'none';
   }
 }
 
@@ -354,6 +358,16 @@ function selectJob() {
   }
   
   console.log('Iframe contentWindow:', iframe.contentWindow);
+  
+  // Show the iframe so the modal is visible
+  iframe.style.display = 'block';
+  iframe.style.position = 'fixed';
+  iframe.style.top = '0';
+  iframe.style.left = '0';
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.zIndex = '10000';
+  iframe.style.border = 'none';
   
   // Send message to iframe to open picker
   iframe.contentWindow.postMessage({
