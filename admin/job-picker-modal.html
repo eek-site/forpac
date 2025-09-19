@@ -497,6 +497,8 @@ function confirmSelection() {
 
 // Open job picker
 async function openJobPicker(options = {}) {
+  console.log('openJobPicker called with options:', options);
+  
   const { filterPPI = false, onJobSelected = null } = options;
   
   jobPickerState.selectedJob = null;
@@ -508,17 +510,30 @@ async function openJobPicker(options = {}) {
   document.getElementById('manualRegoInput').value = '';
   document.getElementById('selectBtn').disabled = true;
   
+  console.log('About to initialize auth...');
+  
   // Initialize auth if needed
   const authOk = await initJobPickerAuth();
+  console.log('Auth result:', authOk);
+  
   if (!authOk) {
+    console.error('Authentication failed');
     alert('Authentication failed. Please sign in again.');
     return;
   }
   
+  console.log('About to show modal...');
+  
   // Show modal
-  document.getElementById('jobPickerModal').classList.add('active');
+  const modal = document.getElementById('jobPickerModal');
+  modal.classList.add('active');
+  
+  console.log('Modal classes after adding active:', modal.className);
+  console.log('Modal computed style:', window.getComputedStyle(modal).visibility);
+  console.log('Modal should be visible now');
   
   // Load jobs
+  console.log('About to fetch jobs...');
   await fetchJobsFromSharePoint();
 }
 
