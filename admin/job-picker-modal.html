@@ -354,24 +354,23 @@ async function fetchJobsFromSharePoint() {
     const rawJobs = (itemsData.value || []).map(item => item.fields);
     const mappedJobs = applyColumnMapping(rawJobs);
     
-    // Filter for open jobs - use InvoiceDate and Paid fields since status fields are empty
+    // Filter for open jobs - use InvoiceIdentifier as the primary indicator
     const openJobs = mappedJobs.filter(job => {
       // Must have a registration number
       const rego = job.Rego || job.Registration || job['Registration Number'];
       if (!rego || !String(rego).trim()) return false;
       
-      // Key insight: Status fields are all empty, so we need to use other indicators
-      // Jobs that are "closed" are likely those that have been invoiced and paid
-      const invoiceDate = job.InvoiceDate || job['Invoice Date'];
-      const paid = job.Paid;
-      const completedDate = job.CompletedDate || job['Completed Date'];
+      // InvoiceIdentifier is the key field - jobs are "closed" when this field has a value
+      // Open jobs have InvoiceIdentifier as empty/null, closed jobs have an invoice identifier
+      const invoiceIdentifier = job.InvoiceIdentifier;
       
-      // Consider a job "closed" if it has been both invoiced AND paid
-      // OR if it has a completion date
-      const isClosed = (invoiceDate && paid) || completedDate;
+      // Job is open if InvoiceIdentifier is empty/null/undefined
+      const isOpen = !invoiceIdentifier || 
+                     String(invoiceIdentifier).trim() === '' ||
+                     invoiceIdentifier === null ||
+                     invoiceIdentifier === undefined;
       
-      // Return true for "open" jobs (not closed)
-      return !isClosed;
+      return isOpen;
     });
     
     jobPickerState.allJobs = openJobs;
