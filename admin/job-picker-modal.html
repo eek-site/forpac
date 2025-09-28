@@ -414,48 +414,57 @@ async function testWithMapping() {
     const listsData = await listsResponse.json();
     const listId = listsData.value[0].id;
     
-    // Get a few sample items
-    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5`;
+    // Get a larger sample to analyze status values
+    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=50`;
     const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const itemsData = await itemsResponse.json();
     
-    debugLog(`Got ${itemsData.value?.length || 0} sample items`);
+    debugLog(`Got ${itemsData.value?.length || 0} sample items for analysis`);
     
-    // Apply column mapping to first item
     if (itemsData.value?.length > 0) {
-      const firstItem = itemsData.value[0];
-      const mappedItem = {};
+      // Apply column mapping
+      const rawJobs = itemsData.value.map(item => item.fields);
+      const mappedJobs = applyColumnMapping(rawJobs);
       
-      Object.keys(firstItem.fields).forEach(internalName => {
-        const displayName = jobPickerState.columnMapping[internalName] || internalName;
-        const value = firstItem.fields[internalName];
-        if (value && String(value).trim().length > 0) {
-          mappedItem[displayName] = value;
-        }
-      });
+      debugLog('=== Status Field Analysis (First 10 Items) ===');
       
-      debugLog('=== Sample Item With Proper Column Names ===');
-      Object.keys(mappedItem).forEach(displayName => {
-        const value = mappedItem[displayName];
-        if (String(value).length < 100) {
-          debugLog(`"${displayName}": "${value}"`);
-        }
-      });
+      // Analyze status field values
+      const statusValues = {
+        CloseAndPost: new Set(),
+        Status: new Set(),
+        JobStatus: new Set(),
+        BookingStatus: new Set(),
+        FormanStatus: new Set()
+      };
       
-      // Now try to find likely registration field
-      const likelyRegoFields = Object.keys(mappedItem).filter(name =>
-        name.toLowerCase().includes('rego') ||
-        name.toLowerCase().includes('registration') ||
-        name.toLowerCase().includes('plate') ||
-        /^[A-Z0-9]{3,8}$/i.test(mappedItem[name]) // Pattern match for rego values
-      );
-      
-      if (likelyRegoFields.length > 0) {
-        debugLog('=== Likely Registration Fields ===');
-        likelyRegoFields.forEach(field => {
-          debugLog(`"${field}": "${mappedItem[field]}"`);
-        });
+      for (let i = 0; i < Math.min(10, mappedJobs.length); i++) {
+        const job = mappedJobs[i];
+        const rego = job.Rego || 'Unknown';
+        
+        debugLog(`--- Job ${i + 1}: ${rego} ---`);
+        debugLog(`  CloseAndPost: "${job.CloseAndPost || ''}"`);
+        debugLog(`  Status: "${job.Status || ''}"`);
+        debugLog(`  JobStatus: "${job.JobStatus || ''}"`);
+        debugLog(`  BookingStatus: "${job.BookingStatus || ''}"`);
+        debugLog(`  FormanStatus: "${job.FormanStatus || ''}"`);
+        
+        // Collect unique values
+        if (job.CloseAndPost) statusValues.CloseAndPost.add(job.CloseAndPost);
+        if (job.Status) statusValues.Status.add(job.Status);
+        if (job.JobStatus) statusValues.JobStatus.add(job.JobStatus);
+        if (job.BookingStatus) statusValues.BookingStatus.add(job.BookingStatus);
+        if (job.FormanStatus) statusValues.FormanStatus.add(job.FormanStatus);
       }
+      
+      debugLog('=== Unique Status Values Found ===');
+      Object.keys(statusValues).forEach(fieldName => {
+        const values = Array.from(statusValues[fieldName]);
+        if (values.length > 0) {
+          debugLog(`${fieldName}: ${values.join(', ')}`);
+        } else {
+          debugLog(`${fieldName}: (no values found)`);
+        }
+      });
     }
     
   } catch (error) {
@@ -553,19 +562,40 @@ async function fetchJobsFromSharePoint() {
                    Object.values(job).find(val => 
                      typeof val === 'string' && /^[A-Z0-9]{3,8}$/i.test(val.trim()));
       
-      if (!rego) return false;
+      if (!rego) {
+        debugLog(`Skipping job - no registration found`);
+        return false;
+      }
       
-      // Less strict status filtering
-      const status = String(job.Status || job.JobStatus || job.BookingStatus || '').toLowerCase();
-      const closed = String(job.CloseAndPost || job.Closed || job.Complete || '').toLowerCase();
+      // More strict status filtering based on actual column names
+      const status = String(job.Status || '').toLowerCase();
+      const jobStatus = String(job.JobStatus || '').toLowerCase(); 
+      const bookingStatus = String(job.BookingStatus || '').toLowerCase();
+      const closeAndPost = String(job.CloseAndPost || '').toLowerCase();
+      const formanStatus = String(job.FormanStatus || '').toLowerCase();
       
-      const isOpen = !status.includes('closed') && 
-                     !status.includes('cancelled') && 
-                     !status.includes('completed') &&
-                     closed !== 'yes' &&
-                     closed !== 'true';
+      // Check if job is closed/completed
+      const isClosed = closeAndPost === 'yes' || 
+                       closeAndPost === 'true' ||
+                       closeAndPost === '1' ||
+                       status.includes('closed') || 
+                       status.includes('completed') || 
+                       status.includes('cancelled') ||
+                       jobStatus.includes('closed') || 
+                       jobStatus.includes('completed') || 
+                       jobStatus.includes('cancelled') ||
+                       bookingStatus.includes('closed') || 
+                       bookingStatus.includes('completed') || 
+                       bookingStatus.includes('cancelled') ||
+                       formanStatus.includes('closed') || 
+                       formanStatus.includes('completed');
       
-      return isOpen;
+      if (isClosed) {
+        debugLog(`Filtered out job ${rego}: CloseAndPost="${closeAndPost}", Status="${status}", JobStatus="${jobStatus}"`);
+        return false;
+      }
+      
+      return true;
     });
     
     debugLog(`Open jobs after filtering: ${openJobs.length}`);
