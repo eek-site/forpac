@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Job Picker - FP Service Management</title>
+<title>Job Picker - Debug Version</title>
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,6 +40,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .close-btn:hover { background: rgba(255,255,255,0.3); }
 
 .modal-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
+
+/* Debug Section */
+.debug-section {
+  background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px;
+  padding: 16px; margin-bottom: 20px;
+}
+.debug-header { font-weight: 600; color: #dc2626; margin-bottom: 12px; }
+.debug-log { 
+  background: #1f2937; color: #f9fafb; padding: 12px; border-radius: 8px;
+  font-family: 'Courier New', monospace; font-size: 12px; max-height: 150px;
+  overflow-y: auto; white-space: pre-wrap;
+}
 
 /* Search Section */
 .search-section { 
@@ -123,6 +135,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .btn-select:disabled { background: #d1d5db; cursor: not-allowed; }
 
+.debug-btn {
+  background: #7c3aed; color: #fff; border: none; padding: 8px 16px;
+  border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 8px;
+}
+
 @media (max-width: 768px) {
   .modal-content { width: 95%; margin: 20px; }
   .search-row { grid-template-columns: 1fr; }
@@ -136,11 +153,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="job-picker-modal" id="jobPickerModal">
   <div class="modal-content">
     <div class="modal-header">
-      <div class="modal-title">Select Job Registration</div>
+      <div class="modal-title">Select Job Registration (Debug Mode)</div>
       <button class="close-btn" onclick="closeJobPicker()">&times;</button>
     </div>
     
     <div class="modal-body">
+      <!-- Debug Section -->
+      <div class="debug-section">
+        <div class="debug-header">Debug Information</div>
+        <div class="debug-log" id="debugLog">Initializing debug mode...</div>
+        <button class="debug-btn" onclick="testSharePointConnection()">Test SharePoint Connection</button>
+        <button class="debug-btn" onclick="showRawData()">Show Raw Data</button>
+        <button class="debug-btn" onclick="clearDebugLog()">Clear Log</button>
+      </div>
+      
       <!-- Direct Search Section -->
       <div class="search-section">
         <div class="search-header">Enter Job Registration Number</div>
@@ -204,8 +230,24 @@ let jobPickerState = {
   isPPIMode: false,
   onJobSelected: null,
   isLoading: false,
-  isInIframe: false
+  isInIframe: false,
+  rawSharePointData: null
 };
+
+// Debug logging
+function debugLog(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  const logEl = document.getElementById('debugLog');
+  if (logEl) {
+    logEl.textContent += `[${timestamp}] ${message}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  console.log(`[JobPicker Debug] ${message}`);
+}
+
+function clearDebugLog() {
+  document.getElementById('debugLog').textContent = '';
+}
 
 // MSAL Configuration
 const MSAL_CONFIG = {
@@ -222,25 +264,38 @@ const GRAPH_SCOPES = ['https://graph.microsoft.com/Sites.Read.All'];
 // Detect if running in iframe
 function detectIframe() {
   jobPickerState.isInIframe = window.self !== window.top;
+  debugLog(`Running in iframe: ${jobPickerState.isInIframe}`);
 }
 
 // Initialize MSAL
 async function initJobPickerAuth() {
-  if (jobPickerState.msalInstance) return true;
+  if (jobPickerState.msalInstance) {
+    debugLog('MSAL already initialized');
+    return true;
+  }
   
   try {
+    debugLog('Initializing MSAL...');
+    
     if (!window.msal || !window.msal.PublicClientApplication) {
       throw new Error('MSAL library not loaded');
     }
 
     jobPickerState.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
     await jobPickerState.msalInstance.initialize();
+    debugLog('MSAL initialized successfully');
 
     const accounts = jobPickerState.msalInstance.getAllAccounts();
-    if (!accounts.length) throw new Error('No authenticated account');
+    debugLog(`Found ${accounts.length} accounts`);
+    
+    if (!accounts.length) {
+      throw new Error('No authenticated account');
+    }
 
+    debugLog(`Active account: ${accounts[0].username}`);
     return true;
   } catch (error) {
+    debugLog(`Auth failed: ${error.message}`);
     console.error('Job picker auth failed:', error);
     return false;
   }
@@ -248,6 +303,8 @@ async function initJobPickerAuth() {
 
 // Get Graph API token
 async function getJobPickerToken() {
+  debugLog('Getting Graph API token...');
+  
   const account = jobPickerState.msalInstance.getActiveAccount() || 
                  jobPickerState.msalInstance.getAllAccounts()[0];
   if (!account) throw new Error('No signed-in account');
@@ -255,11 +312,117 @@ async function getJobPickerToken() {
   const request = { scopes: GRAPH_SCOPES, account };
   try {
     const { accessToken } = await jobPickerState.msalInstance.acquireTokenSilent(request);
+    debugLog('Token acquired silently');
     return accessToken;
   } catch (err) {
-    console.warn('Silent token failed; attempting interactive', err);
+    debugLog(`Silent token failed: ${err.message}, trying interactive...`);
     const resp = await jobPickerState.msalInstance.acquireTokenPopup({ scopes: GRAPH_SCOPES });
+    debugLog('Token acquired interactively');
     return resp?.accessToken || '';
+  }
+}
+
+// Test SharePoint connection
+async function testSharePointConnection() {
+  debugLog('=== Testing SharePoint Connection ===');
+  
+  try {
+    const token = await getJobPickerToken();
+    debugLog(`Token length: ${token.length} characters`);
+    
+    // Test Graph API access
+    const meUrl = 'https://graph.microsoft.com/v1.0/me';
+    const meResponse = await fetch(meUrl, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const meData = await meResponse.json();
+    debugLog(`User: ${meData.displayName} (${meData.userPrincipalName})`);
+    
+    // Test site access
+    const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
+    debugLog(`Testing site URL: ${siteUrl}`);
+    
+    const siteResponse = await fetch(siteUrl, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    if (!siteResponse.ok) {
+      debugLog(`Site response error: ${siteResponse.status} ${siteResponse.statusText}`);
+      const errorText = await siteResponse.text();
+      debugLog(`Error details: ${errorText}`);
+      return;
+    }
+    
+    const site = await siteResponse.json();
+    debugLog(`Site found: ${site.displayName} (ID: ${site.id})`);
+    
+    // Test list access
+    const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
+    const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
+    debugLog(`Testing list URL: ${listsUrl}`);
+    
+    const listsResponse = await fetch(listsUrl, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    if (!listsResponse.ok) {
+      debugLog(`Lists response error: ${listsResponse.status} ${listsResponse.statusText}`);
+      return;
+    }
+    
+    const listsData = await listsResponse.json();
+    debugLog(`Found ${listsData.value?.length || 0} matching lists`);
+    
+    if (listsData.value?.length) {
+      const list = listsData.value[0];
+      debugLog(`List found: ${list.displayName} (ID: ${list.id})`);
+      
+      // Test items access
+      const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${list.id}/items?$expand=fields&$top=5`;
+      const itemsResponse = await fetch(itemsUrl, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!itemsResponse.ok) {
+        debugLog(`Items response error: ${itemsResponse.status} ${itemsResponse.statusText}`);
+        return;
+      }
+      
+      const itemsData = await itemsResponse.json();
+      debugLog(`Found ${itemsData.value?.length || 0} items (showing first 5)`);
+      
+      if (itemsData.value?.length) {
+        const firstItem = itemsData.value[0];
+        debugLog(`Sample item fields: ${Object.keys(firstItem.fields || {}).join(', ')}`);
+      }
+    } else {
+      debugLog('No matching lists found. Available lists:');
+      
+      // Get all lists
+      const allListsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists`;
+      const allListsResponse = await fetch(allListsUrl, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const allListsData = await allListsResponse.json();
+      
+      allListsData.value?.forEach(list => {
+        debugLog(`  - ${list.displayName}`);
+      });
+    }
+    
+  } catch (error) {
+    debugLog(`Connection test failed: ${error.message}`);
+    console.error('Connection test error:', error);
+  }
+}
+
+// Show raw SharePoint data
+function showRawData() {
+  if (jobPickerState.rawSharePointData) {
+    debugLog('=== Raw SharePoint Data ===');
+    debugLog(JSON.stringify(jobPickerState.rawSharePointData, null, 2));
+  } else {
+    debugLog('No raw data available. Fetch jobs first.');
   }
 }
 
@@ -267,58 +430,105 @@ async function getJobPickerToken() {
 async function fetchJobsFromSharePoint() {
   jobPickerState.isLoading = true;
   updateJobsDisplay();
+  
+  debugLog('=== Starting job fetch ===');
 
   try {
     const token = await getJobPickerToken();
+    debugLog('Token acquired for job fetch');
     
     // Get site
     const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
+    debugLog(`Fetching site: ${siteUrl}`);
+    
     const siteResponse = await fetch(siteUrl, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    
+    if (!siteResponse.ok) {
+      throw new Error(`Site fetch failed: ${siteResponse.status} ${siteResponse.statusText}`);
+    }
+    
     const site = await siteResponse.json();
+    debugLog(`Site retrieved: ${site.displayName}`);
 
     // Get list
     const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
     const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
+    debugLog(`Fetching list: ${listsUrl}`);
+    
     const listsResponse = await fetch(listsUrl, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    
+    if (!listsResponse.ok) {
+      throw new Error(`Lists fetch failed: ${listsResponse.status} ${listsResponse.statusText}`);
+    }
+    
     const listsData = await listsResponse.json();
+    debugLog(`Lists response: ${listsData.value?.length || 0} lists found`);
     
     if (!listsData.value?.length) {
       throw new Error(`List not found: ${JOB_PICKER_CONFIG.SPO_LIST_TITLE}`);
     }
     
     const listId = listsData.value[0].id;
+    debugLog(`Using list ID: ${listId}`);
 
-    // Get items - focusing on open jobs
+    // Get items
     const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
+    debugLog(`Fetching items: ${itemsUrl}`);
+    
     const itemsResponse = await fetch(itemsUrl, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    const itemsData = await itemsResponse.json();
-
-    // Process jobs - filter for "open" jobs (equivalent to yellow highlighting)
-    const allJobs = (itemsData.value || []).map(item => item.fields);
     
-    // Filter for open jobs (not closed, cancelled, or completed)
-    jobPickerState.allJobs = allJobs.filter(job => {
+    if (!itemsResponse.ok) {
+      throw new Error(`Items fetch failed: ${itemsResponse.status} ${itemsResponse.statusText}`);
+    }
+    
+    const itemsData = await itemsResponse.json();
+    jobPickerState.rawSharePointData = itemsData;
+    
+    debugLog(`Raw items retrieved: ${itemsData.value?.length || 0}`);
+
+    // Process jobs
+    const allJobs = (itemsData.value || []).map(item => item.fields);
+    debugLog(`Processing ${allJobs.length} job records`);
+    
+    // Debug: Show available field names
+    if (allJobs.length > 0) {
+      const sampleFields = Object.keys(allJobs[0]);
+      debugLog(`Sample field names: ${sampleFields.join(', ')}`);
+    }
+    
+    // Filter for open jobs
+    const openJobs = allJobs.filter(job => {
       const status = String(job.Status || job.JobStatus || job.BookingStatus || '').toLowerCase();
       const closed = String(job.CloseAndPost || job.Closed || '').toLowerCase();
+      const hasRego = job.Rego || job.Registration || job.JobRego;
       
-      // Exclude closed, cancelled, completed jobs
-      return !status.includes('closed') && 
-             !status.includes('cancelled') && 
-             !status.includes('completed') &&
-             closed !== 'yes' &&
-             closed !== 'true' &&
-             job.Rego; // Must have a registration number
+      const isOpen = !status.includes('closed') && 
+                     !status.includes('cancelled') && 
+                     !status.includes('completed') &&
+                     closed !== 'yes' &&
+                     closed !== 'true' &&
+                     hasRego;
+      
+      if (!isOpen && hasRego) {
+        debugLog(`Filtered out job ${hasRego}: status="${status}", closed="${closed}"`);
+      }
+      
+      return isOpen;
     });
-
+    
+    debugLog(`Open jobs after filtering: ${openJobs.length}`);
+    
+    jobPickerState.allJobs = openJobs;
     applyJobFilters();
     
   } catch (error) {
+    debugLog(`Job fetch error: ${error.message}`);
     console.error('Failed to load jobs:', error);
     showJobPickerError('Failed to load jobs from SharePoint: ' + error.message);
   } finally {
@@ -330,24 +540,29 @@ async function fetchJobsFromSharePoint() {
 // Apply filters to jobs
 function applyJobFilters() {
   let filtered = [...jobPickerState.allJobs];
+  debugLog(`Applying filters to ${filtered.length} jobs`);
   
   // PPI filter
   if (jobPickerState.isPPIMode) {
+    const beforePPICount = filtered.length;
     filtered = filtered.filter(job => {
       const jobType = String(job.ServiceType || job.JobType || '');
       return jobType.toLowerCase().includes('pre purchase') || 
              jobType.toLowerCase().includes('ppi') ||
              jobType.toLowerCase().includes('inspection');
     });
+    debugLog(`PPI filter: ${beforePPICount} -> ${filtered.length} jobs`);
   }
   
   jobPickerState.filteredJobs = filtered;
+  debugLog(`Final filtered jobs: ${filtered.length}`);
   updateJobsDisplay();
 }
 
 // Toggle PPI filter
 function togglePPIFilter() {
   jobPickerState.isPPIMode = document.getElementById('ppiFilter').checked;
+  debugLog(`PPI filter toggled: ${jobPickerState.isPPIMode}`);
   applyJobFilters();
 }
 
@@ -387,7 +602,7 @@ function updateJobsDisplay() {
   container.innerHTML = `
     <div class="jobs-list">
       ${jobs.map((job, index) => {
-        const rego = job.Rego || 'Unknown';
+        const rego = job.Rego || job.Registration || job.JobRego || 'Unknown';
         const customer = job.CustomerName || (job.FirstName + ' ' + job.LastName) || 'Unknown Customer';
         const service = job.ServiceType || job.ServiceRequired || 'Service';
         const isPPI = String(service).toLowerCase().includes('pre purchase') || 
@@ -409,6 +624,8 @@ function updateJobsDisplay() {
 
 // Select job from list
 function selectJob(index) {
+  debugLog(`Job selected: index ${index}`);
+  
   // Clear previous selection
   document.querySelectorAll('.job-item').forEach(item => {
     item.classList.remove('selected');
@@ -420,6 +637,9 @@ function selectJob(index) {
     jobItem.classList.add('selected');
     jobPickerState.selectedJob = jobPickerState.filteredJobs[index];
     document.getElementById('selectBtn').disabled = false;
+    
+    const rego = jobPickerState.selectedJob.Rego || jobPickerState.selectedJob.Registration || 'Unknown';
+    debugLog(`Selected job: ${rego}`);
   }
 }
 
@@ -434,6 +654,8 @@ function selectManualRego() {
   const input = document.getElementById('manualRegoInput');
   const rego = input.value.trim();
   
+  debugLog(`Manual rego entry: "${rego}"`);
+  
   if (!rego) {
     alert('Please enter a job registration number');
     return;
@@ -441,17 +663,18 @@ function selectManualRego() {
   
   // First check if rego exists in filtered list
   const foundInList = jobPickerState.filteredJobs.find(job => 
-    String(job.Rego || '').toLowerCase() === rego.toLowerCase()
+    String(job.Rego || job.Registration || '').toLowerCase() === rego.toLowerCase()
   );
   
   if (foundInList) {
+    debugLog(`Found rego in filtered list`);
     jobPickerState.selectedJob = foundInList;
   } else if (jobPickerState.isPPIMode) {
-    // In PPI mode, reject unknown regos (matching VBA behavior)
+    debugLog(`Rego not found in PPI mode - rejecting`);
     alert('That registration number is not in the available PPI jobs list.');
     return;
   } else {
-    // In standard mode, accept unknown rego (matching VBA fallback behavior)
+    debugLog(`Rego not found - creating manual entry`);
     jobPickerState.selectedJob = { Rego: rego, isManualEntry: true };
   }
   
@@ -465,9 +688,10 @@ function confirmSelection() {
     return;
   }
   
-  const rego = jobPickerState.selectedJob.Rego;
+  const rego = jobPickerState.selectedJob.Rego || jobPickerState.selectedJob.Registration || 'Unknown';
+  debugLog(`Confirming selection: ${rego}`);
   
-  // Store selected job in global variable (like VBA's selectedJobRego)
+  // Store selected job in global variable
   window.selectedJobRego = rego;
   
   // Store in session storage for persistence
@@ -476,19 +700,18 @@ function confirmSelection() {
   
   // Handle callback or postMessage based on context
   if (jobPickerState.isInIframe) {
-    // Send message to parent window
+    debugLog('Sending message to parent window');
     window.parent.postMessage({
       type: 'JOB_SELECTED',
       job: jobPickerState.selectedJob,
       rego: rego
     }, '*');
   } else {
-    // Call callback if provided
     if (jobPickerState.onJobSelected) {
+      debugLog('Calling onJobSelected callback');
       jobPickerState.onJobSelected(jobPickerState.selectedJob);
     }
     
-    // Show confirmation (like VBA MsgBox)
     alert(`You selected: ${rego}`);
   }
   
@@ -497,7 +720,8 @@ function confirmSelection() {
 
 // Open job picker
 async function openJobPicker(options = {}) {
-  console.log('openJobPicker called with options:', options);
+  debugLog('=== Opening Job Picker ===');
+  debugLog(`Options: ${JSON.stringify(options)}`);
   
   const { filterPPI = false, onJobSelected = null } = options;
   
@@ -510,41 +734,31 @@ async function openJobPicker(options = {}) {
   document.getElementById('manualRegoInput').value = '';
   document.getElementById('selectBtn').disabled = true;
   
-  console.log('About to initialize auth...');
-  
-  // Initialize auth if needed
+  // Initialize auth
   const authOk = await initJobPickerAuth();
-  console.log('Auth result:', authOk);
-  
   if (!authOk) {
-    console.error('Authentication failed');
+    debugLog('Authentication failed - cannot proceed');
     alert('Authentication failed. Please sign in again.');
     return;
   }
   
-  console.log('About to show modal...');
-  
   // Show modal
   const modal = document.getElementById('jobPickerModal');
   modal.classList.add('active');
-  
-  console.log('Modal classes after adding active:', modal.className);
-  console.log('Modal computed style:', window.getComputedStyle(modal).visibility);
-  console.log('Modal should be visible now');
+  debugLog('Modal shown');
   
   // Load jobs
-  console.log('About to fetch jobs...');
   await fetchJobsFromSharePoint();
 }
 
 // Close job picker
 function closeJobPicker() {
+  debugLog('Closing job picker');
   document.getElementById('jobPickerModal').classList.remove('active');
   jobPickerState.selectedJob = null;
   jobPickerState.onJobSelected = null;
   
   if (jobPickerState.isInIframe) {
-    // Send close message to parent
     window.parent.postMessage({
       type: 'JOB_PICKER_CLOSED'
     }, '*');
@@ -565,14 +779,11 @@ function showJobPickerError(message) {
   `;
 }
 
-// Listen for messages from parent window (iframe mode)
+// Listen for messages from parent window
 window.addEventListener('message', function(event) {
-  console.log('Job picker received message:', event.data);
-  console.log('Message origin:', event.origin);
-  console.log('isInIframe:', jobPickerState.isInIframe);
+  debugLog(`Received message: ${JSON.stringify(event.data)}`);
   
   if (event.data.type === 'OPEN_PICKER') {
-    console.log('Opening picker with options:', event.data.options);
     openJobPicker(event.data.options || {});
   }
 });
@@ -594,8 +805,9 @@ document.addEventListener('keydown', (event) => {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
   detectIframe();
+  debugLog('Job picker initialized');
   
-  // Export functions for global use (non-iframe mode)
+  // Export functions for global use
   if (!jobPickerState.isInIframe) {
     window.openJobPicker = openJobPicker;
     window.closeJobPicker = closeJobPicker;
@@ -604,6 +816,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<!-- Test button for standalone mode -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 20000;">
+  <button onclick="openJobPicker()" style="background: #1e3c72; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">
+    Open Job Picker
+  </button>
+</div>
 
 </body>
 </html>
