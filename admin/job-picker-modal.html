@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Job Picker - Debug Version</title>
+<title>Job Picker - Fixed Debug Version</title>
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -137,7 +137,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .debug-btn {
   background: #7c3aed; color: #fff; border: none; padding: 8px 16px;
-  border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 8px;
+  border-radius: 6px; cursor: pointer; font-weight: 600; margin: 4px;
 }
 
 @media (max-width: 768px) {
@@ -153,7 +153,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="job-picker-modal" id="jobPickerModal">
   <div class="modal-content">
     <div class="modal-header">
-      <div class="modal-title">Select Job Registration (Debug Mode)</div>
+      <div class="modal-title">Job Picker - Column Mapping Debug</div>
       <button class="close-btn" onclick="closeJobPicker()">&times;</button>
     </div>
     
@@ -161,11 +161,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <!-- Debug Section -->
       <div class="debug-section">
         <div class="debug-header">Debug Information</div>
-        <div class="debug-log" id="debugLog">Initializing debug mode...</div>
-        <button class="debug-btn" onclick="testSharePointConnection()">Test Connection</button>
-        <button class="debug-btn" onclick="tryAlternativeColumnRetrieval()">Fix Column Names</button>
+        <div class="debug-log" id="debugLog">Ready for debugging...</div>
+        <button class="debug-btn" onclick="getColumnMapping()">Get Column Mapping</button>
+        <button class="debug-btn" onclick="testWithMapping()">Test With Mapping</button>
         <button class="debug-btn" onclick="showRawData()">Show Raw Data</button>
-        <button class="debug-btn" onclick="analyzeFieldPatterns()">Analyze Fields</button>
         <button class="debug-btn" onclick="clearDebugLog()">Clear Log</button>
       </div>
       
@@ -233,7 +232,8 @@ let jobPickerState = {
   onJobSelected: null,
   isLoading: false,
   isInIframe: false,
-  rawSharePointData: null
+  rawSharePointData: null,
+  columnMapping: null
 };
 
 // Debug logging
@@ -324,275 +324,9 @@ async function getJobPickerToken() {
   }
 }
 
-// Test SharePoint connection and investigate column schema
-async function testSharePointConnection() {
-  debugLog('=== Testing SharePoint Connection ===');
-  
-  try {
-    const token = await getJobPickerToken();
-    debugLog(`Token length: ${token.length} characters`);
-    
-    // Test Graph API access
-    const meUrl = 'https://graph.microsoft.com/v1.0/me';
-    const meResponse = await fetch(meUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const meData = await meResponse.json();
-    debugLog(`User: ${meData.displayName} (${meData.userPrincipalName})`);
-    
-    // Test site access
-    const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
-    debugLog(`Testing site URL: ${siteUrl}`);
-    
-    const siteResponse = await fetch(siteUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (!siteResponse.ok) {
-      debugLog(`Site response error: ${siteResponse.status} ${siteResponse.statusText}`);
-      const errorText = await siteResponse.text();
-      debugLog(`Error details: ${errorText}`);
-      return;
-    }
-    
-    const site = await siteResponse.json();
-    debugLog(`Site found: ${site.displayName} (ID: ${site.id})`);
-    
-    // Test list access
-    const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
-    const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
-    debugLog(`Testing list URL: ${listsUrl}`);
-    
-    const listsResponse = await fetch(listsUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (!listsResponse.ok) {
-      debugLog(`Lists response error: ${listsResponse.status} ${listsResponse.statusText}`);
-      return;
-    }
-    
-    const listsData = await listsResponse.json();
-    debugLog(`Found ${listsData.value?.length || 0} matching lists`);
-    
-    if (listsData.value?.length) {
-      const list = listsData.value[0];
-      debugLog(`List found: ${list.displayName} (ID: ${list.id})`);
-      
-      // *** INVESTIGATE COLUMNS SCHEMA ***
-      debugLog('=== Investigating Column Schema ===');
-      const columnsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${list.id}/columns`;
-      const columnsResponse = await fetch(columnsUrl, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (columnsResponse.ok) {
-        const columnsData = await columnsResponse.json();
-        debugLog(`Found ${columnsData.value?.length || 0} columns:`);
-        
-        columnsData.value?.forEach(col => {
-          debugLog(`  Column: "${col.displayName}" (Internal: ${col.name}) - Type: ${col.columnGroup || col.type || 'unknown'}`);
-        });
-        
-        // Look for columns that might contain registration data
-        const regoColumns = columnsData.value?.filter(col => 
-          col.displayName?.toLowerCase().includes('rego') ||
-          col.displayName?.toLowerCase().includes('registration') ||
-          col.name?.toLowerCase().includes('rego')
-        );
-        
-        if (regoColumns?.length) {
-          debugLog('=== Potential Registration Columns ===');
-          regoColumns.forEach(col => {
-            debugLog(`  "${col.displayName}" (${col.name})`);
-          });
-        }
-      } else {
-        debugLog(`Columns request failed: ${columnsResponse.status}`);
-      }
-      
-      // *** TEST DIFFERENT ITEM RETRIEVAL METHODS ***
-      debugLog('=== Testing Different Item Retrieval Methods ===');
-      
-      // Method 1: Basic items with fields
-      debugLog('Method 1: Basic $expand=fields');
-      const itemsUrl1 = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${list.id}/items?$expand=fields&$top=2`;
-      const itemsResponse1 = await fetch(itemsUrl1, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (itemsResponse1.ok) {
-        const itemsData1 = await itemsResponse1.json();
-        if (itemsData1.value?.length) {
-          const firstItem = itemsData1.value[0];
-          debugLog(`Sample fields (Method 1): ${Object.keys(firstItem.fields || {}).slice(0, 10).join(', ')}`);
-        }
-      }
-      
-      // Method 2: Try with content types
-      debugLog('Method 2: With content types');
-      const itemsUrl2 = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${list.id}/items?$expand=fields,contentType&$top=2`;
-      const itemsResponse2 = await fetch(itemsUrl2, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (itemsResponse2.ok) {
-        const itemsData2 = await itemsResponse2.json();
-        if (itemsData2.value?.length) {
-          const firstItem = itemsData2.value[0];
-          debugLog(`Content type: ${firstItem.contentType?.name || 'unknown'}`);
-          debugLog(`Sample fields (Method 2): ${Object.keys(firstItem.fields || {}).slice(0, 10).join(', ')}`);
-        }
-      }
-      
-      // Method 3: Try direct SharePoint REST API approach
-      debugLog('Method 3: Testing SharePoint REST API pattern');
-      // Note: This would require different authentication, just documenting the approach
-      debugLog('SharePoint REST would use: /_api/web/lists/getbytitle(\\'listname\\')/items');
-      
-      // Method 4: Check if list is actually an Excel file or other format
-      debugLog('Method 4: Checking list type and template');
-      debugLog(`List template: ${list.list?.template || 'unknown'}`);
-      debugLog(`List base type: ${list.list?.baseType || 'unknown'}`);
-      
-    } else {
-      debugLog('No matching lists found. Available lists:');
-      
-      // Get all lists
-      const allListsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists`;
-      const allListsResponse = await fetch(allListsUrl, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const allListsData = await allListsResponse.json();
-      
-      allListsData.value?.forEach(list => {
-        debugLog(`  - "${list.displayName}" (Template: ${list.list?.template || 'unknown'})`);
-      });
-    }
-    
-  } catch (error) {
-    debugLog(`Connection test failed: ${error.message}`);
-    console.error('Connection test error:', error);
-  }
-}
-
-// Show raw SharePoint data
-function showRawData() {
-  if (jobPickerState.rawSharePointData) {
-    debugLog('=== Raw SharePoint Data ===');
-    
-    // Show first few items with their field values to help identify patterns
-    const items = jobPickerState.rawSharePointData.value || [];
-    if (items.length > 0) {
-      debugLog('=== First 3 Items Field Analysis ===');
-      
-      for (let i = 0; i < Math.min(3, items.length); i++) {
-        debugLog(`--- Item ${i + 1} ---`);
-        const fields = items[i].fields;
-        
-        Object.keys(fields).forEach(key => {
-          const value = fields[key];
-          if (value && typeof value === 'string' && value.length > 0 && value.length < 50) {
-            debugLog(`${key}: "${value}"`);
-          }
-        });
-      }
-    }
-    
-    debugLog('=== Full Raw Data (first item) ===');
-    if (items.length > 0) {
-      debugLog(JSON.stringify(items[0].fields, null, 2));
-    }
-  } else {
-    debugLog('No raw data available. Fetch jobs first.');
-  }
-}
-
-// Analyze field patterns to identify which field contains what data
-function analyzeFieldPatterns() {
-  if (!jobPickerState.rawSharePointData?.value?.length) {
-    debugLog('No data to analyze. Fetch jobs first.');
-    return null;
-  }
-  
-  debugLog('=== Analyzing Field Patterns ===');
-  
-  const items = jobPickerState.rawSharePointData.value;
-  const fieldAnalysis = {};
-  
-  // Analyze first 10 items to find patterns
-  for (let i = 0; i < Math.min(10, items.length); i++) {
-    const fields = items[i].fields;
-    
-    Object.keys(fields).forEach(fieldName => {
-      const value = fields[fieldName];
-      
-      if (!fieldAnalysis[fieldName]) {
-        fieldAnalysis[fieldName] = {
-          sampleValues: [],
-          likelyType: 'unknown',
-          nonEmptyCount: 0
-        };
-      }
-      
-      if (value && String(value).trim().length > 0) {
-        fieldAnalysis[fieldName].nonEmptyCount++;
-        if (fieldAnalysis[fieldName].sampleValues.length < 3) {
-          fieldAnalysis[fieldName].sampleValues.push(String(value).trim());
-        }
-      }
-    });
-  }
-  
-  // Identify likely field purposes based on patterns
-  Object.keys(fieldAnalysis).forEach(fieldName => {
-    const analysis = fieldAnalysis[fieldName];
-    const samples = analysis.sampleValues;
-    
-    if (samples.length === 0) {
-      analysis.likelyType = 'empty';
-      return;
-    }
-    
-    // Check for registration number patterns (letters + numbers, typically 6-8 chars)
-    if (samples.some(s => /^[A-Z0-9]{3,8}$/i.test(s))) {
-      analysis.likelyType = 'registration';
-    }
-    // Check for name patterns
-    else if (samples.some(s => /^[A-Za-z\s]{2,30}$/.test(s) && s.includes(' '))) {
-      analysis.likelyType = 'name';
-    }
-    // Check for status patterns
-    else if (samples.some(s => ['open', 'closed', 'pending', 'complete'].some(status => 
-      s.toLowerCase().includes(status)))) {
-      analysis.likelyType = 'status';
-    }
-    // Check for service type patterns
-    else if (samples.some(s => s.toLowerCase().includes('service') || 
-      s.toLowerCase().includes('inspection') || s.toLowerCase().includes('repair'))) {
-      analysis.likelyType = 'service';
-    }
-    // Check for date patterns
-    else if (samples.some(s => /\d{1,2}\/\d{1,2}\/\d{4}/.test(s) || 
-      /\d{4}-\d{2}-\d{2}/.test(s))) {
-      analysis.likelyType = 'date';
-    }
-  });
-  
-  // Sort by likelihood and non-empty count
-  const sortedFields = Object.keys(fieldAnalysis)
-    .filter(f => fieldAnalysis[f].likelyType !== 'empty')
-    .sort((a, b) => fieldAnalysis[b].nonEmptyCount - fieldAnalysis[a].nonEmptyCount);
-  
-  debugLog('=== Field Analysis Results ===');
-  sortedFields.forEach(fieldName => {
-    const analysis = fieldAnalysis[fieldName];
-    debugLog(`${fieldName} (${analysis.likelyType}): ${analysis.nonEmptyCount} entries, samples: ${analysis.sampleValues.join(', ')}`);
-  });
-  
-// Try alternative methods to get proper column names
-async function tryAlternativeColumnRetrieval() {
-  debugLog('=== Trying Alternative Column Retrieval Methods ===');
+// Get column mapping
+async function getColumnMapping() {
+  debugLog('=== Getting Column Mapping ===');
   
   try {
     const token = await getJobPickerToken();
@@ -606,165 +340,245 @@ async function tryAlternativeColumnRetrieval() {
     const listsData = await listsResponse.json();
     const listId = listsData.value[0].id;
     
-    // Method 1: Get columns first, then map to items
-    debugLog('Method 1: Using column definitions to map field names');
+    // Get columns
+    debugLog('Fetching column definitions...');
     const columnsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/columns`;
     const columnsResponse = await fetch(columnsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const columnsData = await columnsResponse.json();
     
-    // Create mapping from internal name to display name
+    // Create mapping
     const columnMapping = {};
+    debugLog(`Found ${columnsData.value?.length || 0} columns:`);
+    
     columnsData.value?.forEach(col => {
       if (col.name && col.displayName) {
         columnMapping[col.name] = col.displayName;
+        debugLog(`  ${col.name} → "${col.displayName}"`);
       }
     });
     
-    debugLog(`Created column mapping for ${Object.keys(columnMapping).length} columns`);
+    jobPickerState.columnMapping = columnMapping;
+    debugLog(`Column mapping created with ${Object.keys(columnMapping).length} entries`);
     
-    // Now get items and apply mapping
-    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=3`;
+    // Look for registration-related columns
+    const regoColumns = Object.keys(columnMapping).filter(internalName => {
+      const displayName = columnMapping[internalName].toLowerCase();
+      return displayName.includes('rego') || 
+             displayName.includes('registration') || 
+             displayName.includes('plate');
+    });
+    
+    if (regoColumns.length > 0) {
+      debugLog('=== Found Registration-Related Columns ===');
+      regoColumns.forEach(internalName => {
+        debugLog(`  ${internalName} → "${columnMapping[internalName]}"`);
+      });
+    } else {
+      debugLog('No obvious registration columns found. All column names:');
+      Object.keys(columnMapping).forEach(internalName => {
+        debugLog(`  "${columnMapping[internalName]}"`);
+      });
+    }
+    
+    return columnMapping;
+    
+  } catch (error) {
+    debugLog(`Column mapping failed: ${error.message}`);
+    return null;
+  }
+}
+
+// Test with column mapping
+async function testWithMapping() {
+  debugLog('=== Testing With Column Mapping ===');
+  
+  if (!jobPickerState.columnMapping) {
+    debugLog('No column mapping available. Getting it first...');
+    await getColumnMapping();
+  }
+  
+  if (!jobPickerState.columnMapping) {
+    debugLog('Failed to get column mapping');
+    return;
+  }
+  
+  try {
+    const token = await getJobPickerToken();
+    const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
+    const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
+    const site = await siteResponse.json();
+    
+    const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
+    const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
+    const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
+    const listsData = await listsResponse.json();
+    const listId = listsData.value[0].id;
+    
+    // Get a few sample items
+    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=5`;
     const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const itemsData = await itemsResponse.json();
     
-    if (itemsData.value?.length) {
+    debugLog(`Got ${itemsData.value?.length || 0} sample items`);
+    
+    // Apply column mapping to first item
+    if (itemsData.value?.length > 0) {
       const firstItem = itemsData.value[0];
-      const mappedFields = {};
+      const mappedItem = {};
       
       Object.keys(firstItem.fields).forEach(internalName => {
-        const displayName = columnMapping[internalName] || internalName;
-        mappedFields[displayName] = firstItem.fields[internalName];
+        const displayName = jobPickerState.columnMapping[internalName] || internalName;
+        const value = firstItem.fields[internalName];
+        if (value && String(value).trim().length > 0) {
+          mappedItem[displayName] = value;
+        }
       });
       
-      debugLog('=== Mapped Field Names (Sample Item) ===');
-      Object.keys(mappedFields).forEach(displayName => {
-        const value = mappedFields[displayName];
-        if (value && String(value).length < 100) {
+      debugLog('=== Sample Item With Proper Column Names ===');
+      Object.keys(mappedItem).forEach(displayName => {
+        const value = mappedItem[displayName];
+        if (String(value).length < 100) {
           debugLog(`"${displayName}": "${value}"`);
         }
       });
       
-      // Look for likely registration fields
-      const likelyRegoFields = Object.keys(mappedFields).filter(name =>
+      // Now try to find likely registration field
+      const likelyRegoFields = Object.keys(mappedItem).filter(name =>
         name.toLowerCase().includes('rego') ||
         name.toLowerCase().includes('registration') ||
-        name.toLowerCase().includes('plate')
+        name.toLowerCase().includes('plate') ||
+        /^[A-Z0-9]{3,8}$/i.test(mappedItem[name]) // Pattern match for rego values
       );
       
-      if (likelyRegoFields.length) {
-        debugLog(`=== Likely Registration Fields ===`);
+      if (likelyRegoFields.length > 0) {
+        debugLog('=== Likely Registration Fields ===');
         likelyRegoFields.forEach(field => {
-          debugLog(`"${field}": "${mappedFields[field]}"`);
+          debugLog(`"${field}": "${mappedItem[field]}"`);
         });
       }
-      
-      return { columnMapping, mappedFields };
     }
     
   } catch (error) {
-    debugLog(`Alternative column retrieval failed: ${error.message}`);
+    debugLog(`Test with mapping failed: ${error.message}`);
   }
-  
-  return null;
 }
 
-// Fetch jobs from SharePoint
+// Show raw data
+function showRawData() {
+  if (jobPickerState.rawSharePointData) {
+    debugLog('=== Raw SharePoint Data (First Item) ===');
+    const firstItem = jobPickerState.rawSharePointData.value[0];
+    if (firstItem) {
+      Object.keys(firstItem.fields).forEach(key => {
+        const value = firstItem.fields[key];
+        if (value && String(value).length < 100) {
+          debugLog(`${key}: "${value}"`);
+        }
+      });
+    }
+  } else {
+    debugLog('No raw data available. Load jobs first.');
+  }
+}
+
+// Apply column mapping to job data
+function applyColumnMapping(rawJobs) {
+  if (!jobPickerState.columnMapping) {
+    debugLog('No column mapping available - returning raw jobs');
+    return rawJobs;
+  }
+  
+  return rawJobs.map(rawJob => {
+    const mappedJob = {};
+    
+    Object.keys(rawJob).forEach(internalName => {
+      const displayName = jobPickerState.columnMapping[internalName] || internalName;
+      mappedJob[displayName] = rawJob[internalName];
+      
+      // Also keep original field names for backward compatibility
+      mappedJob[internalName] = rawJob[internalName];
+    });
+    
+    return mappedJob;
+  });
+}
+
+// Fetch jobs from SharePoint with column mapping
 async function fetchJobsFromSharePoint() {
   jobPickerState.isLoading = true;
   updateJobsDisplay();
   
-  debugLog('=== Starting job fetch ===');
+  debugLog('=== Starting job fetch with column mapping ===');
 
   try {
+    // Get column mapping first
+    if (!jobPickerState.columnMapping) {
+      await getColumnMapping();
+    }
+    
     const token = await getJobPickerToken();
-    debugLog('Token acquired for job fetch');
     
     // Get site
     const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
-    debugLog(`Fetching site: ${siteUrl}`);
-    
-    const siteResponse = await fetch(siteUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (!siteResponse.ok) {
-      throw new Error(`Site fetch failed: ${siteResponse.status} ${siteResponse.statusText}`);
-    }
-    
+    const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
     const site = await siteResponse.json();
-    debugLog(`Site retrieved: ${site.displayName}`);
 
     // Get list
     const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
     const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
-    debugLog(`Fetching list: ${listsUrl}`);
-    
-    const listsResponse = await fetch(listsUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (!listsResponse.ok) {
-      throw new Error(`Lists fetch failed: ${listsResponse.status} ${listsResponse.statusText}`);
-    }
-    
+    const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const listsData = await listsResponse.json();
-    debugLog(`Lists response: ${listsData.value?.length || 0} lists found`);
-    
-    if (!listsData.value?.length) {
-      throw new Error(`List not found: ${JOB_PICKER_CONFIG.SPO_LIST_TITLE}`);
-    }
-    
     const listId = listsData.value[0].id;
-    debugLog(`Using list ID: ${listId}`);
 
     // Get items
     const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
-    debugLog(`Fetching items: ${itemsUrl}`);
-    
-    const itemsResponse = await fetch(itemsUrl, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (!itemsResponse.ok) {
-      throw new Error(`Items fetch failed: ${itemsResponse.status} ${itemsResponse.statusText}`);
-    }
-    
+    const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const itemsData = await itemsResponse.json();
-    jobPickerState.rawSharePointData = itemsData;
     
+    jobPickerState.rawSharePointData = itemsData;
     debugLog(`Raw items retrieved: ${itemsData.value?.length || 0}`);
 
-    // Process jobs
-    const allJobs = (itemsData.value || []).map(item => item.fields);
-    debugLog(`Processing ${allJobs.length} job records`);
+    // Apply column mapping
+    const rawJobs = (itemsData.value || []).map(item => item.fields);
+    const mappedJobs = applyColumnMapping(rawJobs);
     
-    // Debug: Show available field names
-    if (allJobs.length > 0) {
-      const sampleFields = Object.keys(allJobs[0]);
-      debugLog(`Sample field names: ${sampleFields.join(', ')}`);
-    }
+    debugLog(`Jobs mapped with column names`);
     
-    // Filter for open jobs
-    const openJobs = allJobs.filter(job => {
+    // Filter for open jobs using multiple possible field names
+    const openJobs = mappedJobs.filter(job => {
+      // Look for registration in multiple possible fields
+      const rego = job.Rego || job.Registration || job['Registration Number'] || 
+                   job.Plate || job['Plate Number'] || job.JobRego ||
+                   // Check all fields for values that look like registration numbers
+                   Object.values(job).find(val => 
+                     typeof val === 'string' && /^[A-Z0-9]{3,8}$/i.test(val.trim()));
+      
+      if (!rego) return false;
+      
+      // Less strict status filtering
       const status = String(job.Status || job.JobStatus || job.BookingStatus || '').toLowerCase();
-      const closed = String(job.CloseAndPost || job.Closed || '').toLowerCase();
-      const hasRego = job.Rego || job.Registration || job.JobRego;
+      const closed = String(job.CloseAndPost || job.Closed || job.Complete || '').toLowerCase();
       
       const isOpen = !status.includes('closed') && 
                      !status.includes('cancelled') && 
                      !status.includes('completed') &&
                      closed !== 'yes' &&
-                     closed !== 'true' &&
-                     hasRego;
-      
-      if (!isOpen && hasRego) {
-        debugLog(`Filtered out job ${hasRego}: status="${status}", closed="${closed}"`);
-      }
+                     closed !== 'true';
       
       return isOpen;
     });
     
     debugLog(`Open jobs after filtering: ${openJobs.length}`);
+    
+    // Show sample of found jobs
+    if (openJobs.length > 0) {
+      debugLog('=== Sample Open Jobs ===');
+      for (let i = 0; i < Math.min(3, openJobs.length); i++) {
+        const job = openJobs[i];
+        const rego = job.Rego || job.Registration || job['Registration Number'] || 'Unknown';
+        debugLog(`${i + 1}. ${rego}`);
+      }
+    }
     
     jobPickerState.allJobs = openJobs;
     applyJobFilters();
@@ -788,7 +602,7 @@ function applyJobFilters() {
   if (jobPickerState.isPPIMode) {
     const beforePPICount = filtered.length;
     filtered = filtered.filter(job => {
-      const jobType = String(job.ServiceType || job.JobType || '');
+      const jobType = String(job.ServiceType || job.JobType || job['Service Type'] || '');
       return jobType.toLowerCase().includes('pre purchase') || 
              jobType.toLowerCase().includes('ppi') ||
              jobType.toLowerCase().includes('inspection');
@@ -844,9 +658,11 @@ function updateJobsDisplay() {
   container.innerHTML = `
     <div class="jobs-list">
       ${jobs.map((job, index) => {
-        const rego = job.Rego || job.Registration || job.JobRego || 'Unknown';
-        const customer = job.CustomerName || (job.FirstName + ' ' + job.LastName) || 'Unknown Customer';
-        const service = job.ServiceType || job.ServiceRequired || 'Service';
+        const rego = job.Rego || job.Registration || job['Registration Number'] || 'Unknown';
+        const customer = job.CustomerName || job['Customer Name'] || 
+                        (job.FirstName && job.LastName ? `${job.FirstName} ${job.LastName}` : '') ||
+                        job.Customer || 'Unknown Customer';
+        const service = job.ServiceType || job['Service Type'] || job.ServiceRequired || 'Service';
         const isPPI = String(service).toLowerCase().includes('pre purchase') || 
                      String(service).toLowerCase().includes('ppi');
         
@@ -880,7 +696,9 @@ function selectJob(index) {
     jobPickerState.selectedJob = jobPickerState.filteredJobs[index];
     document.getElementById('selectBtn').disabled = false;
     
-    const rego = jobPickerState.selectedJob.Rego || jobPickerState.selectedJob.Registration || 'Unknown';
+    const rego = jobPickerState.selectedJob.Rego || 
+                 jobPickerState.selectedJob.Registration || 
+                 jobPickerState.selectedJob['Registration Number'] || 'Unknown';
     debugLog(`Selected job: ${rego}`);
   }
 }
@@ -903,10 +721,11 @@ function selectManualRego() {
     return;
   }
   
-  // First check if rego exists in filtered list
-  const foundInList = jobPickerState.filteredJobs.find(job => 
-    String(job.Rego || job.Registration || '').toLowerCase() === rego.toLowerCase()
-  );
+  // Check if rego exists in filtered list
+  const foundInList = jobPickerState.filteredJobs.find(job => {
+    const jobRego = job.Rego || job.Registration || job['Registration Number'] || '';
+    return String(jobRego).toLowerCase() === rego.toLowerCase();
+  });
   
   if (foundInList) {
     debugLog(`Found rego in filtered list`);
@@ -930,7 +749,9 @@ function confirmSelection() {
     return;
   }
   
-  const rego = jobPickerState.selectedJob.Rego || jobPickerState.selectedJob.Registration || 'Unknown';
+  const rego = jobPickerState.selectedJob.Rego || 
+               jobPickerState.selectedJob.Registration || 
+               jobPickerState.selectedJob['Registration Number'] || 'Unknown';
   debugLog(`Confirming selection: ${rego}`);
   
   // Store selected job in global variable
