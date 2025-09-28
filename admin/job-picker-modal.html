@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Job Picker - Fixed Debug Version</title>
+<title>Job Picker - FP Service Management</title>
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,18 +40,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .close-btn:hover { background: rgba(255,255,255,0.3); }
 
 .modal-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
-
-/* Debug Section */
-.debug-section {
-  background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px;
-  padding: 16px; margin-bottom: 20px;
-}
-.debug-header { font-weight: 600; color: #dc2626; margin-bottom: 12px; }
-.debug-log { 
-  background: #1f2937; color: #f9fafb; padding: 12px; border-radius: 8px;
-  font-family: 'Courier New', monospace; font-size: 12px; max-height: 150px;
-  overflow-y: auto; white-space: pre-wrap;
-}
 
 /* Search Section */
 .search-section { 
@@ -135,11 +123,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .btn-select:disabled { background: #d1d5db; cursor: not-allowed; }
 
-.debug-btn {
-  background: #7c3aed; color: #fff; border: none; padding: 8px 16px;
-  border-radius: 6px; cursor: pointer; font-weight: 600; margin: 4px;
-}
-
 @media (max-width: 768px) {
   .modal-content { width: 95%; margin: 20px; }
   .search-row { grid-template-columns: 1fr; }
@@ -153,21 +136,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="job-picker-modal" id="jobPickerModal">
   <div class="modal-content">
     <div class="modal-header">
-      <div class="modal-title">Job Picker - Column Mapping Debug</div>
+      <div class="modal-title">Select Job Registration</div>
       <button class="close-btn" onclick="closeJobPicker()">&times;</button>
     </div>
     
     <div class="modal-body">
-      <!-- Debug Section -->
-      <div class="debug-section">
-        <div class="debug-header">Debug Information</div>
-        <div class="debug-log" id="debugLog">Ready for debugging...</div>
-        <button class="debug-btn" onclick="getColumnMapping()">Get Column Mapping</button>
-        <button class="debug-btn" onclick="testWithMapping()">Test With Mapping</button>
-        <button class="debug-btn" onclick="showRawData()">Show Raw Data</button>
-        <button class="debug-btn" onclick="clearDebugLog()">Clear Log</button>
-      </div>
-      
       <!-- Direct Search Section -->
       <div class="search-section">
         <div class="search-header">Enter Job Registration Number</div>
@@ -232,24 +205,8 @@ let jobPickerState = {
   onJobSelected: null,
   isLoading: false,
   isInIframe: false,
-  rawSharePointData: null,
   columnMapping: null
 };
-
-// Debug logging
-function debugLog(message) {
-  const timestamp = new Date().toLocaleTimeString();
-  const logEl = document.getElementById('debugLog');
-  if (logEl) {
-    logEl.textContent += `[${timestamp}] ${message}\n`;
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-  console.log(`[JobPicker Debug] ${message}`);
-}
-
-function clearDebugLog() {
-  document.getElementById('debugLog').textContent = '';
-}
 
 // MSAL Configuration
 const MSAL_CONFIG = {
@@ -266,38 +223,25 @@ const GRAPH_SCOPES = ['https://graph.microsoft.com/Sites.Read.All'];
 // Detect if running in iframe
 function detectIframe() {
   jobPickerState.isInIframe = window.self !== window.top;
-  debugLog(`Running in iframe: ${jobPickerState.isInIframe}`);
 }
 
 // Initialize MSAL
 async function initJobPickerAuth() {
-  if (jobPickerState.msalInstance) {
-    debugLog('MSAL already initialized');
-    return true;
-  }
+  if (jobPickerState.msalInstance) return true;
   
   try {
-    debugLog('Initializing MSAL...');
-    
     if (!window.msal || !window.msal.PublicClientApplication) {
       throw new Error('MSAL library not loaded');
     }
 
     jobPickerState.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
     await jobPickerState.msalInstance.initialize();
-    debugLog('MSAL initialized successfully');
 
     const accounts = jobPickerState.msalInstance.getAllAccounts();
-    debugLog(`Found ${accounts.length} accounts`);
-    
-    if (!accounts.length) {
-      throw new Error('No authenticated account');
-    }
+    if (!accounts.length) throw new Error('No authenticated account');
 
-    debugLog(`Active account: ${accounts[0].username}`);
     return true;
   } catch (error) {
-    debugLog(`Auth failed: ${error.message}`);
     console.error('Job picker auth failed:', error);
     return false;
   }
@@ -305,8 +249,6 @@ async function initJobPickerAuth() {
 
 // Get Graph API token
 async function getJobPickerToken() {
-  debugLog('Getting Graph API token...');
-  
   const account = jobPickerState.msalInstance.getActiveAccount() || 
                  jobPickerState.msalInstance.getAllAccounts()[0];
   if (!account) throw new Error('No signed-in account');
@@ -314,19 +256,17 @@ async function getJobPickerToken() {
   const request = { scopes: GRAPH_SCOPES, account };
   try {
     const { accessToken } = await jobPickerState.msalInstance.acquireTokenSilent(request);
-    debugLog('Token acquired silently');
     return accessToken;
   } catch (err) {
-    debugLog(`Silent token failed: ${err.message}, trying interactive...`);
+    console.warn('Silent token failed; attempting interactive', err);
     const resp = await jobPickerState.msalInstance.acquireTokenPopup({ scopes: GRAPH_SCOPES });
-    debugLog('Token acquired interactively');
     return resp?.accessToken || '';
   }
 }
 
-// Get column mapping
+// Get column mapping from SharePoint
 async function getColumnMapping() {
-  debugLog('=== Getting Column Mapping ===');
+  if (jobPickerState.columnMapping) return jobPickerState.columnMapping;
   
   try {
     const token = await getJobPickerToken();
@@ -341,159 +281,30 @@ async function getColumnMapping() {
     const listId = listsData.value[0].id;
     
     // Get columns
-    debugLog('Fetching column definitions...');
     const columnsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/columns`;
     const columnsResponse = await fetch(columnsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const columnsData = await columnsResponse.json();
     
     // Create mapping
     const columnMapping = {};
-    debugLog(`Found ${columnsData.value?.length || 0} columns:`);
-    
     columnsData.value?.forEach(col => {
       if (col.name && col.displayName) {
         columnMapping[col.name] = col.displayName;
-        debugLog(`  ${col.name} → "${col.displayName}"`);
       }
     });
     
     jobPickerState.columnMapping = columnMapping;
-    debugLog(`Column mapping created with ${Object.keys(columnMapping).length} entries`);
-    
-    // Look for registration-related columns
-    const regoColumns = Object.keys(columnMapping).filter(internalName => {
-      const displayName = columnMapping[internalName].toLowerCase();
-      return displayName.includes('rego') || 
-             displayName.includes('registration') || 
-             displayName.includes('plate');
-    });
-    
-    if (regoColumns.length > 0) {
-      debugLog('=== Found Registration-Related Columns ===');
-      regoColumns.forEach(internalName => {
-        debugLog(`  ${internalName} → "${columnMapping[internalName]}"`);
-      });
-    } else {
-      debugLog('No obvious registration columns found. All column names:');
-      Object.keys(columnMapping).forEach(internalName => {
-        debugLog(`  "${columnMapping[internalName]}"`);
-      });
-    }
-    
     return columnMapping;
     
   } catch (error) {
-    debugLog(`Column mapping failed: ${error.message}`);
+    console.error('Column mapping failed:', error);
     return null;
-  }
-}
-
-// Test with column mapping
-async function testWithMapping() {
-  debugLog('=== Testing With Column Mapping ===');
-  
-  if (!jobPickerState.columnMapping) {
-    debugLog('No column mapping available. Getting it first...');
-    await getColumnMapping();
-  }
-  
-  if (!jobPickerState.columnMapping) {
-    debugLog('Failed to get column mapping');
-    return;
-  }
-  
-  try {
-    const token = await getJobPickerToken();
-    const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
-    const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
-    const site = await siteResponse.json();
-    
-    const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
-    const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
-    const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
-    const listsData = await listsResponse.json();
-    const listId = listsData.value[0].id;
-    
-    // Get a larger sample to analyze status values
-    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=50`;
-    const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
-    const itemsData = await itemsResponse.json();
-    
-    debugLog(`Got ${itemsData.value?.length || 0} sample items for analysis`);
-    
-    if (itemsData.value?.length > 0) {
-      // Apply column mapping
-      const rawJobs = itemsData.value.map(item => item.fields);
-      const mappedJobs = applyColumnMapping(rawJobs);
-      
-      debugLog('=== Status Field Analysis (First 10 Items) ===');
-      
-      // Analyze status field values
-      const statusValues = {
-        CloseAndPost: new Set(),
-        Status: new Set(),
-        JobStatus: new Set(),
-        BookingStatus: new Set(),
-        FormanStatus: new Set()
-      };
-      
-      for (let i = 0; i < Math.min(10, mappedJobs.length); i++) {
-        const job = mappedJobs[i];
-        const rego = job.Rego || 'Unknown';
-        
-        debugLog(`--- Job ${i + 1}: ${rego} ---`);
-        debugLog(`  CloseAndPost: "${job.CloseAndPost || ''}"`);
-        debugLog(`  Status: "${job.Status || ''}"`);
-        debugLog(`  JobStatus: "${job.JobStatus || ''}"`);
-        debugLog(`  BookingStatus: "${job.BookingStatus || ''}"`);
-        debugLog(`  FormanStatus: "${job.FormanStatus || ''}"`);
-        
-        // Collect unique values
-        if (job.CloseAndPost) statusValues.CloseAndPost.add(job.CloseAndPost);
-        if (job.Status) statusValues.Status.add(job.Status);
-        if (job.JobStatus) statusValues.JobStatus.add(job.JobStatus);
-        if (job.BookingStatus) statusValues.BookingStatus.add(job.BookingStatus);
-        if (job.FormanStatus) statusValues.FormanStatus.add(job.FormanStatus);
-      }
-      
-      debugLog('=== Unique Status Values Found ===');
-      Object.keys(statusValues).forEach(fieldName => {
-        const values = Array.from(statusValues[fieldName]);
-        if (values.length > 0) {
-          debugLog(`${fieldName}: ${values.join(', ')}`);
-        } else {
-          debugLog(`${fieldName}: (no values found)`);
-        }
-      });
-    }
-    
-  } catch (error) {
-    debugLog(`Test with mapping failed: ${error.message}`);
-  }
-}
-
-// Show raw data
-function showRawData() {
-  if (jobPickerState.rawSharePointData) {
-    debugLog('=== Raw SharePoint Data (First Item) ===');
-    const firstItem = jobPickerState.rawSharePointData.value[0];
-    if (firstItem) {
-      Object.keys(firstItem.fields).forEach(key => {
-        const value = firstItem.fields[key];
-        if (value && String(value).length < 100) {
-          debugLog(`${key}: "${value}"`);
-        }
-      });
-    }
-  } else {
-    debugLog('No raw data available. Load jobs first.');
   }
 }
 
 // Apply column mapping to job data
 function applyColumnMapping(rawJobs) {
   if (!jobPickerState.columnMapping) {
-    debugLog('No column mapping available - returning raw jobs');
     return rawJobs;
   }
   
@@ -503,7 +314,6 @@ function applyColumnMapping(rawJobs) {
     Object.keys(rawJob).forEach(internalName => {
       const displayName = jobPickerState.columnMapping[internalName] || internalName;
       mappedJob[displayName] = rawJob[internalName];
-      
       // Also keep original field names for backward compatibility
       mappedJob[internalName] = rawJob[internalName];
     });
@@ -512,18 +322,14 @@ function applyColumnMapping(rawJobs) {
   });
 }
 
-// Fetch jobs from SharePoint with column mapping
+// Fetch jobs from SharePoint
 async function fetchJobsFromSharePoint() {
   jobPickerState.isLoading = true;
   updateJobsDisplay();
-  
-  debugLog('=== Starting job fetch with column mapping ===');
 
   try {
     // Get column mapping first
-    if (!jobPickerState.columnMapping) {
-      await getColumnMapping();
-    }
+    await getColumnMapping();
     
     const token = await getJobPickerToken();
     
@@ -543,78 +349,35 @@ async function fetchJobsFromSharePoint() {
     const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
     const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const itemsData = await itemsResponse.json();
-    
-    jobPickerState.rawSharePointData = itemsData;
-    debugLog(`Raw items retrieved: ${itemsData.value?.length || 0}`);
 
     // Apply column mapping
     const rawJobs = (itemsData.value || []).map(item => item.fields);
     const mappedJobs = applyColumnMapping(rawJobs);
     
-    debugLog(`Jobs mapped with column names`);
-    
-    // Filter for open jobs using multiple possible field names
+    // Filter for open jobs - use InvoiceDate and Paid fields since status fields are empty
     const openJobs = mappedJobs.filter(job => {
-      // Look for registration in multiple possible fields
-      const rego = job.Rego || job.Registration || job['Registration Number'] || 
-                   job.Plate || job['Plate Number'] || job.JobRego ||
-                   // Check all fields for values that look like registration numbers
-                   Object.values(job).find(val => 
-                     typeof val === 'string' && /^[A-Z0-9]{3,8}$/i.test(val.trim()));
+      // Must have a registration number
+      const rego = job.Rego || job.Registration || job['Registration Number'];
+      if (!rego || !String(rego).trim()) return false;
       
-      if (!rego) {
-        debugLog(`Skipping job - no registration found`);
-        return false;
-      }
+      // Key insight: Status fields are all empty, so we need to use other indicators
+      // Jobs that are "closed" are likely those that have been invoiced and paid
+      const invoiceDate = job.InvoiceDate || job['Invoice Date'];
+      const paid = job.Paid;
+      const completedDate = job.CompletedDate || job['Completed Date'];
       
-      // More strict status filtering based on actual column names
-      const status = String(job.Status || '').toLowerCase();
-      const jobStatus = String(job.JobStatus || '').toLowerCase(); 
-      const bookingStatus = String(job.BookingStatus || '').toLowerCase();
-      const closeAndPost = String(job.CloseAndPost || '').toLowerCase();
-      const formanStatus = String(job.FormanStatus || '').toLowerCase();
+      // Consider a job "closed" if it has been both invoiced AND paid
+      // OR if it has a completion date
+      const isClosed = (invoiceDate && paid) || completedDate;
       
-      // Check if job is closed/completed
-      const isClosed = closeAndPost === 'yes' || 
-                       closeAndPost === 'true' ||
-                       closeAndPost === '1' ||
-                       status.includes('closed') || 
-                       status.includes('completed') || 
-                       status.includes('cancelled') ||
-                       jobStatus.includes('closed') || 
-                       jobStatus.includes('completed') || 
-                       jobStatus.includes('cancelled') ||
-                       bookingStatus.includes('closed') || 
-                       bookingStatus.includes('completed') || 
-                       bookingStatus.includes('cancelled') ||
-                       formanStatus.includes('closed') || 
-                       formanStatus.includes('completed');
-      
-      if (isClosed) {
-        debugLog(`Filtered out job ${rego}: CloseAndPost="${closeAndPost}", Status="${status}", JobStatus="${jobStatus}"`);
-        return false;
-      }
-      
-      return true;
+      // Return true for "open" jobs (not closed)
+      return !isClosed;
     });
-    
-    debugLog(`Open jobs after filtering: ${openJobs.length}`);
-    
-    // Show sample of found jobs
-    if (openJobs.length > 0) {
-      debugLog('=== Sample Open Jobs ===');
-      for (let i = 0; i < Math.min(3, openJobs.length); i++) {
-        const job = openJobs[i];
-        const rego = job.Rego || job.Registration || job['Registration Number'] || 'Unknown';
-        debugLog(`${i + 1}. ${rego}`);
-      }
-    }
     
     jobPickerState.allJobs = openJobs;
     applyJobFilters();
     
   } catch (error) {
-    debugLog(`Job fetch error: ${error.message}`);
     console.error('Failed to load jobs:', error);
     showJobPickerError('Failed to load jobs from SharePoint: ' + error.message);
   } finally {
@@ -626,29 +389,24 @@ async function fetchJobsFromSharePoint() {
 // Apply filters to jobs
 function applyJobFilters() {
   let filtered = [...jobPickerState.allJobs];
-  debugLog(`Applying filters to ${filtered.length} jobs`);
   
   // PPI filter
   if (jobPickerState.isPPIMode) {
-    const beforePPICount = filtered.length;
     filtered = filtered.filter(job => {
-      const jobType = String(job.ServiceType || job.JobType || job['Service Type'] || '');
-      return jobType.toLowerCase().includes('pre purchase') || 
-             jobType.toLowerCase().includes('ppi') ||
-             jobType.toLowerCase().includes('inspection');
+      const serviceType = String(job.ServiceType || job['Service Type'] || '');
+      return serviceType.toLowerCase().includes('pre purchase') || 
+             serviceType.toLowerCase().includes('ppi') ||
+             serviceType.toLowerCase().includes('inspection');
     });
-    debugLog(`PPI filter: ${beforePPICount} -> ${filtered.length} jobs`);
   }
   
   jobPickerState.filteredJobs = filtered;
-  debugLog(`Final filtered jobs: ${filtered.length}`);
   updateJobsDisplay();
 }
 
 // Toggle PPI filter
 function togglePPIFilter() {
   jobPickerState.isPPIMode = document.getElementById('ppiFilter').checked;
-  debugLog(`PPI filter toggled: ${jobPickerState.isPPIMode}`);
   applyJobFilters();
 }
 
@@ -712,8 +470,6 @@ function updateJobsDisplay() {
 
 // Select job from list
 function selectJob(index) {
-  debugLog(`Job selected: index ${index}`);
-  
   // Clear previous selection
   document.querySelectorAll('.job-item').forEach(item => {
     item.classList.remove('selected');
@@ -725,11 +481,6 @@ function selectJob(index) {
     jobItem.classList.add('selected');
     jobPickerState.selectedJob = jobPickerState.filteredJobs[index];
     document.getElementById('selectBtn').disabled = false;
-    
-    const rego = jobPickerState.selectedJob.Rego || 
-                 jobPickerState.selectedJob.Registration || 
-                 jobPickerState.selectedJob['Registration Number'] || 'Unknown';
-    debugLog(`Selected job: ${rego}`);
   }
 }
 
@@ -744,28 +495,25 @@ function selectManualRego() {
   const input = document.getElementById('manualRegoInput');
   const rego = input.value.trim();
   
-  debugLog(`Manual rego entry: "${rego}"`);
-  
   if (!rego) {
     alert('Please enter a job registration number');
     return;
   }
   
-  // Check if rego exists in filtered list
+  // First check if rego exists in filtered list
   const foundInList = jobPickerState.filteredJobs.find(job => {
     const jobRego = job.Rego || job.Registration || job['Registration Number'] || '';
     return String(jobRego).toLowerCase() === rego.toLowerCase();
   });
   
   if (foundInList) {
-    debugLog(`Found rego in filtered list`);
     jobPickerState.selectedJob = foundInList;
   } else if (jobPickerState.isPPIMode) {
-    debugLog(`Rego not found in PPI mode - rejecting`);
+    // In PPI mode, reject unknown regos
     alert('That registration number is not in the available PPI jobs list.');
     return;
   } else {
-    debugLog(`Rego not found - creating manual entry`);
+    // In standard mode, accept unknown rego
     jobPickerState.selectedJob = { Rego: rego, isManualEntry: true };
   }
   
@@ -782,7 +530,6 @@ function confirmSelection() {
   const rego = jobPickerState.selectedJob.Rego || 
                jobPickerState.selectedJob.Registration || 
                jobPickerState.selectedJob['Registration Number'] || 'Unknown';
-  debugLog(`Confirming selection: ${rego}`);
   
   // Store selected job in global variable
   window.selectedJobRego = rego;
@@ -793,18 +540,19 @@ function confirmSelection() {
   
   // Handle callback or postMessage based on context
   if (jobPickerState.isInIframe) {
-    debugLog('Sending message to parent window');
+    // Send message to parent window
     window.parent.postMessage({
       type: 'JOB_SELECTED',
       job: jobPickerState.selectedJob,
       rego: rego
     }, '*');
   } else {
+    // Call callback if provided
     if (jobPickerState.onJobSelected) {
-      debugLog('Calling onJobSelected callback');
       jobPickerState.onJobSelected(jobPickerState.selectedJob);
     }
     
+    // Show confirmation
     alert(`You selected: ${rego}`);
   }
   
@@ -813,9 +561,6 @@ function confirmSelection() {
 
 // Open job picker
 async function openJobPicker(options = {}) {
-  debugLog('=== Opening Job Picker ===');
-  debugLog(`Options: ${JSON.stringify(options)}`);
-  
   const { filterPPI = false, onJobSelected = null } = options;
   
   jobPickerState.selectedJob = null;
@@ -827,10 +572,9 @@ async function openJobPicker(options = {}) {
   document.getElementById('manualRegoInput').value = '';
   document.getElementById('selectBtn').disabled = true;
   
-  // Initialize auth
+  // Initialize auth if needed
   const authOk = await initJobPickerAuth();
   if (!authOk) {
-    debugLog('Authentication failed - cannot proceed');
     alert('Authentication failed. Please sign in again.');
     return;
   }
@@ -838,7 +582,6 @@ async function openJobPicker(options = {}) {
   // Show modal
   const modal = document.getElementById('jobPickerModal');
   modal.classList.add('active');
-  debugLog('Modal shown');
   
   // Load jobs
   await fetchJobsFromSharePoint();
@@ -846,12 +589,12 @@ async function openJobPicker(options = {}) {
 
 // Close job picker
 function closeJobPicker() {
-  debugLog('Closing job picker');
   document.getElementById('jobPickerModal').classList.remove('active');
   jobPickerState.selectedJob = null;
   jobPickerState.onJobSelected = null;
   
   if (jobPickerState.isInIframe) {
+    // Send close message to parent
     window.parent.postMessage({
       type: 'JOB_PICKER_CLOSED'
     }, '*');
@@ -872,10 +615,8 @@ function showJobPickerError(message) {
   `;
 }
 
-// Listen for messages from parent window
+// Listen for messages from parent window (iframe mode)
 window.addEventListener('message', function(event) {
-  debugLog(`Received message: ${JSON.stringify(event.data)}`);
-  
   if (event.data.type === 'OPEN_PICKER') {
     openJobPicker(event.data.options || {});
   }
@@ -898,9 +639,8 @@ document.addEventListener('keydown', (event) => {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
   detectIframe();
-  debugLog('Job picker initialized');
   
-  // Export functions for global use
+  // Export functions for global use (non-iframe mode)
   if (!jobPickerState.isInIframe) {
     window.openJobPicker = openJobPicker;
     window.closeJobPicker = closeJobPicker;
@@ -909,13 +649,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
-
-<!-- Test button for standalone mode -->
-<div style="position: fixed; top: 20px; right: 20px; z-index: 20000;">
-  <button onclick="openJobPicker()" style="background: #1e3c72; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">
-    Open Job Picker
-  </button>
-</div>
 
 </body>
 </html>
