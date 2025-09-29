@@ -129,19 +129,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .job-item:hover { border-color: #1e3c72; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .job-item.selected { border-color: #10b981; background: #ecfdf5; }
+.job-item.closed-job { 
+  background: #fafafa; opacity: 0.8; border-color: #d1d5db; 
+}
+.job-item.closed-job:hover { 
+  opacity: 1; border-color: #9ca3af; 
+}
 
 .job-info { flex: 1; }
 .job-rego { font-weight: 700; font-size: 1.1em; color: #1e3c72; margin-bottom: 4px; }
 .job-details { font-size: 0.9em; color: #64748b; margin-bottom: 4px; }
 .job-date { font-size: 0.85em; color: #9ca3af; }
 .job-badges {
-  display: flex; gap: 8px; align-items: center;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
 }
 .job-badge { 
   background: #fef3c7; color: #92400e; padding: 4px 8px; 
   border-radius: 12px; font-size: 0.8em; font-weight: 600; 
 }
 .job-badge.ppi { background: #dbeafe; color: #1e40af; }
+.job-badge.closed { background: #fee2e2; color: #991b1b; }
+.job-badge.open { background: #d1fae5; color: #065f46; }
 
 .loading-spinner { 
   display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -239,6 +247,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="filter-toggle">
           <input type="checkbox" id="ppiFilter" class="checkbox" onchange="togglePPIFilter()">
           <label for="ppiFilter">Show only PPI (Pre Purchase Inspection) jobs</label>
+        </div>
+        
+        <div class="filter-toggle">
+          <input type="checkbox" id="showAllJobs" class="checkbox" onchange="toggleShowAllJobs()">
+          <label for="showAllJobs">Show ALL jobs (including closed/invoiced jobs)</label>
         </div>
       </div>
       
@@ -354,6 +367,7 @@ let jobPickerState = {
   filteredJobs: [],
   selectedJob: null,
   isPPIMode: false,
+  showAllJobs: false,
   onJobSelected: null,
   isLoading: false,
   isInIframe: false,
@@ -629,24 +643,28 @@ async function fetchJobsFromSharePoint() {
     const rawJobs = (itemsData.value || []).map(item => item.fields);
     const mappedJobs = applyColumnMapping(rawJobs);
     
-    // Filter for open jobs and add parsed date
-    const openJobs = mappedJobs.filter(job => {
+    // Process ALL jobs and mark their open/closed status
+    const allJobsWithStatus = mappedJobs.filter(job => {
       const rego = job.Rego || job.Registration || job['Registration Number'];
-      if (!rego || !String(rego).trim()) return false;
-      
+      // Must have a rego to be valid
+      return rego && String(rego).trim();
+    }).map(job => {
       const invoiceIdentifier = job.InvoiceIdentifier;
       const isOpen = !invoiceIdentifier || 
                      String(invoiceIdentifier).trim() === '' ||
+                     String(invoiceIdentifier).trim() === '0' ||
                      invoiceIdentifier === null ||
                      invoiceIdentifier === undefined;
       
-      return isOpen;
-    }).map(job => ({
-      ...job,
-      parsedDate: parseJobDate(job)
-    }));
+      return {
+        ...job,
+        parsedDate: parseJobDate(job),
+        isOpen: isOpen,
+        invoiceId: invoiceIdentifier || 'N/A'
+      };
+    });
     
-    jobPickerState.allJobs = openJobs;
+    jobPickerState.allJobs = allJobsWithStatus;
     applyJobFilters();
     
   } catch (error) {
@@ -705,6 +723,11 @@ function applyJobFilters() {
   jobPickerState.sortBy = document.getElementById('sortBy')?.value || 'date-desc';
   
   let filtered = [...jobPickerState.allJobs];
+  
+  // Show All Jobs toggle - if OFF, only show open jobs
+  if (!jobPickerState.showAllJobs) {
+    filtered = filtered.filter(job => job.isOpen);
+  }
   
   // PPI filter
   if (jobPickerState.isPPIMode) {
@@ -778,6 +801,12 @@ function togglePPIFilter() {
   applyJobFilters();
 }
 
+// Toggle Show All Jobs
+function toggleShowAllJobs() {
+  jobPickerState.showAllJobs = document.getElementById('showAllJobs').checked;
+  applyJobFilters();
+}
+
 // Update jobs display
 function updateJobsDisplay() {
   const container = document.getElementById('jobsContainer');
@@ -817,6 +846,7 @@ function updateJobsDisplay() {
   
   if (!jobs.length) {
     const filterText = jobPickerState.isPPIMode ? 'PPI ' : '';
+    const modeText = jobPickerState.showAllJobs ? 'all ' : 'open ';
     const hasFilters = jobPickerState.filters.rego || jobPickerState.filters.customer || 
                       jobPickerState.filters.service || jobPickerState.filters.dateFrom || 
                       jobPickerState.filters.dateTo;
@@ -824,10 +854,11 @@ function updateJobsDisplay() {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">📋</div>
-        <div>No ${filterText}jobs ${hasFilters ? 'match your filters' : 'available'}</div>
+        <div>No ${filterText}${modeText}jobs ${hasFilters ? 'match your filters' : 'available'}</div>
         <div style="font-size: 0.9em; margin-top: 8px;">
           ${hasFilters ? 'Try adjusting your filters' : 
-            jobPickerState.isPPIMode ? 'Try unchecking the PPI filter' : 'All jobs may be closed or completed'}
+            jobPickerState.isPPIMode ? 'Try unchecking the PPI filter' : 
+            jobPickerState.showAllJobs ? 'No jobs found in the system' : 'All jobs may be closed or completed'}
         </div>
       </div>
     `;
@@ -845,15 +876,19 @@ function updateJobsDisplay() {
         const isPPI = String(service).toLowerCase().includes('pre purchase') || 
                      String(service).toLowerCase().includes('ppi');
         const dateDisplay = formatJobDate(job.parsedDate);
+        const isOpen = job.isOpen;
+        const invoiceId = job.invoiceId;
         
         return `
-          <div class="job-item" onclick="selectJob(${index})" data-index="${index}">
+          <div class="job-item ${!isOpen ? 'closed-job' : ''}" onclick="selectJob(${index})" data-index="${index}">
             <div class="job-info">
               <div class="job-rego">${index + 1}. ${rego}</div>
               <div class="job-details">${customer} - ${service}</div>
               <div class="job-date">📅 ${dateDisplay}</div>
+              ${!isOpen ? `<div class="job-date" style="color: #ef4444;">🔒 Invoice: ${invoiceId}</div>` : ''}
             </div>
             <div class="job-badges">
+              ${isOpen ? '<div class="job-badge open">OPEN</div>' : '<div class="job-badge closed">CLOSED</div>'}
               ${isPPI ? '<div class="job-badge ppi">PPI</div>' : '<div class="job-badge">Service</div>'}
             </div>
           </div>
@@ -947,9 +982,11 @@ async function openJobPicker(options = {}) {
   
   jobPickerState.selectedJob = null;
   jobPickerState.isPPIMode = filterPPI;
+  jobPickerState.showAllJobs = false;
   jobPickerState.onJobSelected = onJobSelected;
   
   document.getElementById('ppiFilter').checked = filterPPI;
+  document.getElementById('showAllJobs').checked = false;
   document.getElementById('manualRegoInput').value = '';
   document.getElementById('selectBtn').disabled = true;
   
