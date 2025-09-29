@@ -217,6 +217,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   .modal-body { padding: 20px; }
   .filters-grid { grid-template-columns: 1fr; }
 }
+
+/* Job Preview Styles */
+.preview-row {
+  display: grid; grid-template-columns: 120px 1fr; gap: 12px; 
+  padding: 10px 0; border-bottom: 1px solid #e2e8f0;
+}
+.preview-row:last-child { border-bottom: none; }
+.preview-label { font-weight: 600; color: #64748b; }
+.preview-value { color: #1e293b; }
+.preview-badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -230,6 +240,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
     
     <div class="modal-body">
+      <!-- Job Preview Section (hidden by default) -->
+      <div id="jobPreviewSection" style="display: none;">
+        <div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+          <div style="font-size: 1.3em; font-weight: 700; color: #1e40af; margin-bottom: 16px;">Selected Job</div>
+          
+          <div id="jobPreviewContent">
+            <!-- Dynamic content will be inserted here -->
+          </div>
+          
+          <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button class="btn-cancel" onclick="backToJobList()" style="flex: 1;">
+              ← Back to Job List
+            </button>
+            <button class="btn-select" onclick="confirmJobSelection()" style="flex: 1;">
+              Accept & Continue →
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Job Selection Section (shown by default) -->
+      <div id="jobSelectionSection">
       <!-- Direct Search Section -->
       <div class="search-section">
         <div class="search-header">Enter Job Registration Number</div>
@@ -340,6 +372,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           </div>
         </div>
       </div>
+      </div>
+      <!-- End Job Selection Section -->
     </div>
     
     <div class="modal-footer">
@@ -630,12 +664,31 @@ async function fetchJobsFromSharePoint() {
         return null;
       }),
       
-      // Get items
+      // Get ALL items with pagination support
       (async () => {
         updateLoadingProgress(3, 'Fetching job data...');
-        const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
-        const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
-        return await itemsResponse.json();
+        let allItems = [];
+        let nextLink = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
+        
+        // Fetch all pages
+        while (nextLink) {
+          const response = await fetch(nextLink, { headers: { Authorization: `Bearer ${token}` }});
+          const data = await response.json();
+          
+          if (data.value) {
+            allItems = allItems.concat(data.value);
+          }
+          
+          // Check for next page
+          nextLink = data['@odata.nextLink'] || null;
+          
+          if (nextLink) {
+            console.log(`Fetched ${allItems.length} items, loading more...`);
+          }
+        }
+        
+        console.log(`Total items fetched: ${allItems.length}`);
+        return { value: allItems };
       })()
     ]);
 
@@ -650,19 +703,27 @@ async function fetchJobsFromSharePoint() {
       return rego && String(rego).trim();
     }).map(job => {
       const invoiceIdentifier = job.InvoiceIdentifier;
+      
+      // A job is OPEN if InvoiceIdentifier is:
+      // - undefined/null
+      // - empty string
+      // - the string "0" (which means not yet invoiced)
+      const invoiceStr = String(invoiceIdentifier || '').trim();
       const isOpen = !invoiceIdentifier || 
-                     String(invoiceIdentifier).trim() === '' ||
-                     String(invoiceIdentifier).trim() === '0' ||
-                     invoiceIdentifier === null ||
-                     invoiceIdentifier === undefined;
+                     invoiceStr === '' || 
+                     invoiceStr === '0';
       
       return {
         ...job,
         parsedDate: parseJobDate(job),
         isOpen: isOpen,
-        invoiceId: invoiceIdentifier || 'N/A'
+        invoiceId: invoiceStr || 'N/A'
       };
     });
+    
+    console.log(`Total jobs loaded: ${allJobsWithStatus.length}`);
+    console.log(`Open jobs: ${allJobsWithStatus.filter(j => j.isOpen).length}`);
+    console.log(`Closed jobs: ${allJobsWithStatus.filter(j => !j.isOpen).length}`);
     
     jobPickerState.allJobs = allJobsWithStatus;
     applyJobFilters();
@@ -934,19 +995,118 @@ function selectManualRego() {
   });
   
   if (foundInList) {
+    // Warn if selecting a closed job
+    if (!foundInList.isOpen && !confirm(`Warning: ${rego} is a CLOSED job (Invoice: ${foundInList.invoiceId}). Are you sure you want to select it?`)) {
+      return;
+    }
     jobPickerState.selectedJob = foundInList;
   } else if (jobPickerState.isPPIMode) {
     alert('That registration number is not in the available PPI jobs list.');
     return;
   } else {
-    jobPickerState.selectedJob = { Rego: rego, isManualEntry: true };
+    jobPickerState.selectedJob = { Rego: rego, isManualEntry: true, isOpen: true };
   }
   
   confirmSelection();
 }
 
-// Confirm job selection
+// Confirm job selection - now shows preview first
 function confirmSelection() {
+  if (!jobPickerState.selectedJob) {
+    alert('Please select a job first');
+    return;
+  }
+  
+  // Show preview screen
+  showJobPreview(jobPickerState.selectedJob);
+}
+
+// Show job preview screen
+function showJobPreview(job) {
+  const rego = job.Rego || job.Registration || job['Registration Number'] || 'Unknown';
+  const customer = job.CustomerName || job['Customer Name'] || 
+                  (job.FirstName && job.LastName ? `${job.FirstName} ${job.LastName}` : '') ||
+                  job.Customer || 'Unknown Customer';
+  const service = job.ServiceType || job['Service Type'] || job.ServiceRequired || 'N/A';
+  const email = job.Email || 'Not provided';
+  const phone = job.CallerPhone || job.CustomerPhone || 'Not provided';
+  const price = job.Price || job.TotalPrice || job.FinalPrice || '$0';
+  const dateDisplay = formatJobDate(job.parsedDate);
+  const isPPI = String(service).toLowerCase().includes('pre purchase') || 
+               String(service).toLowerCase().includes('ppi');
+  const isOpen = job.isOpen;
+  const invoiceId = job.invoiceId;
+  
+  // Build preview HTML
+  const previewHTML = `
+    <div style="font-size: 1.5em; font-weight: 700; color: #1e3c72; margin-bottom: 16px;">
+      Job: ${rego}
+    </div>
+    
+    <div class="preview-badge-row" style="margin-bottom: 20px;">
+      ${isOpen ? '<div class="job-badge open">OPEN</div>' : '<div class="job-badge closed">CLOSED</div>'}
+      ${isPPI ? '<div class="job-badge ppi">PPI</div>' : '<div class="job-badge">Service</div>'}
+      ${!isOpen ? `<div class="job-badge closed">Invoice: ${invoiceId}</div>` : ''}
+    </div>
+    
+    <div class="preview-row">
+      <div class="preview-label">Customer</div>
+      <div class="preview-value">${customer}</div>
+    </div>
+    
+    <div class="preview-row">
+      <div class="preview-label">Service Type</div>
+      <div class="preview-value">${service}</div>
+    </div>
+    
+    <div class="preview-row">
+      <div class="preview-label">Price</div>
+      <div class="preview-value">${price}</div>
+    </div>
+    
+    <div class="preview-row">
+      <div class="preview-label">Email</div>
+      <div class="preview-value">${email}</div>
+    </div>
+    
+    <div class="preview-row">
+      <div class="preview-label">Phone</div>
+      <div class="preview-value">${phone}</div>
+    </div>
+    
+    <div class="preview-row">
+      <div class="preview-label">Date</div>
+      <div class="preview-value">${dateDisplay}</div>
+    </div>
+    
+    ${!isOpen ? `
+      <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 12px; margin-top: 16px;">
+        <strong style="color: #991b1b;">⚠️ Warning:</strong> This is a CLOSED job (Invoice: ${invoiceId})
+      </div>
+    ` : ''}
+  `;
+  
+  document.getElementById('jobPreviewContent').innerHTML = previewHTML;
+  
+  // Hide job selection, show preview
+  document.getElementById('jobSelectionSection').style.display = 'none';
+  document.getElementById('jobPreviewSection').style.display = 'block';
+}
+
+// Back to job list
+function backToJobList() {
+  document.getElementById('jobPreviewSection').style.display = 'none';
+  document.getElementById('jobSelectionSection').style.display = 'block';
+  
+  // Clear selection
+  document.querySelectorAll('.job-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  document.getElementById('selectBtn').disabled = true;
+}
+
+// Confirm job selection and pass to parent
+function confirmJobSelection() {
   if (!jobPickerState.selectedJob) {
     alert('Please select a job first');
     return;
@@ -990,6 +1150,10 @@ async function openJobPicker(options = {}) {
   document.getElementById('manualRegoInput').value = '';
   document.getElementById('selectBtn').disabled = true;
   
+  // Reset to job selection view
+  document.getElementById('jobPreviewSection').style.display = 'none';
+  document.getElementById('jobSelectionSection').style.display = 'block';
+  
   // Clear filters
   clearAllFilters();
   
@@ -1008,6 +1172,11 @@ async function openJobPicker(options = {}) {
 // Close job picker
 function closeJobPicker() {
   document.getElementById('jobPickerModal').classList.remove('active');
+  
+  // Reset to job selection view
+  document.getElementById('jobPreviewSection').style.display = 'none';
+  document.getElementById('jobSelectionSection').style.display = 'block';
+  
   jobPickerState.selectedJob = null;
   jobPickerState.onJobSelected = null;
   
