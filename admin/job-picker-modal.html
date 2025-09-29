@@ -144,8 +144,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .job-badge.ppi { background: #dbeafe; color: #1e40af; }
 
 .loading-spinner { 
-  display: flex; align-items: center; justify-content: center; 
+  display: flex; flex-direction: column; align-items: center; justify-content: center; 
   padding: 40px; color: #64748b; 
+}
+.spinner-row {
+  display: flex; align-items: center; margin-bottom: 20px;
 }
 .spinner { 
   width: 32px; height: 32px; border: 3px solid #e2e8f0; 
@@ -153,6 +156,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   animation: spin 1s linear infinite; margin-right: 12px; 
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Progress Bar - NEW */
+.progress-container {
+  width: 100%; max-width: 400px; margin-top: 16px;
+}
+.progress-bar {
+  width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, #1e3c72, #2a5298);
+  transition: width 0.3s ease; width: 0%;
+}
+.progress-text {
+  margin-top: 8px; font-size: 0.85em; color: #64748b; text-align: center;
+}
+.progress-steps {
+  margin-top: 12px; font-size: 0.75em; color: #9ca3af;
+}
+.progress-step {
+  margin: 4px 0;
+}
+.progress-step.done {
+  color: #10b981;
+}
+.progress-step.active {
+  color: #1e3c72; font-weight: 600;
+}
 
 .empty-state { 
   text-align: center; padding: 40px; color: #64748b; 
@@ -335,7 +365,13 @@ let jobPickerState = {
     dateFrom: '',
     dateTo: ''
   },
-  sortBy: 'date-desc' // Default: newest first
+  sortBy: 'date-desc', // Default: newest first
+  loadingProgress: {
+    current: 0,
+    total: 4,
+    steps: [],
+    message: ''
+  }
 };
 
 // MSAL Configuration
@@ -394,23 +430,71 @@ async function getJobPickerToken() {
   }
 }
 
-// Get column mapping from SharePoint
+// Update loading progress
+function updateLoadingProgress(step, message) {
+  const progress = jobPickerState.loadingProgress;
+  
+  if (step === 'start') {
+    progress.current = 0;
+    progress.steps = [
+      { name: 'Authenticating...', done: false, active: true },
+      { name: 'Connecting to SharePoint...', done: false, active: false },
+      { name: 'Loading column configuration...', done: false, active: false },
+      { name: 'Fetching job data...', done: false, active: false }
+    ];
+    progress.message = message || 'Starting...';
+  } else if (typeof step === 'number') {
+    progress.current = step;
+    progress.steps.forEach((s, i) => {
+      s.done = i < step;
+      s.active = i === step;
+    });
+    progress.message = message || progress.steps[step]?.name || '';
+  }
+  
+  updateJobsDisplay();
+}
+
+// Get column mapping from SharePoint (with cache)
 async function getColumnMapping() {
+  // Check cache first
+  const cacheKey = 'jobPicker_columnMapping';
+  const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+  
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    const cacheTime = localStorage.getItem(cacheKey + '_time');
+    
+    if (cached && cacheTime) {
+      const age = Date.now() - parseInt(cacheTime);
+      if (age < cacheExpiry) {
+        console.log('Using cached column mapping');
+        jobPickerState.columnMapping = JSON.parse(cached);
+        return jobPickerState.columnMapping;
+      }
+    }
+  } catch (e) {
+    console.warn('Cache read failed:', e);
+  }
+  
   if (jobPickerState.columnMapping) return jobPickerState.columnMapping;
   
   try {
     const token = await getJobPickerToken();
+    
+    // Step 1: Get site
     const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
     const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
     const site = await siteResponse.json();
     
+    // Step 2: Get list (need this before columns)
     const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
     const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
     const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const listsData = await listsResponse.json();
     const listId = listsData.value[0].id;
     
-    // Get columns
+    // Step 3: Get columns
     const columnsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/columns`;
     const columnsResponse = await fetch(columnsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const columnsData = await columnsResponse.json();
@@ -424,6 +508,16 @@ async function getColumnMapping() {
     });
     
     jobPickerState.columnMapping = columnMapping;
+    
+    // Save to cache
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(columnMapping));
+      localStorage.setItem(cacheKey + '_time', Date.now().toString());
+      console.log('Column mapping cached');
+    } catch (e) {
+      console.warn('Cache write failed:', e);
+    }
+    
     return columnMapping;
     
   } catch (error) {
@@ -489,33 +583,47 @@ function applyColumnMapping(rawJobs) {
   });
 }
 
-// Fetch jobs from SharePoint
+// Fetch jobs from SharePoint (OPTIMIZED with parallel calls)
 async function fetchJobsFromSharePoint() {
   jobPickerState.isLoading = true;
-  updateJobsDisplay();
+  updateLoadingProgress('start', 'Initializing...');
 
   try {
-    // Get column mapping first
-    await getColumnMapping();
-    
+    // Step 0: Get token
+    updateLoadingProgress(0, 'Authenticating...');
     const token = await getJobPickerToken();
     
-    // Get site
+    // Step 1: Get site
+    updateLoadingProgress(1, 'Connecting to SharePoint...');
     const siteUrl = `https://graph.microsoft.com/v1.0/sites/${JOB_PICKER_CONFIG.SPO_HOST}:${JOB_PICKER_CONFIG.SPO_SITE_PATH}`;
     const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
     const site = await siteResponse.json();
 
-    // Get list
+    // Step 2: Get list
     const listNameOData = JOB_PICKER_CONFIG.SPO_LIST_TITLE.replace(/'/g, "''");
     const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
     const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
     const listsData = await listsResponse.json();
     const listId = listsData.value[0].id;
 
-    // Get items
-    const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
-    const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
-    const itemsData = await itemsResponse.json();
+    // Step 3 & 4: PARALLEL - Get column mapping AND items at the same time
+    updateLoadingProgress(2, 'Loading configuration and data...');
+    
+    const [columnMapping, itemsData] = await Promise.all([
+      // Get column mapping (from cache or API)
+      getColumnMapping().catch(err => {
+        console.warn('Column mapping failed, continuing without it:', err);
+        return null;
+      }),
+      
+      // Get items
+      (async () => {
+        updateLoadingProgress(3, 'Fetching job data...');
+        const itemsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
+        const itemsResponse = await fetch(itemsUrl, { headers: { Authorization: `Bearer ${token}` }});
+        return await itemsResponse.json();
+      })()
+    ]);
 
     // Apply column mapping
     const rawJobs = (itemsData.value || []).map(item => item.fields);
@@ -676,10 +784,28 @@ function updateJobsDisplay() {
   const countEl = document.getElementById('jobCount');
   
   if (jobPickerState.isLoading) {
+    const progress = jobPickerState.loadingProgress;
+    const percentage = Math.round((progress.current / progress.total) * 100);
+    
     container.innerHTML = `
       <div class="loading-spinner">
-        <div class="spinner"></div>
-        Loading jobs from SharePoint...
+        <div class="spinner-row">
+          <div class="spinner"></div>
+          <span>Loading jobs from SharePoint...</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${percentage}%"></div>
+          </div>
+          <div class="progress-text">${progress.message}</div>
+          <div class="progress-steps">
+            ${progress.steps.map(step => `
+              <div class="progress-step ${step.done ? 'done' : ''} ${step.active ? 'active' : ''}">
+                ${step.done ? '✓' : step.active ? '⟳' : '○'} ${step.name}
+              </div>
+            `).join('')}
+          </div>
+        </div>
       </div>
     `;
     countEl.textContent = 'Loading...';
