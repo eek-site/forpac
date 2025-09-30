@@ -110,8 +110,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
 </div>
 
-<!-- Hidden iframe for job picker -->
-<iframe id="jobPickerFrame" src="job-picker-modal.html" style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; border: none; z-index: 10001;"></iframe>
+<!-- Include Job Picker Modal -->
+<iframe 
+    id="jobPickerFrame"
+    src="job-picker-modal.html" 
+    style="display: none;" 
+    onload="initJobPicker()"
+></iframe>
 
 <div class="page-container" id="pageContainer">
     <div class="header">
@@ -455,32 +460,72 @@ function hideError(fieldName) {
   if (error) error.classList.remove('show');
 }
 
+// Initialize job picker iframe communication
+function initJobPicker() {
+  console.log('Job picker iframe loaded');
+  // Listen for messages from job picker iframe
+  window.addEventListener('message', handleJobPickerMessage);
+}
+
+function handleJobPickerMessage(event) {
+  console.log('Received message:', event.data);
+  
+  if (event.data.type === 'JOB_SELECTED') {
+    // Hide the iframe
+    document.getElementById('jobPickerFrame').style.display = 'none';
+    handleJobSelection(event.data);
+  } else if (event.data.type === 'JOB_PICKER_CLOSED') {
+    console.log('Job picker closed');
+    // Hide the iframe
+    document.getElementById('jobPickerFrame').style.display = 'none';
+  }
+}
+
 // Job Picker Integration
 function openJobPicker() {
+  console.log('Opening job picker...');
+  
+  // Get the iframe
   const iframe = document.getElementById('jobPickerFrame');
+  
+  if (!iframe) {
+    showAlert('Job picker not available', 'error');
+    return;
+  }
+  
+  console.log('Iframe contentWindow:', iframe.contentWindow);
+  
+  // Show the iframe so the modal is visible
   iframe.style.display = 'block';
-  iframe.contentWindow.postMessage({ type: 'OPEN_PICKER', options: {} }, '*');
+  iframe.style.position = 'fixed';
+  iframe.style.top = '0';
+  iframe.style.left = '0';
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.zIndex = '10000';
+  iframe.style.border = 'none';
+  
+  // Send message to iframe to open picker
+  iframe.contentWindow.postMessage({
+    type: 'OPEN_PICKER',
+    options: { filterPPI: false }
+  }, '*');
+}
+
+function handleJobSelection(data) {
+  console.log('Job selected:', data);
+  formData.jobRego = data.rego;
+  formData.isManualRego = false;
+  formData.jobData = data.job;
+  
+  document.getElementById('selectedRegoValue').textContent = data.rego;
+  document.getElementById('selectedRegoDisplay').style.display = 'block';
 }
 
 function closeJobPicker() {
   const iframe = document.getElementById('jobPickerFrame');
   iframe.style.display = 'none';
 }
-
-window.addEventListener('message', function(event) {
-  if (event.data.type === 'JOB_SELECTED') {
-    formData.jobRego = event.data.rego;
-    formData.isManualRego = false;
-    formData.jobData = event.data.job;
-    
-    document.getElementById('selectedRegoValue').textContent = event.data.rego;
-    document.getElementById('selectedRegoDisplay').style.display = 'block';
-    
-    closeJobPicker();
-  } else if (event.data.type === 'JOB_PICKER_CLOSED') {
-    closeJobPicker();
-  }
-});
 
 function handleManualRegoKeypress(event) {
   if (event.key === 'Enter') {
