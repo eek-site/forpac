@@ -560,16 +560,12 @@ function showStep(stepId) {
   // Hide all steps
   document.querySelectorAll('.form-step').forEach(step => {
     step.classList.remove('active');
-    step.style.display = 'none';
   });
   
   // Show target step
   const targetStep = document.querySelector(`[data-step="${stepId}"]`);
   if (targetStep) {
-    targetStep.style.display = 'block';
-    setTimeout(() => {
-      targetStep.classList.add('active');
-    }, 10);
+    targetStep.classList.add('active');
   }
   
   if (typeof stepId === 'number') {
