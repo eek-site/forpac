@@ -493,6 +493,19 @@ async function confirmCancellation() {
 }
 
 async function callCancellationFlow(data) {
+  // Get authentication token
+  let token;
+  try {
+    const tokenRequest = {
+      scopes: ['https://service.flow.microsoft.com//.default']
+    };
+    const response = await msalInstance.acquireTokenSilent(tokenRequest);
+    token = response.accessToken;
+  } catch (error) {
+    console.error('Token acquisition failed:', error);
+    throw new Error('Authentication failed. Please refresh the page and try again.');
+  }
+  
   // Power Automate flow endpoint
   const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1';
   
@@ -500,9 +513,10 @@ async function callCancellationFlow(data) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({
-      commandNumber: 0,  // Mark DNC Job is command 0
+      commandNumber: 0,
       action: 'MarkDNCJob',
       data: {
         jobId: data.jobId,
@@ -516,7 +530,6 @@ async function callCancellationFlow(data) {
         notes: data.notes,
         cancelledBy: data.cancelledBy,
         cancelledAt: data.cancelledAt,
-        // Include all job data for reference
         fullJobData: selectedJob
       }
     })
