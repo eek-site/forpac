@@ -153,51 +153,51 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 
                 <div class="form-group">
                     <div class="options-grid">
-                        <div class="option-card" onclick="selectEmergency('Jump Start')">
+                        <div class="option-card" onclick="selectEmergency('Jump Start', this)">
                             <div class="option-icon">🔋</div>
                             <div>Jump Start</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Tyre Change')">
+                        <div class="option-card" onclick="selectEmergency('Tyre Change', this)">
                             <div class="option-icon">🛞</div>
                             <div>Tyre Change</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Locksmith')">
+                        <div class="option-card" onclick="selectEmergency('Locksmith', this)">
                             <div class="option-icon">🔑</div>
                             <div>Locksmith</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Mechanic')">
+                        <div class="option-card" onclick="selectEmergency('Mechanic', this)">
                             <div class="option-icon">🔧</div>
                             <div>Mechanic</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Fuel Delivery')">
+                        <div class="option-card" onclick="selectEmergency('Fuel Delivery', this)">
                             <div class="option-icon">⛽</div>
                             <div>Fuel Delivery</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Fuel Extraction')">
+                        <div class="option-card" onclick="selectEmergency('Fuel Extraction', this)">
                             <div class="option-icon">🚫</div>
                             <div>Fuel Extraction</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Truck Tyre')">
+                        <div class="option-card" onclick="selectEmergency('Truck Tyre', this)">
                             <div class="option-icon">🚛</div>
                             <div>Truck Tyre</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Pre-Purchase Inspection')">
+                        <div class="option-card" onclick="selectEmergency('Pre-Purchase Inspection', this)">
                             <div class="option-icon">📋</div>
                             <div>Pre-Purchase Inspection</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Trailer Inspection')">
+                        <div class="option-card" onclick="selectEmergency('Trailer Inspection', this)">
                             <div class="option-icon">🚐</div>
                             <div>Trailer Inspection</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Non Emergency')">
+                        <div class="option-card" onclick="selectEmergency('Non Emergency', this)">
                             <div class="option-icon">ℹ️</div>
                             <div>Non Emergency</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Follow-Up')">
+                        <div class="option-card" onclick="selectEmergency('Follow-Up', this)">
                             <div class="option-icon">📞</div>
                             <div>Follow-Up</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('DNC')">
+                        <div class="option-card" onclick="selectEmergency('DNC', this)">
                             <div class="option-icon">❌</div>
                             <div>DNC (Do Not Continue)</div>
                         </div>
@@ -278,23 +278,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 <div class="form-group">
                     <label class="form-label">Connect the caller with</label>
                     <div class="options-grid">
-                        <div class="option-card" onclick="selectConnection('Client Job in Progress Team')">
+                        <div class="option-card" onclick="selectConnection('Client Job in Progress Team', this)">
                             <div class="option-icon">👥</div>
                             <div>Client Job in Progress Team</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Client Post Job Support')">
+                        <div class="option-card" onclick="selectConnection('Client Post Job Support', this)">
                             <div class="option-icon">💬</div>
                             <div>Client Post Job Support</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Supplier Job in Progress Team')">
+                        <div class="option-card" onclick="selectConnection('Supplier Job in Progress Team', this)">
                             <div class="option-icon">🚗</div>
                             <div>Supplier Job in Progress Team</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Supplier Post Job Support')">
+                        <div class="option-card" onclick="selectConnection('Supplier Post Job Support', this)">
                             <div class="option-icon">🔧</div>
                             <div>Supplier Post Job Support</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Blacklist Caller')">
+                        <div class="option-card" onclick="selectConnection('Blacklist Caller', this)">
                             <div class="option-icon">🚫</div>
                             <div>Blacklist Caller</div>
                         </div>
@@ -337,15 +337,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 <div class="form-group">
                     <label class="form-label">Is it okay if we send some information to your mobile and email?</label>
                     <div class="options-grid" style="grid-template-columns: repeat(3, 1fr);">
-                        <div class="option-card" onclick="selectConsent('Yes')">
+                        <div class="option-card" onclick="selectConsent('Yes', this)">
                             <div class="option-icon">✅</div>
                             <div>Yes</div>
                         </div>
-                        <div class="option-card" onclick="selectConsent('No')">
+                        <div class="option-card" onclick="selectConsent('No', this)">
                             <div class="option-icon">❌</div>
                             <div>No</div>
                         </div>
-                        <div class="option-card" onclick="selectConsent('Does Not Apply')">
+                        <div class="option-card" onclick="selectConsent('Does Not Apply', this)">
                             <div class="option-icon">➖</div>
                             <div>Does Not Apply</div>
                         </div>
@@ -390,43 +390,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                         Reason for DNC <span class="required">*</span>
                     </label>
                     <div class="options-grid">
-                        <div class="option-card" onclick="selectDNCReason('Incorrect Phone Number')">
+                        <div class="option-card" onclick="selectDNCReason('Incorrect Phone Number', this)">
                             <div>❌ Incorrect Phone Number</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Membership/Subscription/Wrong Number')">
+                        <div class="option-card" onclick="selectDNCReason('Membership/Subscription/Wrong Number', this)">
                             <div>🔄 Membership/Wrong Number</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Out of Scope')">
+                        <div class="option-card" onclick="selectDNCReason('Out of Scope', this)">
                             <div>🚫 Out of Scope</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Resolved themselves')">
+                        <div class="option-card" onclick="selectDNCReason('Resolved themselves', this)">
                             <div>✅ Resolved themselves</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Only have cash')">
+                        <div class="option-card" onclick="selectDNCReason('Only have cash', this)">
                             <div>💵 Only have cash</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Too expensive')">
+                        <div class="option-card" onclick="selectDNCReason('Too expensive', this)">
                             <div>💰 Too expensive</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Not an emergency')">
+                        <div class="option-card" onclick="selectDNCReason('Not an emergency', this)">
                             <div>ℹ️ Not an emergency</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Wait time is too long')">
+                        <div class="option-card" onclick="selectDNCReason('Wait time is too long', this)">
                             <div>⏰ Wait time too long</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Hang up no explanation')">
+                        <div class="option-card" onclick="selectDNCReason('Hang up no explanation', this)">
                             <div>📞 Hang up (no explanation)</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Hang up annoyed/frustrated')">
+                        <div class="option-card" onclick="selectDNCReason('Hang up annoyed/frustrated', this)">
                             <div>😤 Hang up (annoyed)</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Hang up rude/abusive')">
+                        <div class="option-card" onclick="selectDNCReason('Hang up rude/abusive', this)">
                             <div>😠 Hang up (rude/abusive)</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('No response/silent call')">
+                        <div class="option-card" onclick="selectDNCReason('No response/silent call', this)">
                             <div>🔇 No response/silent</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Did not consent to further contact')">
+                        <div class="option-card" onclick="selectDNCReason('Did not consent to further contact', this)">
                             <div>🚫 No consent for contact</div>
                         </div>
                     </div>
@@ -570,11 +570,15 @@ function showStep(stepId) {
   }
 }
 
-function selectEmergency(type) {
-  document.querySelectorAll('.option-card').forEach(card => {
+function selectEmergency(type, element) {
+  // Remove selection from all cards in this step
+  const parentGrid = element.closest('.options-grid');
+  parentGrid.querySelectorAll('.option-card').forEach(card => {
     card.classList.remove('selected');
   });
-  event.target.closest('.option-card').classList.add('selected');
+  
+  // Add selection to clicked card
+  element.classList.add('selected');
   formData.emergencyType = type;
   
   // Handle special cases
@@ -644,19 +648,21 @@ async function confirmAndComplete() {
   }
 }
 
-function selectConnection(type) {
-  document.querySelectorAll('.option-card').forEach(card => {
+function selectConnection(type, element) {
+  const parentGrid = element.closest('.options-grid');
+  parentGrid.querySelectorAll('.option-card').forEach(card => {
     card.classList.remove('selected');
   });
-  event.target.closest('.option-card').classList.add('selected');
+  element.classList.add('selected');
   formData.connectionType = type;
 }
 
-function selectConsent(consent) {
-  document.querySelectorAll('.option-card').forEach(card => {
+function selectConsent(consent, element) {
+  const parentGrid = element.closest('.options-grid');
+  parentGrid.querySelectorAll('.option-card').forEach(card => {
     card.classList.remove('selected');
   });
-  event.target.closest('.option-card').classList.add('selected');
+  element.classList.add('selected');
   formData.consent = consent;
   
   if (consent === 'Yes' || consent === 'Does Not Apply') {
@@ -694,11 +700,12 @@ async function sendConnectionData() {
   }
 }
 
-function selectDNCReason(reason) {
-  document.querySelectorAll('.option-card').forEach(card => {
+function selectDNCReason(reason, element) {
+  const parentGrid = element.closest('.options-grid');
+  parentGrid.querySelectorAll('.option-card').forEach(card => {
     card.classList.remove('selected');
   });
-  event.target.closest('.option-card').classList.add('selected');
+  element.classList.add('selected');
   formData.dncReason = reason;
 }
 
@@ -729,7 +736,7 @@ async function submitDNC() {
 }
 
 async function submitToFlow(data) {
-  const flowEndpoint = 'https://prod-02.australiasoutheast.logic.azure.com:443/workflows/YOUR_WORKFLOW_ID/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=YOUR_SIGNATURE';
+  const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_ok7gvPEZKmPw9q2jiKY9Msqofd65YeMtuGfSjEqxJ4';
   
   const response = await fetch(flowEndpoint, {
     method: 'POST',
