@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Triage Form - FP Service Management</title>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
+
+.loading { position: fixed; inset: 0; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+.loading.authenticated { display: none; }
+.spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #1e3c72; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: #718096; font-size: 14px; }
+
+.page-container { display: none; min-height: 100vh; }
+.page-container.authenticated { display: block; }
+
+.header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.back-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.back-btn:hover { background: rgba(255,255,255,0.3); color: #fff; text-decoration: none; }
+.page-title { font-size: 20px; font-weight: 700; }
+.page-icon { font-size: 24px; }
+
+.main-content { padding: 24px; max-width: 900px; margin: 0 auto; }
+
+.progress-bar-container { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.progress-steps { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.progress-step { flex: 1; text-align: center; position: relative; }
+.progress-step-circle { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 600; font-size: 14px; }
+.progress-step.active .progress-step-circle { background: #1e3c72; color: #fff; }
+.progress-step.completed .progress-step-circle { background: #10b981; color: #fff; }
+.progress-step-label { font-size: 12px; color: #64748b; }
+.progress-step.active .progress-step-label { color: #1e3c72; font-weight: 600; }
+.progress-bar-line { height: 2px; background: #e2e8f0; position: relative; }
+.progress-bar-fill { height: 100%; background: #1e3c72; transition: width 0.3s ease; }
+
+.content-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+.section-title { font-size: 1.4em; font-weight: 700; color: #1e3c72; margin-bottom: 8px; }
+.section-description { color: #64748b; margin-bottom: 24px; line-height: 1.5; }
+
+.form-step { display: none; }
+.form-step.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.form-group { margin-bottom: 24px; }
+.form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; font-size: 15px; }
+.form-label .required { color: #ef4444; margin-left: 4px; }
+.form-input { width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.2s; }
+.form-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
+.form-input.error { border-color: #ef4444; }
+.error-message { color: #ef4444; font-size: 13px; margin-top: 6px; display: none; }
+.error-message.show { display: block; }
+
+.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.option-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.option-card:hover { border-color: #1e3c72; background: #f0f4ff; }
+.option-card.selected { border-color: #1e3c72; background: #dbeafe; color: #1e3c72; font-weight: 600; }
+.option-card .option-icon { font-size: 24px; margin-bottom: 8px; }
+
+.btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: #1e3c72; color: #fff; }
+.btn-primary:hover { background: #1a3260; }
+.btn-primary:disabled { background: #d1d5db; cursor: not-allowed; }
+.btn-secondary { background: #6b7280; color: #fff; }
+.btn-secondary:hover { background: #5b6370; }
+.btn-success { background: #10b981; color: #fff; }
+.btn-success:hover { background: #059669; }
+
+.button-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+.alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; border: 1px solid; }
+.alert-success { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.alert-error { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.alert-info { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+.alert-warning { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.loading-overlay.show { display: flex; }
+.loading-card { background: #fff; padding: 30px; border-radius: 8px; text-align: center; }
+
+.completion-message { text-align: center; padding: 40px 20px; }
+.completion-icon { font-size: 64px; margin-bottom: 20px; }
+.completion-title { font-size: 1.8em; font-weight: 700; color: #1e3c72; margin-bottom: 12px; }
+.completion-text { color: #64748b; font-size: 1.1em; line-height: 1.6; }
+
+@media (max-width: 768px) {
+  .header { padding: 12px 16px; }
+  .page-title { font-size: 18px; }
+  .main-content { padding: 16px; }
+  .content-card { padding: 20px; }
+  .options-grid { grid-template-columns: 1fr; }
+  .progress-step-label { font-size: 10px; }
+  .button-group { flex-direction: column; }
+  .button-group .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="loading-text">Verifying access...</div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner"></div>
+        <div style="margin-top: 15px;">Processing...</div>
+    </div>
+</div>
+
+<div class="page-container" id="pageContainer">
+    <div class="header">
+        <div class="header-left">
+            <a href="command-menu.html" class="back-btn">← Back to Menu</a>
+            <div class="page-icon">🔍</div>
+            <div class="page-title">Triage Form</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+            <div class="progress-steps">
+                <div class="progress-step active" data-step="1">
+                    <div class="progress-step-circle">1</div>
+                    <div class="progress-step-label">Emergency</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="progress-step-circle">2</div>
+                    <div class="progress-step-label">Details</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="progress-step-circle">3</div>
+                    <div class="progress-step-label">Confirmation</div>
+                </div>
+            </div>
+            <div class="progress-bar-line">
+                <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <!-- STEP 1: Emergency Type -->
+            <div class="form-step active" data-step="1">
+                <div class="section-title">What is your emergency?</div>
+                <div class="section-description">Select the type of service you need assistance with</div>
+                
+                <div class="form-group">
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectEmergency('Jump Start')">
+                            <div class="option-icon">🔋</div>
+                            <div>Jump Start</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Tyre Change')">
+                            <div class="option-icon">🛞</div>
+                            <div>Tyre Change</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Locksmith')">
+                            <div class="option-icon">🔑</div>
+                            <div>Locksmith</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Mechanic')">
+                            <div class="option-icon">🔧</div>
+                            <div>Mechanic</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Fuel Delivery')">
+                            <div class="option-icon">⛽</div>
+                            <div>Fuel Delivery</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Fuel Extraction')">
+                            <div class="option-icon">🚫</div>
+                            <div>Fuel Extraction</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Truck Tyre')">
+                            <div class="option-icon">🚛</div>
+                            <div>Truck Tyre</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Pre-Purchase Inspection')">
+                            <div class="option-icon">📋</div>
+                            <div>Pre-Purchase Inspection</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Trailer Inspection')">
+                            <div class="option-icon">🚐</div>
+                            <div>Trailer Inspection</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Non Emergency')">
+                            <div class="option-icon">ℹ️</div>
+                            <div>Non Emergency</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('Follow-Up')">
+                            <div class="option-icon">📞</div>
+                            <div>Follow-Up</div>
+                        </div>
+                        <div class="option-card" onclick="selectEmergency('DNC')">
+                            <div class="option-icon">❌</div>
+                            <div>DNC (Do Not Continue)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Caller Information -->
+            <div class="form-step" data-step="2">
+                <div class="section-title">Caller Information</div>
+                <div class="section-description">Please provide your contact details</div>
+                
+                <div class="form-group">
+                    <label for="callerName" class="form-label">
+                        Your Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="callerName" 
+                        class="form-input" 
+                        placeholder="Enter your full name"
+                        required
+                    >
+                    <div class="error-message" id="callerNameError">Please enter your name</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mobileNumber" class="form-label">
+                        Mobile Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="mobileNumber" 
+                        class="form-input" 
+                        placeholder="Enter your mobile number"
+                        required
+                    >
+                    <div class="error-message" id="mobileNumberError">Please enter a valid mobile number</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn btn-primary" onclick="validateAndNext()">Next →</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Confirmation -->
+            <div class="form-step" data-step="3">
+                <div class="section-title">Almost Done!</div>
+                <div class="section-description">
+                    We'll send you a text message with a link. Click on it, fill out the form, 
+                    and make payment so we can immediately dispatch our local technician to resolve your emergency.
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>📱 Check your phone!</strong> You will receive a text message shortly with further instructions.
+                </div>
+                
+                <div class="form-group">
+                    <div class="options-grid" style="grid-template-columns: 1fr;">
+                        <div class="option-card" onclick="confirmAndComplete()">
+                            <div class="option-icon">✅</div>
+                            <div>Thank you for choosing Eek Mechanical. Have a nice day.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                </div>
+            </div>
+
+            <!-- CONNECT CALLER SECTION -->
+            <div class="form-step" data-step="connect">
+                <div class="section-title">Connect Caller</div>
+                <div class="section-description">Routing caller to the appropriate team</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Connect the caller with</label>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectConnection('Client Job in Progress Team')">
+                            <div class="option-icon">👥</div>
+                            <div>Client Job in Progress Team</div>
+                        </div>
+                        <div class="option-card" onclick="selectConnection('Client Post Job Support')">
+                            <div class="option-icon">💬</div>
+                            <div>Client Post Job Support</div>
+                        </div>
+                        <div class="option-card" onclick="selectConnection('Supplier Job in Progress Team')">
+                            <div class="option-icon">🚗</div>
+                            <div>Supplier Job in Progress Team</div>
+                        </div>
+                        <div class="option-card" onclick="selectConnection('Supplier Post Job Support')">
+                            <div class="option-icon">🔧</div>
+                            <div>Supplier Post Job Support</div>
+                        </div>
+                        <div class="option-card" onclick="selectConnection('Blacklist Caller')">
+                            <div class="option-icon">🚫</div>
+                            <div>Blacklist Caller</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vehicleRego" class="form-label">Vehicle Registration</label>
+                    <input 
+                        type="text" 
+                        id="vehicleRego" 
+                        class="form-input" 
+                        placeholder="Enter vehicle registration"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailAddress" class="form-label">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="emailAddress" 
+                        class="form-input" 
+                        placeholder="Enter email address"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactNumber" class="form-label">
+                        Mobile Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="contactNumber" 
+                        class="form-input" 
+                        placeholder="Enter landline number if no mobile available"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Is it okay if we send some information to your mobile and email?</label>
+                    <div class="options-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="option-card" onclick="selectConsent('Yes')">
+                            <div class="option-icon">✅</div>
+                            <div>Yes</div>
+                        </div>
+                        <div class="option-card" onclick="selectConsent('No')">
+                            <div class="option-icon">❌</div>
+                            <div>No</div>
+                        </div>
+                        <div class="option-card" onclick="selectConsent('Does Not Apply')">
+                            <div class="option-icon">➖</div>
+                            <div>Does Not Apply</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" id="consentMessage" style="display: none;">
+                    <strong>✅ Message Sent</strong><br>
+                    Thanks, I have sent you a text and an email with further instructions. 
+                    In the future, when you call, you'll receive a quick text reminder showing you 
+                    how to connect with the right team — so you can get the support you need without 
+                    waiting on hold. Please hang up now and review the information I just sent to you. 
+                    Thank you for choosing Eek Mechanical. Have a nice day.
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToStart()">← Back to Start</button>
+                    <button class="btn btn-success" onclick="sendConnectionData()">Send Data</button>
+                </div>
+            </div>
+
+            <!-- DNC SECTION -->
+            <div class="form-step" data-step="dnc">
+                <div class="section-title">Do Not Continue (DNC)</div>
+                <div class="section-description">Record the reason why this call is not continuing</div>
+                
+                <div class="form-group">
+                    <label for="dncPhone" class="form-label">
+                        Phone Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="dncPhone" 
+                        class="form-input" 
+                        placeholder="Enter phone number"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Reason for DNC <span class="required">*</span>
+                    </label>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectDNCReason('Incorrect Phone Number')">
+                            <div>❌ Incorrect Phone Number</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Membership/Subscription/Wrong Number')">
+                            <div>🔄 Membership/Wrong Number</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Out of Scope')">
+                            <div>🚫 Out of Scope</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Resolved themselves')">
+                            <div>✅ Resolved themselves</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Only have cash')">
+                            <div>💵 Only have cash</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Too expensive')">
+                            <div>💰 Too expensive</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Not an emergency')">
+                            <div>ℹ️ Not an emergency</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Wait time is too long')">
+                            <div>⏰ Wait time too long</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Hang up no explanation')">
+                            <div>📞 Hang up (no explanation)</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Hang up annoyed/frustrated')">
+                            <div>😤 Hang up (annoyed)</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Hang up rude/abusive')">
+                            <div>😠 Hang up (rude/abusive)</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('No response/silent call')">
+                            <div>🔇 No response/silent</div>
+                        </div>
+                        <div class="option-card" onclick="selectDNCReason('Did not consent to further contact')">
+                            <div>🚫 No consent for contact</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToStart()">← Back to Start</button>
+                    <button class="btn btn-primary" onclick="submitDNC()">Submit DNC</button>
+                </div>
+            </div>
+
+            <!-- COMPLETION -->
+            <div class="form-step" data-step="complete">
+                <div class="completion-message">
+                    <div class="completion-icon">✅</div>
+                    <div class="completion-title">Triage Complete</div>
+                    <div class="completion-text">
+                        The caller has been processed successfully. All information has been recorded and 
+                        the appropriate actions have been taken.
+                    </div>
+                    <button class="btn btn-primary" onclick="startNewTriage()" style="margin-top: 24px;">
+                        Start New Triage
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let msalInstance = null;
+let currentStep = 1;
+let formData = {
+    emergencyType: '',
+    callerName: '',
+    mobileNumber: '',
+    connectionType: '',
+    vehicleRego: '',
+    emailAddress: '',
+    contactNumber: '',
+    consent: '',
+    dncPhone: '',
+    dncReason: ''
+};
+
+const msalConfig = {
+  auth: {
+    clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+    authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+    redirectUri: window.location.origin + '/admin'
+  },
+  cache: {
+    cacheLocation: 'sessionStorage',
+    storeAuthStateInCookie: true
+  }
+};
+
+async function initAuth(){
+  try{
+    if(!window.msal || !window.msal.PublicClientApplication){
+      console.error('MSAL failed to load.');
+      return false;
+    }
+
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    const redirectResponse = await msalInstance.handleRedirectPromise();
+    if (redirectResponse && redirectResponse.account){
+      msalInstance.setActiveAccount(redirectResponse.account);
+    }
+
+    const active = msalInstance.getActiveAccount();
+    const accounts = msalInstance.getAllAccounts();
+    const account = active || accounts[0];
+
+    if (account){
+      msalInstance.setActiveAccount(account);
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e){
+    console.error('Auth init error:', e);
+    return false;
+  }
+}
+
+function showPage(){
+  document.getElementById('loadingScreen').classList.add('authenticated');
+  document.getElementById('pageContainer').classList.add('authenticated');
+}
+
+function showLoading(){
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading(){
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+function showAlert(message, type = 'info'){
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type}`;
+  alertDiv.innerHTML = message;
+  const contentCard = document.querySelector('.content-card');
+  contentCard.insertBefore(alertDiv, contentCard.firstChild);
+  setTimeout(() => alertDiv.remove(), 5000);
+}
+
+function updateProgress() {
+  const totalSteps = 3;
+  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  
+  document.querySelectorAll('.progress-step').forEach((step, index) => {
+    const stepNum = index + 1;
+    if (stepNum < currentStep) {
+      step.classList.add('completed');
+      step.classList.remove('active');
+    } else if (stepNum === currentStep) {
+      step.classList.add('active');
+      step.classList.remove('completed');
+    } else {
+      step.classList.remove('active', 'completed');
+    }
+  });
+}
+
+function showStep(stepId) {
+  document.querySelectorAll('.form-step').forEach(step => {
+    step.classList.remove('active');
+  });
+  
+  const targetStep = document.querySelector(`[data-step="${stepId}"]`);
+  if (targetStep) {
+    targetStep.classList.add('active');
+  }
+  
+  if (typeof stepId === 'number') {
+    currentStep = stepId;
+    updateProgress();
+  }
+}
+
+function selectEmergency(type) {
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  event.target.closest('.option-card').classList.add('selected');
+  formData.emergencyType = type;
+  
+  // Handle special cases
+  if (type === 'DNC') {
+    setTimeout(() => showStep('dnc'), 300);
+  } else if (type === 'Follow-Up' || type === 'Non Emergency') {
+    setTimeout(() => showStep('connect'), 300);
+  } else {
+    setTimeout(() => showStep(2), 300);
+  }
+}
+
+function validateAndNext() {
+  const name = document.getElementById('callerName').value.trim();
+  const mobile = document.getElementById('mobileNumber').value.trim();
+  
+  let isValid = true;
+  
+  if (!name) {
+    document.getElementById('callerName').classList.add('error');
+    document.getElementById('callerNameError').classList.add('show');
+    isValid = false;
+  } else {
+    document.getElementById('callerName').classList.remove('error');
+    document.getElementById('callerNameError').classList.remove('show');
+  }
+  
+  if (!mobile || !/^\d{7,}$/.test(mobile.replace(/[\s\-()]/g, ''))) {
+    document.getElementById('mobileNumber').classList.add('error');
+    document.getElementById('mobileNumberError').classList.add('show');
+    isValid = false;
+  } else {
+    document.getElementById('mobileNumber').classList.remove('error');
+    document.getElementById('mobileNumberError').classList.remove('show');
+  }
+  
+  if (isValid) {
+    formData.callerName = name;
+    formData.mobileNumber = mobile;
+    showStep(3);
+  }
+}
+
+function previousStep() {
+  if (currentStep > 1) {
+    showStep(currentStep - 1);
+  }
+}
+
+async function confirmAndComplete() {
+  showLoading();
+  
+  try {
+    // Submit to Power Automate
+    await submitToFlow({
+      action: 'TriageBooking',
+      ...formData,
+      submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+      submittedAt: new Date().toISOString()
+    });
+    
+    hideLoading();
+    showStep('complete');
+  } catch (error) {
+    hideLoading();
+    showAlert('Failed to submit triage: ' + error.message, 'error');
+  }
+}
+
+function selectConnection(type) {
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  event.target.closest('.option-card').classList.add('selected');
+  formData.connectionType = type;
+}
+
+function selectConsent(consent) {
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  event.target.closest('.option-card').classList.add('selected');
+  formData.consent = consent;
+  
+  if (consent === 'Yes' || consent === 'Does Not Apply') {
+    document.getElementById('consentMessage').style.display = 'block';
+  } else {
+    showStep('dnc');
+  }
+}
+
+async function sendConnectionData() {
+  formData.vehicleRego = document.getElementById('vehicleRego').value;
+  formData.emailAddress = document.getElementById('emailAddress').value;
+  formData.contactNumber = document.getElementById('contactNumber').value;
+  
+  if (!formData.contactNumber) {
+    showAlert('Please enter a contact number', 'error');
+    return;
+  }
+  
+  showLoading();
+  
+  try {
+    await submitToFlow({
+      action: 'ConnectCaller',
+      ...formData,
+      submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+      submittedAt: new Date().toISOString()
+    });
+    
+    hideLoading();
+    showStep('complete');
+  } catch (error) {
+    hideLoading();
+    showAlert('Failed to submit connection: ' + error.message, 'error');
+  }
+}
+
+function selectDNCReason(reason) {
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  event.target.closest('.option-card').classList.add('selected');
+  formData.dncReason = reason;
+}
+
+async function submitDNC() {
+  formData.dncPhone = document.getElementById('dncPhone').value;
+  
+  if (!formData.dncPhone || !formData.dncReason) {
+    showAlert('Please enter phone number and select a reason', 'error');
+    return;
+  }
+  
+  showLoading();
+  
+  try {
+    await submitToFlow({
+      action: 'RecordDNC',
+      ...formData,
+      submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+      submittedAt: new Date().toISOString()
+    });
+    
+    hideLoading();
+    showStep('complete');
+  } catch (error) {
+    hideLoading();
+    showAlert('Failed to submit DNC: ' + error.message, 'error');
+  }
+}
+
+async function submitToFlow(data) {
+  const flowEndpoint = 'https://prod-02.australiasoutheast.logic.azure.com:443/workflows/YOUR_WORKFLOW_ID/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=YOUR_SIGNATURE';
+  
+  const response = await fetch(flowEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      commandNumber: 1,
+      formType: 'Triage',
+      data: data
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Flow failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+function backToStart() {
+  formData = {
+    emergencyType: '',
+    callerName: '',
+    mobileNumber: '',
+    connectionType: '',
+    vehicleRego: '',
+    emailAddress: '',
+    contactNumber: '',
+    consent: '',
+    dncPhone: '',
+    dncReason: ''
+  };
+  showStep(1);
+}
+
+function startNewTriage() {
+  backToStart();
+}
+
+window.addEventListener('DOMContentLoaded', async function(){
+  const authenticated = await initAuth();
+  if(authenticated){
+    showPage();
+  } else {
+    window.location.href = '/admin';
+  }
+});
+</script>
+
+</body>
+</html>
