@@ -287,6 +287,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 <div class="form-group">
                     <label for="recipientPhone" class="form-label">
                         Phone Number <span class="required">*</span>
+                        <span class="helper-text">Required - This is the primary contact method</span>
                     </label>
                     <input 
                         type="tel" 
@@ -300,30 +301,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 
                 <div class="form-group">
                     <label for="recipientEmail" class="form-label">
-                        Email Address <span class="required">*</span>
+                        Email Address
+                        <span class="helper-text">Optional</span>
                     </label>
                     <input 
                         type="email" 
                         id="recipientEmail" 
                         class="form-input" 
-                        placeholder="email@example.com"
-                        required
+                        placeholder="email@example.com (optional)"
                     >
-                    <div class="error-message" id="emailError">Please enter a valid email address</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="recipientName" class="form-label">
-                        Recipient Name <span class="required">*</span>
+                        Recipient Name
+                        <span class="helper-text">Optional</span>
                     </label>
                     <input 
                         type="text" 
                         id="recipientName" 
                         class="form-input" 
-                        placeholder="Enter recipient name"
-                        required
+                        placeholder="Enter recipient name (optional)"
                     >
-                    <div class="error-message" id="nameError">Please enter a recipient name</div>
                 </div>
                 
                 <div class="button-group">
@@ -652,34 +651,17 @@ async function submitPaymentGateway() {
     const email = document.getElementById('recipientEmail').value.trim();
     const name = document.getElementById('recipientName').value.trim();
     
-    let isValid = true;
-    
+    // Only phone is required
     if (!phone || !/^\d{7,}$/.test(phone.replace(/[\s\-()]/g, ''))) {
       showError('phone');
-      isValid = false;
+      return;
     } else {
       hideError('phone');
     }
     
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showError('email');
-      isValid = false;
-    } else {
-      hideError('email');
-    }
-    
-    if (!name) {
-      showError('name');
-      isValid = false;
-    } else {
-      hideError('name');
-    }
-    
-    if (!isValid) return;
-    
     formData.recipientPhone = phone;
-    formData.recipientEmail = email;
-    formData.recipientName = name;
+    formData.recipientEmail = email || ''; // Optional - empty string if not provided
+    formData.recipientName = name || 'there'; // Optional - "there" if not provided
   }
   
   showLoading();
@@ -705,9 +687,9 @@ async function submitPaymentGateway() {
       redirectOption: formData.redirectOption,
       amount: formData.amount,
       description: formData.description,
-      recipientPhone: formData.recipientPhone || customerPhone,
-      recipientEmail: formData.recipientEmail || customerEmail,
-      recipientName: formData.recipientName || customerName,
+      recipientPhone: formData.recipientPhone || customerPhone || '',
+      recipientEmail: formData.recipientEmail || customerEmail || '',
+      recipientName: formData.recipientName || customerName || 'there',
       submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
       submittedAt: new Date().toISOString()
     });
