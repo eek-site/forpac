@@ -562,8 +562,8 @@ function showStep(stepId) {
     step.classList.remove('active');
   });
   
-  // Show target step
-  const targetStep = document.querySelector(`[data-step="${stepId}"]`);
+  // Show target step - SCOPED TO FORM STEPS ONLY
+  const targetStep = document.querySelector(`.form-step[data-step="${stepId}"]`);
   if (targetStep) {
     targetStep.classList.add('active');
   }
