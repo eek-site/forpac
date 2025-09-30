@@ -502,8 +502,23 @@ async function callCancellationFlow(data) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      action: 'CANCEL_JOB_DNC',
-      data: data
+      commandNumber: 0,  // Mark DNC Job is command 0
+      action: 'MarkDNCJob',
+      data: {
+        jobId: data.jobId,
+        rego: data.rego,
+        customerName: selectedJob.CustomerName || 'Unknown',
+        serviceType: selectedJob.ServiceType || 'Unknown',
+        email: selectedJob.Email || '',
+        phone: selectedJob.CallerPhone || '',
+        price: selectedJob.Price || 0,
+        reason: data.reason,
+        notes: data.notes,
+        cancelledBy: data.cancelledBy,
+        cancelledAt: data.cancelledAt,
+        // Include all job data for reference
+        fullJobData: selectedJob
+      }
     })
   });
   
