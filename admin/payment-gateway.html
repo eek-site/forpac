@@ -181,7 +181,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
                 
                 <div class="form-group">
-                    <div class="options-grid">
+                    <div class="options-grid" id="paymentMethodGrid">
                         <div class="option-card" data-method="1" onclick="selectPaymentMethod(1)">
                             <div class="option-icon">💳</div>
                             <div class="option-label">Credit Card (Stripe)</div>
@@ -190,7 +190,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                             <div class="option-icon">🏦</div>
                             <div class="option-label">Bank Transfer</div>
                         </div>
-                        <div class="option-card" data-method="3" onclick="selectPaymentMethod(3)">
+                        <div class="option-card" data-method="3" id="manualPaymentOption" onclick="selectPaymentMethod(3)">
                             <div class="option-icon">✍️</div>
                             <div class="option-label">Credit Card (Stripe) Manual (Ad-Hoc)</div>
                         </div>
@@ -556,6 +556,17 @@ function proceedToPaymentMethod() {
   }
   
   document.getElementById('regoDisplay2').textContent = formData.jobRego;
+  
+  // Hide option 3 (Manual Ad-Hoc) if we have customer data from job picker
+  const manualOption = document.getElementById('manualPaymentOption');
+  if (!formData.isManualRego && formData.jobData) {
+    // We have customer data - hide manual option
+    manualOption.style.display = 'none';
+  } else {
+    // Manual rego or no customer data - show all options
+    manualOption.style.display = 'block';
+  }
+  
   showStep(2);
 }
 
