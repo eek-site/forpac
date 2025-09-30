@@ -64,6 +64,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .checkbox-item input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
 .checkbox-item label { flex: 1; cursor: pointer; font-weight: 500; }
 
+.note-input-container { margin-top: 8px; margin-left: 32px; margin-bottom: 8px; }
+
 .btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
 .btn-primary { background: #1e3c72; color: #fff; }
 .btn-primary:hover { background: #1a3260; }
@@ -394,19 +396,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                     </label>
                     <div class="checkbox-group">
                         <div class="checkbox-item" onclick="toggleJobNote(this, 'Services Rendered')">
-                            <input type="checkbox" id="note1" value="Services Rendered">
+                            <input type="checkbox" id="note1" value="Services Rendered" onclick="event.stopPropagation();">
                             <label for="note1">Services Rendered:</label>
                         </div>
+                        <div id="servicesRenderedInput" class="note-input-container" style="display: none;">
+                            <input 
+                                type="text" 
+                                id="servicesRenderedText" 
+                                class="form-input" 
+                                placeholder="Enter services rendered details (optional)"
+                            >
+                        </div>
+                        
                         <div class="checkbox-item" onclick="toggleJobNote(this, 'Supplier Overage Charges')">
-                            <input type="checkbox" id="note2" value="Supplier Overage Charges">
+                            <input type="checkbox" id="note2" value="Supplier Overage Charges" onclick="event.stopPropagation();">
                             <label for="note2">Supplier Overage Charges:</label>
                         </div>
+                        <div id="supplierOverageInput" class="note-input-container" style="display: none;">
+                            <input 
+                                type="text" 
+                                id="supplierOverageText" 
+                                class="form-input" 
+                                placeholder="Enter supplier overage details (optional)"
+                            >
+                        </div>
+                        
                         <div class="checkbox-item" onclick="toggleJobNote(this, 'Close Job')">
-                            <input type="checkbox" id="note3" value="Close Job">
+                            <input type="checkbox" id="note3" value="Close Job" onclick="event.stopPropagation();">
                             <label for="note3">Close Job</label>
                         </div>
+                        
                         <div class="checkbox-item" onclick="toggleJobNote(this, 'DNC')">
-                            <input type="checkbox" id="note4" value="DNC">
+                            <input type="checkbox" id="note4" value="DNC" onclick="event.stopPropagation();">
                             <label for="note4">DNC</label>
                         </div>
                     </div>
@@ -743,6 +764,8 @@ function backFromRouting() {
 
 function toggleJobNote(element, value) {
   const checkbox = element.querySelector('input[type="checkbox"]');
+  
+  // Toggle checkbox
   checkbox.checked = !checkbox.checked;
   
   if (checkbox.checked) {
@@ -750,19 +773,43 @@ function toggleJobNote(element, value) {
     if (!formData.jobNotes.includes(value)) {
       formData.jobNotes.push(value);
     }
+    
+    // Show input field if Services Rendered or Supplier Overage
+    if (value === 'Services Rendered') {
+      document.getElementById('servicesRenderedInput').style.display = 'block';
+    } else if (value === 'Supplier Overage Charges') {
+      document.getElementById('supplierOverageInput').style.display = 'block';
+    }
   } else {
     element.classList.remove('selected');
     formData.jobNotes = formData.jobNotes.filter(note => note !== value);
+    
+    // Hide input field if Services Rendered or Supplier Overage
+    if (value === 'Services Rendered') {
+      document.getElementById('servicesRenderedInput').style.display = 'none';
+      document.getElementById('servicesRenderedText').value = '';
+    } else if (value === 'Supplier Overage Charges') {
+      document.getElementById('supplierOverageInput').style.display = 'none';
+      document.getElementById('supplierOverageText').value = '';
+    }
   }
   
   // Limit to 2 selections
   if (formData.jobNotes.length > 2) {
-    // Uncheck the oldest selection
     const oldestValue = formData.jobNotes.shift();
     const oldestCheckbox = document.querySelector(`input[value="${oldestValue}"]`);
     if (oldestCheckbox) {
       oldestCheckbox.checked = false;
       oldestCheckbox.parentElement.classList.remove('selected');
+      
+      // Hide input if needed
+      if (oldestValue === 'Services Rendered') {
+        document.getElementById('servicesRenderedInput').style.display = 'none';
+        document.getElementById('servicesRenderedText').value = '';
+      } else if (oldestValue === 'Supplier Overage Charges') {
+        document.getElementById('supplierOverageInput').style.display = 'none';
+        document.getElementById('supplierOverageText').value = '';
+      }
     }
   }
   
@@ -807,6 +854,18 @@ async function submitSupplier() {
   
   showLoading();
   
+  // Build job notes with optional text details
+  const jobNotesWithDetails = formData.jobNotes.map(note => {
+    if (note === 'Services Rendered') {
+      const text = document.getElementById('servicesRenderedText').value.trim();
+      return text ? `Services Rendered: ${text}` : 'Services Rendered';
+    } else if (note === 'Supplier Overage Charges') {
+      const text = document.getElementById('supplierOverageText').value.trim();
+      return text ? `Supplier Overage Charges: ${text}` : 'Supplier Overage Charges';
+    }
+    return note;
+  });
+  
   try {
     await submitToFlow({
       action: 'JobBuild',
@@ -822,7 +881,7 @@ async function submitSupplier() {
       emailJobSupplier: formData.emailJobSupplier,
       costings: formData.costings,
       bank: formData.bank,
-      jobNotes: formData.jobNotes,
+      jobNotes: jobNotesWithDetails,
       paid: formData.paid,
       closeAndPost: formData.closeAndPost,
       submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
@@ -896,6 +955,8 @@ function startNew() {
   document.getElementById('selectedRegoDisplay').style.display = 'none';
   document.getElementById('typeSelection').style.display = 'none';
   document.getElementById('clientMobileGroup').style.display = 'none';
+  document.getElementById('servicesRenderedInput').style.display = 'none';
+  document.getElementById('supplierOverageInput').style.display = 'none';
   
   showStep(1);
 }
