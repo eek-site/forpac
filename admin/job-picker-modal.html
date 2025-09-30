@@ -574,22 +574,15 @@ async function getColumnMapping() {
   }
 }
 
-// Parse date from various formats
+// Parse date from job - uses StartTime only
 function parseJobDate(job) {
-  // Try multiple date field names - StartTime FIRST since that's what your CSV uses
-  const dateFields = ['StartTime', 'CompletionTime', 'Created', 'CreatedDate', 'JobDate', 'Date', 'ServiceDate', 'BookingDate', 'RequestedDate', 'ScheduledDate'];
-  
-  for (const field of dateFields) {
-    const dateValue = job[field];
-    if (dateValue) {
-      const parsed = new Date(dateValue);
-      if (!isNaN(parsed.getTime()) && parsed.getTime() !== 0) {
-        return parsed;
-      }
+  const dateValue = job.StartTime;
+  if (dateValue) {
+    const parsed = new Date(dateValue);
+    if (!isNaN(parsed.getTime()) && parsed.getTime() !== 0) {
+      return parsed;
     }
   }
-  
-  // Fallback: return epoch if no date found
   return new Date(0);
 }
 
@@ -750,16 +743,12 @@ function sortJobs(jobs) {
         bVal = b.parsedDate.getTime();
         break;
       case 'rego':
-        aVal = String(a.Rego || a.Registration || a['Registration Number'] || '').toLowerCase();
-        bVal = String(b.Rego || b.Registration || b['Registration Number'] || '').toLowerCase();
+        aVal = String(a.Rego || '').toLowerCase();
+        bVal = String(b.Rego || '').toLowerCase();
         break;
       case 'customer':
-        aVal = String(a.CustomerName || a['Customer Name'] || 
-                     (a.FirstName && a.LastName ? `${a.FirstName} ${a.LastName}` : '') ||
-                     a.Customer || '').toLowerCase();
-        bVal = String(b.CustomerName || b['Customer Name'] || 
-                     (b.FirstName && b.LastName ? `${b.FirstName} ${b.LastName}` : '') ||
-                     b.Customer || '').toLowerCase();
+        aVal = String(a.CustomerName || '').toLowerCase();
+        bVal = String(b.CustomerName || '').toLowerCase();
         break;
       default:
         return 0;
@@ -793,7 +782,7 @@ function applyJobFilters() {
   // PPI filter
   if (jobPickerState.isPPIMode) {
     filtered = filtered.filter(job => {
-      const serviceType = String(job.ServiceType || job['Service Type'] || '');
+      const serviceType = String(job.ServiceType || '');
       return serviceType.toLowerCase().includes('pre purchase') || 
              serviceType.toLowerCase().includes('ppi') ||
              serviceType.toLowerCase().includes('inspection');
@@ -803,23 +792,21 @@ function applyJobFilters() {
   // Text filters
   if (jobPickerState.filters.rego) {
     filtered = filtered.filter(job => {
-      const rego = String(job.Rego || job.Registration || job['Registration Number'] || '').toLowerCase();
+      const rego = String(job.Rego || '').toLowerCase();
       return rego.includes(jobPickerState.filters.rego);
     });
   }
   
   if (jobPickerState.filters.customer) {
     filtered = filtered.filter(job => {
-      const customer = String(job.CustomerName || job['Customer Name'] || 
-                              (job.FirstName && job.LastName ? `${job.FirstName} ${job.LastName}` : '') ||
-                              job.Customer || '').toLowerCase();
+      const customer = String(job.CustomerName || '').toLowerCase();
       return customer.includes(jobPickerState.filters.customer);
     });
   }
   
   if (jobPickerState.filters.service) {
     filtered = filtered.filter(job => {
-      const service = String(job.ServiceType || job['Service Type'] || job.ServiceRequired || '').toLowerCase();
+      const service = String(job.ServiceType || '').toLowerCase();
       return service.includes(jobPickerState.filters.service);
     });
   }
@@ -929,11 +916,9 @@ function updateJobsDisplay() {
   container.innerHTML = `
     <div class="jobs-list">
       ${jobs.map((job, index) => {
-        const rego = job.Rego || job.Registration || job['Registration Number'] || 'Unknown';
-        const customer = job.CustomerName || job['Customer Name'] || 
-                        (job.FirstName && job.LastName ? `${job.FirstName} ${job.LastName}` : '') ||
-                        job.Customer || 'Unknown Customer';
-        const service = job.ServiceType || job['Service Type'] || job.ServiceRequired || 'Service';
+        const rego = job.Rego || 'Unknown';
+        const customer = job.CustomerName || 'Unknown Customer';
+        const service = job.ServiceType || 'Service';
         const isPPI = String(service).toLowerCase().includes('pre purchase') || 
                      String(service).toLowerCase().includes('ppi');
         const dateDisplay = formatJobDate(job.parsedDate);
@@ -990,7 +975,7 @@ function selectManualRego() {
   }
   
   const foundInList = jobPickerState.filteredJobs.find(job => {
-    const jobRego = job.Rego || job.Registration || job['Registration Number'] || '';
+    const jobRego = job.Rego || '';
     return String(jobRego).toLowerCase() === rego.toLowerCase();
   });
   
@@ -1023,14 +1008,12 @@ function confirmSelection() {
 
 // Show job preview screen
 function showJobPreview(job) {
-  const rego = job.Rego || job.Registration || job['Registration Number'] || 'Unknown';
-  const customer = job.CustomerName || job['Customer Name'] || 
-                  (job.FirstName && job.LastName ? `${job.FirstName} ${job.LastName}` : '') ||
-                  job.Customer || 'Unknown Customer';
-  const service = job.ServiceType || job['Service Type'] || job.ServiceRequired || 'N/A';
+  const rego = job.Rego || 'Unknown';
+  const customer = job.CustomerName || 'Unknown Customer';
+  const service = job.ServiceType || 'N/A';
   const email = job.Email || 'Not provided';
-  const phone = job.CallerPhone || job.CustomerPhone || 'Not provided';
-  const price = job.Price || job.TotalPrice || job.FinalPrice || '$0';
+  const phone = job.CallerPhone || 'Not provided';
+  const price = job.Price || '$0';
   
   // Format date with actual date/time instead of relative
   let dateDisplay = 'No date';
@@ -1128,9 +1111,7 @@ function confirmJobSelection() {
     return;
   }
   
-  const rego = jobPickerState.selectedJob.Rego || 
-               jobPickerState.selectedJob.Registration || 
-               jobPickerState.selectedJob['Registration Number'] || 'Unknown';
+  const rego = jobPickerState.selectedJob.Rego || 'Unknown';
   
   window.selectedJobRego = rego;
   sessionStorage.setItem('selectedJobRego', rego);
