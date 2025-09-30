@@ -124,7 +124,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
 
     <div class="main-content">
-        <!-- Progress Bar -->
         <div class="progress-bar-container">
             <div class="progress-steps">
                 <div class="progress-step active" data-step="1">
@@ -146,7 +145,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
 
         <div class="content-card">
-            <!-- STEP 1: Emergency Type -->
             <div class="form-step active" data-step="1" id="step1">
                 <div class="section-title">What is your emergency?</div>
                 <div class="section-description">Select the type of service you need assistance with</div>
@@ -205,7 +203,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
             </div>
 
-            <!-- STEP 2: Caller Information -->
             <div class="form-step" data-step="2" id="step2">
                 <div class="section-title">Caller Information</div>
                 <div class="section-description">Please provide your contact details</div>
@@ -244,7 +241,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
             </div>
 
-            <!-- STEP 3: Confirmation -->
             <div class="form-step" data-step="3" id="step3">
                 <div class="section-title">Almost Done!</div>
                 <div class="section-description">
@@ -270,7 +266,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
             </div>
 
-            <!-- CONNECT CALLER SECTION -->
             <div class="form-step" data-step="connect" id="stepConnect">
                 <div class="section-title">Connect Caller</div>
                 <div class="section-description">Routing caller to the appropriate team</div>
@@ -367,7 +362,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
             </div>
 
-            <!-- DNC SECTION -->
             <div class="form-step" data-step="dnc" id="stepDnc">
                 <div class="section-title">Do Not Continue (DNC)</div>
                 <div class="section-description">Record the reason why this call is not continuing</div>
@@ -438,7 +432,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
             </div>
 
-            <!-- COMPLETION -->
             <div class="form-step" data-step="complete" id="stepComplete">
                 <div class="completion-message">
                     <div class="completion-icon">✅</div>
@@ -557,12 +550,11 @@ function updateProgress() {
 function showStep(stepId) {
   console.log('Showing step:', stepId);
   
-  // Hide all steps
   document.querySelectorAll('.form-step').forEach(step => {
     step.classList.remove('active');
   });
   
-  // Show target step - SCOPED TO FORM STEPS ONLY
+  // FIXED: Scope selector to .form-step only
   const targetStep = document.querySelector(`.form-step[data-step="${stepId}"]`);
   if (targetStep) {
     targetStep.classList.add('active');
@@ -726,9 +718,7 @@ function startNewTriage() {
   backToStart();
 }
 
-// Initialize event listeners when DOM is ready
 function initEventListeners() {
-  // Emergency type selection
   const emergencyOptions = document.getElementById('emergencyOptions');
   if (emergencyOptions) {
     emergencyOptions.addEventListener('click', function(e) {
@@ -738,13 +728,11 @@ function initEventListeners() {
       const type = card.getAttribute('data-type');
       console.log('Emergency selected:', type);
       
-      // Clear previous selections
       emergencyOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       
       formData.emergencyType = type;
       
-      // Route to appropriate step
       setTimeout(() => {
         if (type === 'DNC') {
           showStep('dnc');
@@ -757,7 +745,6 @@ function initEventListeners() {
     });
   }
   
-  // Connection type selection
   const connectionOptions = document.getElementById('connectionOptions');
   if (connectionOptions) {
     connectionOptions.addEventListener('click', function(e) {
@@ -770,7 +757,6 @@ function initEventListeners() {
     });
   }
   
-  // Consent selection
   const consentOptions = document.getElementById('consentOptions');
   if (consentOptions) {
     consentOptions.addEventListener('click', function(e) {
@@ -791,7 +777,6 @@ function initEventListeners() {
     });
   }
   
-  // DNC reason selection
   const dncOptions = document.getElementById('dncOptions');
   if (dncOptions) {
     dncOptions.addEventListener('click', function(e) {
