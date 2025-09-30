@@ -147,7 +147,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
                 <div class="progress-step" data-step="5">
                     <div class="progress-step-circle">5</div>
-                    <div class="progress-step-label">Review</div>
+                    <div class="progress-step-label">Submit</div>
                 </div>
             </div>
             <div class="progress-bar-line">
@@ -343,49 +343,49 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
             </div>
 
-            <!-- Step 4: Service Specific Details -->
+            <!-- Step 4: Service Selection -->
             <div class="form-step" data-step="4">
-                <div class="section-title">Service Details</div>
-                <div class="section-description">Select the specific service required</div>
+                <div class="section-title">Service Required</div>
+                <div class="section-description">Select the specific service you need</div>
                 
                 <div class="form-group">
                     <label class="form-label">
                         Service Required <span class="required">*</span>
                     </label>
                     <div class="options-grid" id="serviceOptions">
-                        <div class="option-card" data-type="Jump Start" data-next="notes">
+                        <div class="option-card" data-service="Jump Start">
                             <div class="option-icon">🔋</div>
                             <div>Jump Start</div>
                         </div>
-                        <div class="option-card" data-type="Mechanical Diagnostic + Minor Repair" data-next="notes">
+                        <div class="option-card" data-service="Mechanical Diagnostic + Minor Repair">
                             <div class="option-icon">🔧</div>
                             <div>Mechanical Diagnostic + Minor Repair</div>
                         </div>
-                        <div class="option-card" data-type="Pre-Purchase Inspection" data-next="seller">
+                        <div class="option-card" data-service="Pre-Purchase Inspection">
                             <div class="option-icon">📋</div>
                             <div>Pre-Purchase Inspection</div>
                         </div>
-                        <div class="option-card" data-type="Petrol in Diesel Extraction" data-next="notes">
+                        <div class="option-card" data-service="Petrol in Diesel Extraction">
                             <div class="option-icon">⛽</div>
                             <div>Petrol in Diesel Extraction</div>
                         </div>
-                        <div class="option-card" data-type="Vehicle Unlock" data-next="notes">
+                        <div class="option-card" data-service="Vehicle Unlock">
                             <div class="option-icon">🔑</div>
                             <div>Vehicle Unlock</div>
                         </div>
-                        <div class="option-card" data-type="Diesel in Petrol Extraction" data-next="notes">
+                        <div class="option-card" data-service="Diesel in Petrol Extraction">
                             <div class="option-icon">⛽</div>
                             <div>Diesel in Petrol Extraction</div>
                         </div>
-                        <div class="option-card" data-type="20L Fuel Delivery" data-next="notes">
+                        <div class="option-card" data-service="20L Fuel Delivery">
                             <div class="option-icon">⛽</div>
                             <div>20L Fuel Delivery</div>
                         </div>
-                        <div class="option-card" data-type="Tyre Change" data-next="notes">
+                        <div class="option-card" data-service="Tyre Change">
                             <div class="option-icon">🛞</div>
                             <div>Tyre Change</div>
                         </div>
-                        <div class="option-card" data-type="Tyre Repair / Replacement" data-next="tyre-size">
+                        <div class="option-card" data-service="Tyre Repair / Replacement">
                             <div class="option-icon">🛞</div>
                             <div>Tyre Repair / Replacement</div>
                         </div>
@@ -393,95 +393,94 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                     <div class="error-message" id="serviceError">Please select a service</div>
                 </div>
                 
-                <!-- Pre-Purchase Inspection Seller Details -->
-                <div id="sellerDetails" style="display: none;">
-                    <div class="form-group">
-                        <label for="sellerName" class="form-label">
-                            Name of the Seller <span class="required">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="sellerName" 
-                            class="form-input" 
-                            placeholder="Enter seller's name"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="sellerPhone" class="form-label">
-                            Seller's Phone Number <span class="required">*</span>
-                        </label>
-                        <input 
-                            type="tel" 
-                            id="sellerPhone" 
-                            class="form-input" 
-                            placeholder="Enter seller's phone number"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="destinationAddress" class="form-label">
-                            Where are we taking you to? <span class="required">*</span>
-                            <span class="helper-text">Destination address after inspection</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="destinationAddress" 
-                            class="form-input" 
-                            placeholder="Enter destination address"
-                        >
-                        <a href="https://www.eek.nz/helper-form" target="_blank" class="helper-link">
-                            Need help? Use our helper tool →
-                        </a>
-                    </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                </div>
+            </div>
+            
+            <!-- Step 4a: Pre-Purchase Inspection - Seller Details -->
+            <div class="form-step" data-step="4a">
+                <div class="section-title">Seller Information</div>
+                <div class="section-description">We need details about the vehicle seller</div>
+                
+                <div class="form-group">
+                    <label for="sellerName" class="form-label">
+                        Name of the Seller <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="sellerName" 
+                        class="form-input" 
+                        placeholder="Enter seller's name"
+                        required
+                    >
+                    <div class="error-message" id="sellerNameError">Please enter the seller's name</div>
                 </div>
                 
-                <!-- Tyre Size Input -->
-                <div id="tyreSizeDetails" style="display: none;">
-                    <div class="form-group">
-                        <label for="tyreSize" class="form-label">
-                            Tyre Size <span class="required">*</span>
-                            <span class="helper-text">Find this printed on the side of the tyre (e.g., 185/65R14)</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="tyreSize" 
-                            class="form-input" 
-                            placeholder="e.g., 185/65R14"
-                        >
-                    </div>
-                </div>
-                
-                <!-- Additional Notes -->
-                <div id="notesSection" style="display: none;">
-                    <div class="form-group">
-                        <label for="additionalNotes" class="form-label">
-                            Additional Notes <span class="required">*</span>
-                            <span class="helper-text">Any information we should know about</span>
-                        </label>
-                        <textarea 
-                            id="additionalNotes" 
-                            class="form-input" 
-                            rows="4"
-                            placeholder="Enter any additional information..."
-                            required
-                        ></textarea>
-                    </div>
+                <div class="form-group">
+                    <label for="sellerPhone" class="form-label">
+                        Seller's Phone Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="sellerPhone" 
+                        class="form-input" 
+                        placeholder="Enter seller's phone number"
+                        required
+                    >
+                    <div class="error-message" id="sellerPhoneError">Please enter the seller's phone number</div>
                 </div>
                 
                 <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
-                    <button class="btn btn-primary" onclick="validateStep4()">Next →</button>
+                    <button class="btn btn-secondary" onclick="showStep(4)">← Previous</button>
+                    <button class="btn btn-primary" onclick="validateStep4a()">Next →</button>
                 </div>
             </div>
-
-            <!-- Step 5: Review and Submit -->
-            <div class="form-step" data-step="5">
-                <div class="section-title">Review Your Booking</div>
-                <div class="section-description">Please review your information before submitting</div>
+            
+            <!-- Step 4c: Tyre Size -->
+            <div class="form-step" data-step="4c">
+                <div class="section-title">Tyre Information</div>
+                <div class="section-description">We need to know your tyre size</div>
                 
-                <div id="reviewContent" style="background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <!-- Review content will be populated by JavaScript -->
+                <div class="form-group">
+                    <label for="tyreSize" class="form-label">
+                        What is the size of the tyre? <span class="required">*</span>
+                        <span class="helper-text">You can find this printed on the side of the tyre (e.g., 185/65R14)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="tyreSize" 
+                        class="form-input" 
+                        placeholder="e.g., 185/65R14"
+                        required
+                    >
+                    <div class="error-message" id="tyreSizeError">Please enter the tyre size</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showStep(4)">← Previous</button>
+                    <button class="btn btn-primary" onclick="validateStep4c()">Next →</button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Additional Notes -->
+            <div class="form-step" data-step="5">
+                <div class="section-title">Additional Information</div>
+                <div class="section-description">Any other details we should know about</div>
+                
+                <div class="form-group">
+                    <label for="additionalNotes" class="form-label">
+                        Add any notes we might need <span class="required">*</span>
+                        <span class="helper-text">Include any relevant information about your situation</span>
+                    </label>
+                    <textarea 
+                        id="additionalNotes" 
+                        class="form-input" 
+                        rows="6"
+                        placeholder="Enter any additional information..."
+                        required
+                    ></textarea>
+                    <div class="error-message" id="additionalNotesError">Please provide some information</div>
                 </div>
                 
                 <div class="form-group">
@@ -497,7 +496,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 </div>
                 
                 <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn btn-secondary" onclick="goBackFromNotes()">← Previous</button>
                     <button class="btn btn-success" onclick="submitBooking()">Submit Booking</button>
                 </div>
             </div>
@@ -736,91 +735,80 @@ function validateStep3() {
   }
 }
 
-function validateStep4() {
-  if (!formData.serviceRequired) {
-    showError('service');
-    return;
-  }
-  
-  const serviceCard = document.querySelector('#serviceOptions .option-card.selected');
-  const nextType = serviceCard ? serviceCard.getAttribute('data-next') : '';
+function validateStep4a() {
+  const sellerName = document.getElementById('sellerName').value.trim();
+  const sellerPhone = document.getElementById('sellerPhone').value.trim();
   
   let isValid = true;
   
-  if (nextType === 'seller') {
-    const sellerName = document.getElementById('sellerName').value.trim();
-    const sellerPhone = document.getElementById('sellerPhone').value.trim();
-    const destination = document.getElementById('destinationAddress').value.trim();
-    
-    if (!sellerName || !sellerPhone || !destination) {
-      showAlert('Please fill in all seller details', 'error');
-      isValid = false;
-    } else {
-      formData.sellerName = sellerName;
-      formData.sellerPhone = sellerPhone;
-      formData.destinationAddress = destination;
-    }
-  } else if (nextType === 'tyre-size') {
-    const tyreSize = document.getElementById('tyreSize').value.trim();
-    if (!tyreSize) {
-      showAlert('Please enter the tyre size', 'error');
-      isValid = false;
-    } else {
-      formData.tyreSize = tyreSize;
-    }
+  if (!sellerName) {
+    showError('sellerName');
+    isValid = false;
+  } else {
+    hideError('sellerName');
   }
   
-  const notes = document.getElementById('additionalNotes').value.trim();
-  if (notes) {
-    formData.additionalNotes = notes;
+  if (!sellerPhone) {
+    showError('sellerPhone');
+    isValid = false;
+  } else {
+    hideError('sellerPhone');
   }
   
   if (isValid) {
-    populateReview();
+    formData.sellerName = sellerName;
+    formData.sellerPhone = sellerPhone;
     showStep(5);
   }
 }
 
-function populateReview() {
-  const reviewContent = document.getElementById('reviewContent');
-  let html = '<div style="display: grid; gap: 16px;">';
+function validateStep4c() {
+  const tyreSize = document.getElementById('tyreSize').value.trim();
   
-  html += `<div><strong>Emergency Type:</strong> ${formData.emergencyType}</div>`;
-  html += `<div><strong>Vehicle:</strong> ${formData.vehicleColor} ${formData.vehicleMake} ${formData.vehicleModel}</div>`;
-  html += `<div><strong>License Plate:</strong> ${formData.licensePlate}</div>`;
-  html += `<div><strong>Customer Name:</strong> ${formData.customerName}</div>`;
-  html += `<div><strong>Email:</strong> ${formData.customerEmail}</div>`;
-  html += `<div><strong>Phone:</strong> ${formData.customerPhone}</div>`;
-  html += `<div><strong>Location:</strong> ${formData.customerLocation}</div>`;
-  html += `<div><strong>Service Required:</strong> ${formData.serviceRequired}</div>`;
-  
-  if (formData.sellerName) {
-    html += `<div><strong>Seller Name:</strong> ${formData.sellerName}</div>`;
-    html += `<div><strong>Seller Phone:</strong> ${formData.sellerPhone}</div>`;
-    html += `<div><strong>Destination:</strong> ${formData.destinationAddress}</div>`;
-  }
-  
-  if (formData.tyreSize) {
-    html += `<div><strong>Tyre Size:</strong> ${formData.tyreSize}</div>`;
-  }
-  
-  if (formData.additionalNotes) {
-    html += `<div><strong>Additional Notes:</strong> ${formData.additionalNotes}</div>`;
-  }
-  
-  html += '</div>';
-  reviewContent.innerHTML = html;
-}
-
-async function submitBooking() {
-  const termsCheckbox = document.getElementById('termsCheckbox');
-  
-  if (!termsCheckbox.checked) {
-    showError('terms');
+  if (!tyreSize) {
+    showError('tyreSize');
     return;
   }
   
-  hideError('terms');
+  hideError('tyreSize');
+  formData.tyreSize = tyreSize;
+  showStep(5);
+}
+
+function goBackFromNotes() {
+  // Go back to the appropriate step based on service type
+  if (formData.serviceRequired === 'Pre-Purchase Inspection') {
+    showStep('4a');
+  } else if (formData.serviceRequired === 'Tyre Repair / Replacement') {
+    showStep('4c');
+  } else {
+    showStep(4);
+  }
+}
+
+async function submitBooking() {
+  const notes = document.getElementById('additionalNotes').value.trim();
+  const termsCheckbox = document.getElementById('termsCheckbox');
+  
+  let isValid = true;
+  
+  if (!notes) {
+    showError('additionalNotes');
+    isValid = false;
+  } else {
+    hideError('additionalNotes');
+    formData.additionalNotes = notes;
+  }
+  
+  if (!termsCheckbox.checked) {
+    showError('terms');
+    isValid = false;
+  } else {
+    hideError('terms');
+  }
+  
+  if (!isValid) return;
+  
   showLoading();
   
   try {
@@ -946,24 +934,23 @@ function initEventListeners() {
       serviceOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       
-      formData.serviceRequired = card.getAttribute('data-type');
-      const nextType = card.getAttribute('data-next');
-      
-      document.getElementById('sellerDetails').style.display = 'none';
-      document.getElementById('tyreSizeDetails').style.display = 'none';
-      document.getElementById('notesSection').style.display = 'none';
-      
-      if (nextType === 'seller') {
-        document.getElementById('sellerDetails').style.display = 'block';
-        document.getElementById('notesSection').style.display = 'block';
-      } else if (nextType === 'tyre-size') {
-        document.getElementById('tyreSizeDetails').style.display = 'block';
-        document.getElementById('notesSection').style.display = 'block';
-      } else if (nextType === 'notes') {
-        document.getElementById('notesSection').style.display = 'block';
-      }
-      
+      const service = card.getAttribute('data-service');
+      formData.serviceRequired = service;
       hideError('service');
+      
+      // MS Forms Branching Logic
+      setTimeout(() => {
+        if (service === 'Pre-Purchase Inspection') {
+          // Branch to seller details (Step 4a)
+          showStep('4a');
+        } else if (service === 'Tyre Repair / Replacement') {
+          // Branch to tyre size (Step 4c)
+          showStep('4c');
+        } else {
+          // All other services go directly to notes (Step 5)
+          showStep(5);
+        }
+      }, 300);
     });
   }
 }
