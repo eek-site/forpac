@@ -44,7 +44,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .section-description { color: #64748b; margin-bottom: 24px; line-height: 1.5; }
 
 .form-step { display: none; }
-.form-step.active { display: block; animation: fadeIn 0.3s ease; }
+.form-step.active { display: block !important; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .form-group { margin-bottom: 24px; }
@@ -147,57 +147,57 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
         <div class="content-card">
             <!-- STEP 1: Emergency Type -->
-            <div class="form-step active" data-step="1">
+            <div class="form-step active" data-step="1" id="step1">
                 <div class="section-title">What is your emergency?</div>
                 <div class="section-description">Select the type of service you need assistance with</div>
                 
                 <div class="form-group">
-                    <div class="options-grid">
-                        <div class="option-card" onclick="selectEmergency('Jump Start', this)">
+                    <div class="options-grid" id="emergencyOptions">
+                        <div class="option-card" data-type="Jump Start">
                             <div class="option-icon">🔋</div>
                             <div>Jump Start</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Tyre Change', this)">
+                        <div class="option-card" data-type="Tyre Change">
                             <div class="option-icon">🛞</div>
                             <div>Tyre Change</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Locksmith', this)">
+                        <div class="option-card" data-type="Locksmith">
                             <div class="option-icon">🔑</div>
                             <div>Locksmith</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Mechanic', this)">
+                        <div class="option-card" data-type="Mechanic">
                             <div class="option-icon">🔧</div>
                             <div>Mechanic</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Fuel Delivery', this)">
+                        <div class="option-card" data-type="Fuel Delivery">
                             <div class="option-icon">⛽</div>
                             <div>Fuel Delivery</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Fuel Extraction', this)">
+                        <div class="option-card" data-type="Fuel Extraction">
                             <div class="option-icon">🚫</div>
                             <div>Fuel Extraction</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Truck Tyre', this)">
+                        <div class="option-card" data-type="Truck Tyre">
                             <div class="option-icon">🚛</div>
                             <div>Truck Tyre</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Pre-Purchase Inspection', this)">
+                        <div class="option-card" data-type="Pre-Purchase Inspection">
                             <div class="option-icon">📋</div>
                             <div>Pre-Purchase Inspection</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Trailer Inspection', this)">
+                        <div class="option-card" data-type="Trailer Inspection">
                             <div class="option-icon">🚐</div>
                             <div>Trailer Inspection</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Non Emergency', this)">
+                        <div class="option-card" data-type="Non Emergency">
                             <div class="option-icon">ℹ️</div>
                             <div>Non Emergency</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('Follow-Up', this)">
+                        <div class="option-card" data-type="Follow-Up">
                             <div class="option-icon">📞</div>
                             <div>Follow-Up</div>
                         </div>
-                        <div class="option-card" onclick="selectEmergency('DNC', this)">
+                        <div class="option-card" data-type="DNC">
                             <div class="option-icon">❌</div>
                             <div>DNC (Do Not Continue)</div>
                         </div>
@@ -206,7 +206,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             </div>
 
             <!-- STEP 2: Caller Information -->
-            <div class="form-step" data-step="2">
+            <div class="form-step" data-step="2" id="step2">
                 <div class="section-title">Caller Information</div>
                 <div class="section-description">Please provide your contact details</div>
                 
@@ -245,7 +245,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             </div>
 
             <!-- STEP 3: Confirmation -->
-            <div class="form-step" data-step="3">
+            <div class="form-step" data-step="3" id="step3">
                 <div class="section-title">Almost Done!</div>
                 <div class="section-description">
                     We'll send you a text message with a link. Click on it, fill out the form, 
@@ -271,30 +271,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             </div>
 
             <!-- CONNECT CALLER SECTION -->
-            <div class="form-step" data-step="connect">
+            <div class="form-step" data-step="connect" id="stepConnect">
                 <div class="section-title">Connect Caller</div>
                 <div class="section-description">Routing caller to the appropriate team</div>
                 
                 <div class="form-group">
                     <label class="form-label">Connect the caller with</label>
-                    <div class="options-grid">
-                        <div class="option-card" onclick="selectConnection('Client Job in Progress Team', this)">
+                    <div class="options-grid" id="connectionOptions">
+                        <div class="option-card" data-type="Client Job in Progress Team">
                             <div class="option-icon">👥</div>
                             <div>Client Job in Progress Team</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Client Post Job Support', this)">
+                        <div class="option-card" data-type="Client Post Job Support">
                             <div class="option-icon">💬</div>
                             <div>Client Post Job Support</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Supplier Job in Progress Team', this)">
+                        <div class="option-card" data-type="Supplier Job in Progress Team">
                             <div class="option-icon">🚗</div>
                             <div>Supplier Job in Progress Team</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Supplier Post Job Support', this)">
+                        <div class="option-card" data-type="Supplier Post Job Support">
                             <div class="option-icon">🔧</div>
                             <div>Supplier Post Job Support</div>
                         </div>
-                        <div class="option-card" onclick="selectConnection('Blacklist Caller', this)">
+                        <div class="option-card" data-type="Blacklist Caller">
                             <div class="option-icon">🚫</div>
                             <div>Blacklist Caller</div>
                         </div>
@@ -336,16 +336,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 
                 <div class="form-group">
                     <label class="form-label">Is it okay if we send some information to your mobile and email?</label>
-                    <div class="options-grid" style="grid-template-columns: repeat(3, 1fr);">
-                        <div class="option-card" onclick="selectConsent('Yes', this)">
+                    <div class="options-grid" style="grid-template-columns: repeat(3, 1fr);" id="consentOptions">
+                        <div class="option-card" data-type="Yes">
                             <div class="option-icon">✅</div>
                             <div>Yes</div>
                         </div>
-                        <div class="option-card" onclick="selectConsent('No', this)">
+                        <div class="option-card" data-type="No">
                             <div class="option-icon">❌</div>
                             <div>No</div>
                         </div>
-                        <div class="option-card" onclick="selectConsent('Does Not Apply', this)">
+                        <div class="option-card" data-type="Does Not Apply">
                             <div class="option-icon">➖</div>
                             <div>Does Not Apply</div>
                         </div>
@@ -368,7 +368,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             </div>
 
             <!-- DNC SECTION -->
-            <div class="form-step" data-step="dnc">
+            <div class="form-step" data-step="dnc" id="stepDnc">
                 <div class="section-title">Do Not Continue (DNC)</div>
                 <div class="section-description">Record the reason why this call is not continuing</div>
                 
@@ -389,44 +389,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                     <label class="form-label">
                         Reason for DNC <span class="required">*</span>
                     </label>
-                    <div class="options-grid">
-                        <div class="option-card" onclick="selectDNCReason('Incorrect Phone Number', this)">
+                    <div class="options-grid" id="dncOptions">
+                        <div class="option-card" data-type="Incorrect Phone Number">
                             <div>❌ Incorrect Phone Number</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Membership/Subscription/Wrong Number', this)">
+                        <div class="option-card" data-type="Membership/Subscription/Wrong Number">
                             <div>🔄 Membership/Wrong Number</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Out of Scope', this)">
+                        <div class="option-card" data-type="Out of Scope">
                             <div>🚫 Out of Scope</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Resolved themselves', this)">
+                        <div class="option-card" data-type="Resolved themselves">
                             <div>✅ Resolved themselves</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Only have cash', this)">
+                        <div class="option-card" data-type="Only have cash">
                             <div>💵 Only have cash</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Too expensive', this)">
+                        <div class="option-card" data-type="Too expensive">
                             <div>💰 Too expensive</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Not an emergency', this)">
+                        <div class="option-card" data-type="Not an emergency">
                             <div>ℹ️ Not an emergency</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Wait time is too long', this)">
+                        <div class="option-card" data-type="Wait time is too long">
                             <div>⏰ Wait time too long</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Hang up no explanation', this)">
+                        <div class="option-card" data-type="Hang up no explanation">
                             <div>📞 Hang up (no explanation)</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Hang up annoyed/frustrated', this)">
+                        <div class="option-card" data-type="Hang up annoyed/frustrated">
                             <div>😤 Hang up (annoyed)</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Hang up rude/abusive', this)">
+                        <div class="option-card" data-type="Hang up rude/abusive">
                             <div>😠 Hang up (rude/abusive)</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('No response/silent call', this)">
+                        <div class="option-card" data-type="No response/silent call">
                             <div>🔇 No response/silent</div>
                         </div>
-                        <div class="option-card" onclick="selectDNCReason('Did not consent to further contact', this)">
+                        <div class="option-card" data-type="Did not consent to further contact">
                             <div>🚫 No consent for contact</div>
                         </div>
                     </div>
@@ -439,7 +439,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             </div>
 
             <!-- COMPLETION -->
-            <div class="form-step" data-step="complete">
+            <div class="form-step" data-step="complete" id="stepComplete">
                 <div class="completion-message">
                     <div class="completion-icon">✅</div>
                     <div class="completion-title">Triage Complete</div>
@@ -555,39 +555,26 @@ function updateProgress() {
 }
 
 function showStep(stepId) {
+  console.log('Showing step:', stepId);
+  
+  // Hide all steps
   document.querySelectorAll('.form-step').forEach(step => {
     step.classList.remove('active');
+    step.style.display = 'none';
   });
   
+  // Show target step
   const targetStep = document.querySelector(`[data-step="${stepId}"]`);
   if (targetStep) {
-    targetStep.classList.add('active');
+    targetStep.style.display = 'block';
+    setTimeout(() => {
+      targetStep.classList.add('active');
+    }, 10);
   }
   
   if (typeof stepId === 'number') {
     currentStep = stepId;
     updateProgress();
-  }
-}
-
-function selectEmergency(type, element) {
-  // Remove selection from all cards in this step
-  const parentGrid = element.closest('.options-grid');
-  parentGrid.querySelectorAll('.option-card').forEach(card => {
-    card.classList.remove('selected');
-  });
-  
-  // Add selection to clicked card
-  element.classList.add('selected');
-  formData.emergencyType = type;
-  
-  // Handle special cases
-  if (type === 'DNC') {
-    setTimeout(() => showStep('dnc'), 300);
-  } else if (type === 'Follow-Up' || type === 'Non Emergency') {
-    setTimeout(() => showStep('connect'), 300);
-  } else {
-    setTimeout(() => showStep(2), 300);
   }
 }
 
@@ -632,7 +619,6 @@ async function confirmAndComplete() {
   showLoading();
   
   try {
-    // Submit to Power Automate
     await submitToFlow({
       action: 'TriageBooking',
       ...formData,
@@ -645,30 +631,6 @@ async function confirmAndComplete() {
   } catch (error) {
     hideLoading();
     showAlert('Failed to submit triage: ' + error.message, 'error');
-  }
-}
-
-function selectConnection(type, element) {
-  const parentGrid = element.closest('.options-grid');
-  parentGrid.querySelectorAll('.option-card').forEach(card => {
-    card.classList.remove('selected');
-  });
-  element.classList.add('selected');
-  formData.connectionType = type;
-}
-
-function selectConsent(consent, element) {
-  const parentGrid = element.closest('.options-grid');
-  parentGrid.querySelectorAll('.option-card').forEach(card => {
-    card.classList.remove('selected');
-  });
-  element.classList.add('selected');
-  formData.consent = consent;
-  
-  if (consent === 'Yes' || consent === 'Does Not Apply') {
-    document.getElementById('consentMessage').style.display = 'block';
-  } else {
-    showStep('dnc');
   }
 }
 
@@ -698,15 +660,6 @@ async function sendConnectionData() {
     hideLoading();
     showAlert('Failed to submit connection: ' + error.message, 'error');
   }
-}
-
-function selectDNCReason(reason, element) {
-  const parentGrid = element.closest('.options-grid');
-  parentGrid.querySelectorAll('.option-card').forEach(card => {
-    card.classList.remove('selected');
-  });
-  element.classList.add('selected');
-  formData.dncReason = reason;
 }
 
 async function submitDNC() {
@@ -777,10 +730,90 @@ function startNewTriage() {
   backToStart();
 }
 
+// Initialize event listeners when DOM is ready
+function initEventListeners() {
+  // Emergency type selection
+  const emergencyOptions = document.getElementById('emergencyOptions');
+  if (emergencyOptions) {
+    emergencyOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      const type = card.getAttribute('data-type');
+      console.log('Emergency selected:', type);
+      
+      // Clear previous selections
+      emergencyOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      
+      formData.emergencyType = type;
+      
+      // Route to appropriate step
+      setTimeout(() => {
+        if (type === 'DNC') {
+          showStep('dnc');
+        } else if (type === 'Follow-Up' || type === 'Non Emergency') {
+          showStep('connect');
+        } else {
+          showStep(2);
+        }
+      }, 300);
+    });
+  }
+  
+  // Connection type selection
+  const connectionOptions = document.getElementById('connectionOptions');
+  if (connectionOptions) {
+    connectionOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      connectionOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      formData.connectionType = card.getAttribute('data-type');
+    });
+  }
+  
+  // Consent selection
+  const consentOptions = document.getElementById('consentOptions');
+  if (consentOptions) {
+    consentOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      consentOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      
+      const consent = card.getAttribute('data-type');
+      formData.consent = consent;
+      
+      if (consent === 'Yes' || consent === 'Does Not Apply') {
+        document.getElementById('consentMessage').style.display = 'block';
+      } else {
+        setTimeout(() => showStep('dnc'), 300);
+      }
+    });
+  }
+  
+  // DNC reason selection
+  const dncOptions = document.getElementById('dncOptions');
+  if (dncOptions) {
+    dncOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      dncOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      formData.dncReason = card.getAttribute('data-type');
+    });
+  }
+}
+
 window.addEventListener('DOMContentLoaded', async function(){
   const authenticated = await initAuth();
   if(authenticated){
     showPage();
+    initEventListeners();
   } else {
     window.location.href = '/admin';
   }
