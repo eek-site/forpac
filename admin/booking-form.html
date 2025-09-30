@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Booking Form - FP Service Management</title>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
+
+.loading { position: fixed; inset: 0; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+.loading.authenticated { display: none; }
+.spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #1e3c72; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: #718096; font-size: 14px; }
+
+.page-container { display: none; min-height: 100vh; }
+.page-container.authenticated { display: block; }
+
+.header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.back-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.back-btn:hover { background: rgba(255,255,255,0.3); color: #fff; text-decoration: none; }
+.page-title { font-size: 20px; font-weight: 700; }
+.page-icon { font-size: 24px; }
+
+.main-content { padding: 24px; max-width: 900px; margin: 0 auto; }
+
+.progress-bar-container { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.progress-steps { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.progress-step { flex: 1; text-align: center; position: relative; }
+.progress-step-circle { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 600; font-size: 14px; }
+.progress-step.active .progress-step-circle { background: #1e3c72; color: #fff; }
+.progress-step.completed .progress-step-circle { background: #10b981; color: #fff; }
+.progress-step-label { font-size: 12px; color: #64748b; }
+.progress-step.active .progress-step-label { color: #1e3c72; font-weight: 600; }
+.progress-bar-line { height: 2px; background: #e2e8f0; position: relative; }
+.progress-bar-fill { height: 100%; background: #1e3c72; transition: width 0.3s ease; }
+
+.content-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+.section-title { font-size: 1.4em; font-weight: 700; color: #1e3c72; margin-bottom: 8px; }
+.section-description { color: #64748b; margin-bottom: 24px; line-height: 1.5; }
+
+.form-step { display: none; }
+.form-step.active { display: block !important; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.form-group { margin-bottom: 24px; }
+.form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; font-size: 15px; }
+.form-label .required { color: #ef4444; margin-left: 4px; }
+.form-label .helper-text { display: block; font-weight: 400; font-size: 13px; color: #6b7280; margin-top: 4px; }
+.form-input { width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.2s; }
+.form-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
+.form-input.error { border-color: #ef4444; }
+.error-message { color: #ef4444; font-size: 13px; margin-top: 6px; display: none; }
+.error-message.show { display: block; }
+
+.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.option-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.option-card:hover { border-color: #1e3c72; background: #f0f4ff; }
+.option-card.selected { border-color: #1e3c72; background: #dbeafe; color: #1e3c72; font-weight: 600; }
+.option-card .option-icon { font-size: 24px; margin-bottom: 8px; }
+
+.btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: #1e3c72; color: #fff; }
+.btn-primary:hover { background: #1a3260; }
+.btn-primary:disabled { background: #d1d5db; cursor: not-allowed; }
+.btn-secondary { background: #6b7280; color: #fff; }
+.btn-secondary:hover { background: #5b6370; }
+.btn-success { background: #10b981; color: #fff; }
+.btn-success:hover { background: #059669; }
+
+.button-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+.alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; border: 1px solid; }
+.alert-success { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.alert-error { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.alert-info { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.loading-overlay.show { display: flex; }
+.loading-card { background: #fff; padding: 30px; border-radius: 8px; text-align: center; }
+
+.completion-message { text-align: center; padding: 40px 20px; }
+.completion-icon { font-size: 64px; margin-bottom: 20px; }
+.completion-title { font-size: 1.8em; font-weight: 700; color: #1e3c72; margin-bottom: 12px; }
+.completion-text { color: #64748b; font-size: 1.1em; line-height: 1.6; }
+
+.helper-link { display: inline-block; margin-top: 8px; color: #1e3c72; text-decoration: none; font-size: 13px; }
+.helper-link:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .header { padding: 12px 16px; }
+  .page-title { font-size: 18px; }
+  .main-content { padding: 16px; }
+  .content-card { padding: 20px; }
+  .options-grid { grid-template-columns: 1fr; }
+  .progress-step-label { font-size: 10px; }
+  .button-group { flex-direction: column; }
+  .button-group .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="loading-text">Verifying access...</div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner"></div>
+        <div style="margin-top: 15px;">Processing...</div>
+    </div>
+</div>
+
+<div class="page-container" id="pageContainer">
+    <div class="header">
+        <div class="header-left">
+            <a href="command-menu.html" class="back-btn">← Back to Menu</a>
+            <div class="page-icon">📅</div>
+            <div class="page-title">Booking Form</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="progress-bar-container">
+            <div class="progress-steps">
+                <div class="progress-step active" data-step="1">
+                    <div class="progress-step-circle">1</div>
+                    <div class="progress-step-label">Emergency</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="progress-step-circle">2</div>
+                    <div class="progress-step-label">Vehicle</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="progress-step-circle">3</div>
+                    <div class="progress-step-label">Details</div>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="progress-step-circle">4</div>
+                    <div class="progress-step-label">Service</div>
+                </div>
+                <div class="progress-step" data-step="5">
+                    <div class="progress-step-circle">5</div>
+                    <div class="progress-step-label">Review</div>
+                </div>
+            </div>
+            <div class="progress-bar-line">
+                <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <!-- Step 1: Emergency Type -->
+            <div class="form-step active" data-step="1">
+                <div class="section-title">What is your emergency?</div>
+                <div class="section-description">Select the type of service you need</div>
+                
+                <div class="form-group">
+                    <div class="options-grid" id="emergencyOptions">
+                        <div class="option-card" data-type="Mechanical Breakdown">
+                            <div class="option-icon">🔧</div>
+                            <div>Mechanical Breakdown</div>
+                        </div>
+                        <div class="option-card" data-type="Locked Out">
+                            <div class="option-icon">🔑</div>
+                            <div>Locked Out</div>
+                        </div>
+                        <div class="option-card" data-type="Misfuel">
+                            <div class="option-icon">⛽</div>
+                            <div>Misfuel</div>
+                        </div>
+                        <div class="option-card" data-type="Flat Battery">
+                            <div class="option-icon">🔋</div>
+                            <div>Flat Battery</div>
+                        </div>
+                        <div class="option-card" data-type="Flat Tyre">
+                            <div class="option-icon">🛞</div>
+                            <div>Flat Tyre</div>
+                        </div>
+                        <div class="option-card" data-type="Trailer Fault">
+                            <div class="option-icon">🚐</div>
+                            <div>Trailer Fault</div>
+                        </div>
+                        <div class="option-card" data-type="Ran Out Of Fuel">
+                            <div class="option-icon">⛽</div>
+                            <div>Ran Out Of Fuel</div>
+                        </div>
+                        <div class="option-card" data-type="Pre-Purchase Inspection">
+                            <div class="option-icon">📋</div>
+                            <div>Pre-Purchase Inspection</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Vehicle Details -->
+            <div class="form-step" data-step="2">
+                <div class="section-title">Vehicle Information</div>
+                <div class="section-description">Tell us about your vehicle</div>
+                
+                <div class="form-group">
+                    <label for="licensePlate" class="form-label">
+                        Vehicle License Plate Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="licensePlate" 
+                        class="form-input" 
+                        placeholder="Enter license plate number"
+                        required
+                    >
+                    <div class="error-message" id="licensePlateError">Please enter a license plate number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vehicleMake" class="form-label">
+                        Make <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="vehicleMake" 
+                        class="form-input" 
+                        placeholder="e.g., Toyota, Ford, Honda"
+                        required
+                    >
+                    <div class="error-message" id="vehicleMakeError">Please enter the vehicle make</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vehicleModel" class="form-label">
+                        Model <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="vehicleModel" 
+                        class="form-input" 
+                        placeholder="e.g., Camry, F-150, Civic"
+                        required
+                    >
+                    <div class="error-message" id="vehicleModelError">Please enter the vehicle model</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Vehicle Colour <span class="required">*</span>
+                    </label>
+                    <div class="options-grid" id="colorOptions">
+                        <div class="option-card" data-type="White">White</div>
+                        <div class="option-card" data-type="Black">Black</div>
+                        <div class="option-card" data-type="Grey">Grey</div>
+                        <div class="option-card" data-type="Silver">Silver</div>
+                        <div class="option-card" data-type="Blue">Blue</div>
+                        <div class="option-card" data-type="Red">Red</div>
+                        <div class="option-card" data-type="Brown / Beige">Brown / Beige</div>
+                        <div class="option-card" data-type="Green">Green</div>
+                        <div class="option-card" data-type="Orange">Orange</div>
+                        <div class="option-card" data-type="Yellow">Yellow</div>
+                        <div class="option-card" data-type="Purple">Purple</div>
+                    </div>
+                    <div class="error-message" id="colorError">Please select a vehicle colour</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn btn-primary" onclick="validateStep2()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Customer Details -->
+            <div class="form-step" data-step="3">
+                <div class="section-title">Your Details</div>
+                <div class="section-description">Please provide your contact information</div>
+                
+                <div class="form-group">
+                    <label for="customerName" class="form-label">
+                        First and Last Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="customerName" 
+                        class="form-input" 
+                        placeholder="Enter your full name"
+                        required
+                    >
+                    <div class="error-message" id="customerNameError">Please enter your name</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerEmail" class="form-label">
+                        Email Address <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="customerEmail" 
+                        class="form-input" 
+                        placeholder="your.email@example.com"
+                        required
+                    >
+                    <div class="error-message" id="customerEmailError">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerPhone" class="form-label">
+                        Phone Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="customerPhone" 
+                        class="form-input" 
+                        placeholder="Enter your phone number"
+                        required
+                    >
+                    <div class="error-message" id="customerPhoneError">Please enter a valid phone number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerLocation" class="form-label">
+                        Where are you? <span class="required">*</span>
+                        <span class="helper-text">Provide your current location or address</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="customerLocation" 
+                        class="form-input" 
+                        placeholder="Enter your location or address"
+                        required
+                    >
+                    <a href="https://www.eek.nz/helper-form" target="_blank" class="helper-link">
+                        Need help finding your location? Use our helper tool →
+                    </a>
+                    <div class="error-message" id="customerLocationError">Please enter your location</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn btn-primary" onclick="validateStep3()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Service Specific Details -->
+            <div class="form-step" data-step="4">
+                <div class="section-title">Service Details</div>
+                <div class="section-description">Select the specific service required</div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Service Required <span class="required">*</span>
+                    </label>
+                    <div class="options-grid" id="serviceOptions">
+                        <div class="option-card" data-type="Jump Start" data-next="notes">
+                            <div class="option-icon">🔋</div>
+                            <div>Jump Start</div>
+                        </div>
+                        <div class="option-card" data-type="Mechanical Diagnostic + Minor Repair" data-next="notes">
+                            <div class="option-icon">🔧</div>
+                            <div>Mechanical Diagnostic + Minor Repair</div>
+                        </div>
+                        <div class="option-card" data-type="Pre-Purchase Inspection" data-next="seller">
+                            <div class="option-icon">📋</div>
+                            <div>Pre-Purchase Inspection</div>
+                        </div>
+                        <div class="option-card" data-type="Petrol in Diesel Extraction" data-next="notes">
+                            <div class="option-icon">⛽</div>
+                            <div>Petrol in Diesel Extraction</div>
+                        </div>
+                        <div class="option-card" data-type="Vehicle Unlock" data-next="notes">
+                            <div class="option-icon">🔑</div>
+                            <div>Vehicle Unlock</div>
+                        </div>
+                        <div class="option-card" data-type="Diesel in Petrol Extraction" data-next="notes">
+                            <div class="option-icon">⛽</div>
+                            <div>Diesel in Petrol Extraction</div>
+                        </div>
+                        <div class="option-card" data-type="20L Fuel Delivery" data-next="notes">
+                            <div class="option-icon">⛽</div>
+                            <div>20L Fuel Delivery</div>
+                        </div>
+                        <div class="option-card" data-type="Tyre Change" data-next="notes">
+                            <div class="option-icon">🛞</div>
+                            <div>Tyre Change</div>
+                        </div>
+                        <div class="option-card" data-type="Tyre Repair / Replacement" data-next="tyre-size">
+                            <div class="option-icon">🛞</div>
+                            <div>Tyre Repair / Replacement</div>
+                        </div>
+                    </div>
+                    <div class="error-message" id="serviceError">Please select a service</div>
+                </div>
+                
+                <!-- Pre-Purchase Inspection Seller Details -->
+                <div id="sellerDetails" style="display: none;">
+                    <div class="form-group">
+                        <label for="sellerName" class="form-label">
+                            Name of the Seller <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="sellerName" 
+                            class="form-input" 
+                            placeholder="Enter seller's name"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sellerPhone" class="form-label">
+                            Seller's Phone Number <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="sellerPhone" 
+                            class="form-input" 
+                            placeholder="Enter seller's phone number"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="destinationAddress" class="form-label">
+                            Where are we taking you to? <span class="required">*</span>
+                            <span class="helper-text">Destination address after inspection</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="destinationAddress" 
+                            class="form-input" 
+                            placeholder="Enter destination address"
+                        >
+                        <a href="https://www.eek.nz/helper-form" target="_blank" class="helper-link">
+                            Need help? Use our helper tool →
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Tyre Size Input -->
+                <div id="tyreSizeDetails" style="display: none;">
+                    <div class="form-group">
+                        <label for="tyreSize" class="form-label">
+                            Tyre Size <span class="required">*</span>
+                            <span class="helper-text">Find this printed on the side of the tyre (e.g., 185/65R14)</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="tyreSize" 
+                            class="form-input" 
+                            placeholder="e.g., 185/65R14"
+                        >
+                    </div>
+                </div>
+                
+                <!-- Additional Notes -->
+                <div id="notesSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="additionalNotes" class="form-label">
+                            Additional Notes <span class="required">*</span>
+                            <span class="helper-text">Any information we should know about</span>
+                        </label>
+                        <textarea 
+                            id="additionalNotes" 
+                            class="form-input" 
+                            rows="4"
+                            placeholder="Enter any additional information..."
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn btn-primary" onclick="validateStep4()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Review and Submit -->
+            <div class="form-step" data-step="5">
+                <div class="section-title">Review Your Booking</div>
+                <div class="section-description">Please review your information before submitting</div>
+                
+                <div id="reviewContent" style="background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <!-- Review content will be populated by JavaScript -->
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="termsCheckbox" style="width: auto; cursor: pointer;">
+                        <span>
+                            I agree to the 
+                            <a href="https://www.eek.nz/terms" target="_blank" style="color: #1e3c72;">Eek Mechanical Terms and Conditions</a>
+                            <span class="required">*</span>
+                        </span>
+                    </label>
+                    <div class="error-message" id="termsError">You must agree to the terms and conditions</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn btn-success" onclick="submitBooking()">Submit Booking</button>
+                </div>
+            </div>
+
+            <!-- Completion Step -->
+            <div class="form-step" data-step="complete">
+                <div class="completion-message">
+                    <div class="completion-icon">✅</div>
+                    <div class="completion-title">Booking Submitted Successfully</div>
+                    <div class="completion-text">
+                        Your roadside assistance request has been submitted. We will dispatch a technician 
+                        to your location shortly. You will receive a confirmation via SMS and email.
+                    </div>
+                    <button class="btn btn-primary" onclick="startNewBooking()" style="margin-top: 24px;">
+                        Create New Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let msalInstance = null;
+let currentStep = 1;
+let formData = {
+    emergencyType: '',
+    licensePlate: '',
+    vehicleMake: '',
+    vehicleModel: '',
+    vehicleColor: '',
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    customerLocation: '',
+    serviceRequired: '',
+    sellerName: '',
+    sellerPhone: '',
+    destinationAddress: '',
+    tyreSize: '',
+    additionalNotes: ''
+};
+
+const msalConfig = {
+  auth: {
+    clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+    authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+    redirectUri: window.location.origin + '/admin'
+  },
+  cache: {
+    cacheLocation: 'sessionStorage',
+    storeAuthStateInCookie: true
+  }
+};
+
+async function initAuth(){
+  try{
+    if(!window.msal || !window.msal.PublicClientApplication){
+      console.error('MSAL failed to load.');
+      return false;
+    }
+
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    const redirectResponse = await msalInstance.handleRedirectPromise();
+    if (redirectResponse && redirectResponse.account){
+      msalInstance.setActiveAccount(redirectResponse.account);
+    }
+
+    const active = msalInstance.getActiveAccount();
+    const accounts = msalInstance.getAllAccounts();
+    const account = active || accounts[0];
+
+    if (account){
+      msalInstance.setActiveAccount(account);
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e){
+    console.error('Auth init error:', e);
+    return false;
+  }
+}
+
+function showPage(){
+  document.getElementById('loadingScreen').classList.add('authenticated');
+  document.getElementById('pageContainer').classList.add('authenticated');
+}
+
+function showLoading(){
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading(){
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+function showAlert(message, type = 'info'){
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type}`;
+  alertDiv.innerHTML = message;
+  const contentCard = document.querySelector('.content-card');
+  contentCard.insertBefore(alertDiv, contentCard.firstChild);
+  setTimeout(() => alertDiv.remove(), 5000);
+}
+
+function updateProgress() {
+  const totalSteps = 5;
+  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  
+  document.querySelectorAll('.progress-step').forEach((step, index) => {
+    const stepNum = index + 1;
+    if (stepNum < currentStep) {
+      step.classList.add('completed');
+      step.classList.remove('active');
+    } else if (stepNum === currentStep) {
+      step.classList.add('active');
+      step.classList.remove('completed');
+    } else {
+      step.classList.remove('active', 'completed');
+    }
+  });
+}
+
+function showStep(stepId) {
+  document.querySelectorAll('.form-step').forEach(step => {
+    step.classList.remove('active');
+  });
+  
+  const targetStep = document.querySelector(`.form-step[data-step="${stepId}"]`);
+  if (targetStep) {
+    targetStep.classList.add('active');
+  }
+  
+  if (typeof stepId === 'number') {
+    currentStep = stepId;
+    updateProgress();
+  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function previousStep() {
+  if (currentStep > 1) {
+    showStep(currentStep - 1);
+  }
+}
+
+function validateStep2() {
+  const licensePlate = document.getElementById('licensePlate').value.trim();
+  const make = document.getElementById('vehicleMake').value.trim();
+  const model = document.getElementById('vehicleModel').value.trim();
+  const color = formData.vehicleColor;
+  
+  let isValid = true;
+  
+  if (!licensePlate) {
+    showError('licensePlate');
+    isValid = false;
+  } else {
+    hideError('licensePlate');
+  }
+  
+  if (!make) {
+    showError('vehicleMake');
+    isValid = false;
+  } else {
+    hideError('vehicleMake');
+  }
+  
+  if (!model) {
+    showError('vehicleModel');
+    isValid = false;
+  } else {
+    hideError('vehicleModel');
+  }
+  
+  if (!color) {
+    showError('color');
+    isValid = false;
+  } else {
+    hideError('color');
+  }
+  
+  if (isValid) {
+    formData.licensePlate = licensePlate;
+    formData.vehicleMake = make;
+    formData.vehicleModel = model;
+    showStep(3);
+  }
+}
+
+function validateStep3() {
+  const name = document.getElementById('customerName').value.trim();
+  const email = document.getElementById('customerEmail').value.trim();
+  const phone = document.getElementById('customerPhone').value.trim();
+  const location = document.getElementById('customerLocation').value.trim();
+  
+  let isValid = true;
+  
+  if (!name) {
+    showError('customerName');
+    isValid = false;
+  } else {
+    hideError('customerName');
+  }
+  
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showError('customerEmail');
+    isValid = false;
+  } else {
+    hideError('customerEmail');
+  }
+  
+  if (!phone || !/^\d{7,}$/.test(phone.replace(/[\s\-()]/g, ''))) {
+    showError('customerPhone');
+    isValid = false;
+  } else {
+    hideError('customerPhone');
+  }
+  
+  if (!location) {
+    showError('customerLocation');
+    isValid = false;
+  } else {
+    hideError('customerLocation');
+  }
+  
+  if (isValid) {
+    formData.customerName = name;
+    formData.customerEmail = email;
+    formData.customerPhone = phone;
+    formData.customerLocation = location;
+    showStep(4);
+  }
+}
+
+function validateStep4() {
+  if (!formData.serviceRequired) {
+    showError('service');
+    return;
+  }
+  
+  const serviceCard = document.querySelector('#serviceOptions .option-card.selected');
+  const nextType = serviceCard ? serviceCard.getAttribute('data-next') : '';
+  
+  let isValid = true;
+  
+  if (nextType === 'seller') {
+    const sellerName = document.getElementById('sellerName').value.trim();
+    const sellerPhone = document.getElementById('sellerPhone').value.trim();
+    const destination = document.getElementById('destinationAddress').value.trim();
+    
+    if (!sellerName || !sellerPhone || !destination) {
+      showAlert('Please fill in all seller details', 'error');
+      isValid = false;
+    } else {
+      formData.sellerName = sellerName;
+      formData.sellerPhone = sellerPhone;
+      formData.destinationAddress = destination;
+    }
+  } else if (nextType === 'tyre-size') {
+    const tyreSize = document.getElementById('tyreSize').value.trim();
+    if (!tyreSize) {
+      showAlert('Please enter the tyre size', 'error');
+      isValid = false;
+    } else {
+      formData.tyreSize = tyreSize;
+    }
+  }
+  
+  const notes = document.getElementById('additionalNotes').value.trim();
+  if (notes) {
+    formData.additionalNotes = notes;
+  }
+  
+  if (isValid) {
+    populateReview();
+    showStep(5);
+  }
+}
+
+function populateReview() {
+  const reviewContent = document.getElementById('reviewContent');
+  let html = '<div style="display: grid; gap: 16px;">';
+  
+  html += `<div><strong>Emergency Type:</strong> ${formData.emergencyType}</div>`;
+  html += `<div><strong>Vehicle:</strong> ${formData.vehicleColor} ${formData.vehicleMake} ${formData.vehicleModel}</div>`;
+  html += `<div><strong>License Plate:</strong> ${formData.licensePlate}</div>`;
+  html += `<div><strong>Customer Name:</strong> ${formData.customerName}</div>`;
+  html += `<div><strong>Email:</strong> ${formData.customerEmail}</div>`;
+  html += `<div><strong>Phone:</strong> ${formData.customerPhone}</div>`;
+  html += `<div><strong>Location:</strong> ${formData.customerLocation}</div>`;
+  html += `<div><strong>Service Required:</strong> ${formData.serviceRequired}</div>`;
+  
+  if (formData.sellerName) {
+    html += `<div><strong>Seller Name:</strong> ${formData.sellerName}</div>`;
+    html += `<div><strong>Seller Phone:</strong> ${formData.sellerPhone}</div>`;
+    html += `<div><strong>Destination:</strong> ${formData.destinationAddress}</div>`;
+  }
+  
+  if (formData.tyreSize) {
+    html += `<div><strong>Tyre Size:</strong> ${formData.tyreSize}</div>`;
+  }
+  
+  if (formData.additionalNotes) {
+    html += `<div><strong>Additional Notes:</strong> ${formData.additionalNotes}</div>`;
+  }
+  
+  html += '</div>';
+  reviewContent.innerHTML = html;
+}
+
+async function submitBooking() {
+  const termsCheckbox = document.getElementById('termsCheckbox');
+  
+  if (!termsCheckbox.checked) {
+    showError('terms');
+    return;
+  }
+  
+  hideError('terms');
+  showLoading();
+  
+  try {
+    await submitToFlow({
+      action: 'CreateBooking',
+      ...formData,
+      submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+      submittedAt: new Date().toISOString()
+    });
+    
+    hideLoading();
+    showStep('complete');
+  } catch (error) {
+    hideLoading();
+    showAlert('Failed to submit booking: ' + error.message, 'error');
+  }
+}
+
+async function submitToFlow(data) {
+  const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_ok7gvPEZKmPw9q2jiKY9Msqofd65YeMtuGfSjEqxJ4';
+  
+  const response = await fetch(flowEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      commandNumber: 2,
+      formType: 'Booking',
+      data: data
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Flow failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+function showError(fieldName) {
+  const input = document.getElementById(fieldName);
+  const error = document.getElementById(fieldName + 'Error');
+  if (input) input.classList.add('error');
+  if (error) error.classList.add('show');
+}
+
+function hideError(fieldName) {
+  const input = document.getElementById(fieldName);
+  const error = document.getElementById(fieldName + 'Error');
+  if (input) input.classList.remove('error');
+  if (error) error.classList.remove('show');
+}
+
+function startNewBooking() {
+  formData = {
+    emergencyType: '',
+    licensePlate: '',
+    vehicleMake: '',
+    vehicleModel: '',
+    vehicleColor: '',
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    customerLocation: '',
+    serviceRequired: '',
+    sellerName: '',
+    sellerPhone: '',
+    destinationAddress: '',
+    tyreSize: '',
+    additionalNotes: ''
+  };
+  
+  document.querySelectorAll('.form-input').forEach(input => {
+    input.value = '';
+    input.classList.remove('error');
+  });
+  
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  document.getElementById('termsCheckbox').checked = false;
+  
+  showStep(1);
+}
+
+function initEventListeners() {
+  const emergencyOptions = document.getElementById('emergencyOptions');
+  if (emergencyOptions) {
+    emergencyOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      emergencyOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      
+      formData.emergencyType = card.getAttribute('data-type');
+      
+      setTimeout(() => showStep(2), 300);
+    });
+  }
+  
+  const colorOptions = document.getElementById('colorOptions');
+  if (colorOptions) {
+    colorOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      colorOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      formData.vehicleColor = card.getAttribute('data-type');
+      hideError('color');
+    });
+  }
+  
+  const serviceOptions = document.getElementById('serviceOptions');
+  if (serviceOptions) {
+    serviceOptions.addEventListener('click', function(e) {
+      const card = e.target.closest('.option-card');
+      if (!card) return;
+      
+      serviceOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      
+      formData.serviceRequired = card.getAttribute('data-type');
+      const nextType = card.getAttribute('data-next');
+      
+      document.getElementById('sellerDetails').style.display = 'none';
+      document.getElementById('tyreSizeDetails').style.display = 'none';
+      document.getElementById('notesSection').style.display = 'none';
+      
+      if (nextType === 'seller') {
+        document.getElementById('sellerDetails').style.display = 'block';
+        document.getElementById('notesSection').style.display = 'block';
+      } else if (nextType === 'tyre-size') {
+        document.getElementById('tyreSizeDetails').style.display = 'block';
+        document.getElementById('notesSection').style.display = 'block';
+      } else if (nextType === 'notes') {
+        document.getElementById('notesSection').style.display = 'block';
+      }
+      
+      hideError('service');
+    });
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async function(){
+  const authenticated = await initAuth();
+  if(authenticated){
+    showPage();
+    initEventListeners();
+  } else {
+    window.location.href = '/admin';
+  }
+});
+</script>
+
+</body>
+</html>
