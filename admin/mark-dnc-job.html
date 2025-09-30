@@ -493,8 +493,8 @@ async function confirmCancellation() {
 }
 
 async function callCancellationFlow(data) {
-  // Power Automate flow endpoint
-  const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1';
+  // Power Automate flow endpoint with signature
+  const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_ok7gvPEZKmPw9q2jiKY9Msqofd65YeMtuGfSjEqxJ4';
   
   const response = await fetch(flowEndpoint, {
     method: 'POST',
@@ -502,7 +502,7 @@ async function callCancellationFlow(data) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      commandNumber: 0,  // Mark DNC Job is command 0
+      commandNumber: 0,
       action: 'MarkDNCJob',
       data: {
         jobId: data.jobId,
@@ -516,7 +516,6 @@ async function callCancellationFlow(data) {
         notes: data.notes,
         cancelledBy: data.cancelledBy,
         cancelledAt: data.cancelledAt,
-        // Include all job data for reference
         fullJobData: selectedJob
       }
     })
