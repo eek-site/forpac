@@ -681,8 +681,9 @@ function proceedFromChargeables() {
   formData.chargeables = document.getElementById('chargeables').value.trim();
   formData.clientMobile = document.getElementById('clientMobile').value.trim();
   
-  document.getElementById('regoDisplay4').textContent = formData.rego;
-  showStep(4);
+  // Billable type skips supplier details and goes directly to Step 5 (Routing)
+  document.getElementById('regoDisplay5').textContent = formData.rego;
+  showStep(5);
 }
 
 function proceedFromReimbursements() {
@@ -708,13 +709,8 @@ function selectTextSupplier(value) {
 }
 
 function backToPreviousFromBillables() {
-  if (formData.type === 'Billable') {
-    showStep(2);
-  } else if (formData.type === 'Deposit' || formData.type === 'Reimbursement' || formData.type === 'Refund') {
-    showStep(3);
-  } else if (formData.type === 'Supplier') {
-    showStep('3b');
-  }
+  // Only Supplier type goes to Step 4, so it goes back to Step 3b
+  showStep('3b');
 }
 
 function proceedFromBillables() {
@@ -730,14 +726,17 @@ function proceedFromBillables() {
 
 function backFromRouting() {
   // Determine where to go back to based on type
-  if (formData.type === 'Close Job' || formData.type === 'DNC') {
+  if (formData.type === 'Billable') {
+    // Billable goes back to Step 2 (Chargeables)
+    showStep(2);
+  } else if (formData.type === 'Close Job' || formData.type === 'DNC') {
     // These types came directly to Step 5, go back to Step 1
     showStep(1);
   } else if (formData.type === 'Deposit' || formData.type === 'Reimbursement' || formData.type === 'Refund') {
     // These types skip Step 4, go back to Step 3 (Reimbursements)
     showStep(3);
-  } else {
-    // Billable and Supplier types go back to Step 4
+  } else if (formData.type === 'Supplier') {
+    // Supplier type goes back to Step 4
     showStep(4);
   }
 }
