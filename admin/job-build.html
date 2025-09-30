@@ -230,16 +230,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                     </div>
                 </div>
                 
-                <div class="form-group" id="clientMobileGroup" style="display: none;">
-                    <label for="clientMobile" class="form-label">
-                        Client Mobile Number
-                        <span class="helper-text">Only required if client is already in the system and this is a new job</span>
+                <div class="form-group" id="customerPhoneGroup" style="display: none;">
+                    <label for="customerPhone" class="form-label">
+                        Customer Phone Number
+                        <span class="helper-text">Auto-filled from job data (edit if needed)</span>
                     </label>
                     <input 
                         type="tel" 
-                        id="clientMobile" 
+                        id="customerPhone" 
                         class="form-input" 
-                        placeholder="Enter mobile number"
+                        placeholder="Enter phone number"
                     >
                 </div>
                 
@@ -504,7 +504,7 @@ let formData = {
     type: '',
     chargeables: '',
     existingClient: '',
-    clientMobile: '',
+    customerPhone: '',
     reimbursement: '',
     textSupplier: '',
     supplier: '',
@@ -649,6 +649,8 @@ function openJobPicker() {
 
 function handleJobSelection(data) {
   console.log('Job selected:', data);
+  console.log('Job data received:', data.job);
+  
   formData.rego = data.rego;
   formData.jobData = data.job;
   
@@ -668,6 +670,16 @@ function selectType(type) {
   setTimeout(() => {
     if (type === 'Billable') {
       document.getElementById('regoDisplay2').textContent = formData.rego;
+      
+      // Pre-fill customer phone from job data
+      if (formData.jobData) {
+        const customerPhone = formData.jobData.CustomerPhone || formData.jobData.CallerPhone || '';
+        if (customerPhone) {
+          document.getElementById('customerPhone').value = customerPhone;
+          console.log('Pre-filled customer phone:', customerPhone);
+        }
+      }
+      
       showStep(2);
     } else if (type === 'Deposit' || type === 'Reimbursement' || type === 'Refund') {
       document.getElementById('regoDisplay3').textContent = formData.rego;
@@ -695,15 +707,23 @@ function selectExistingClient(value) {
   document.querySelector(`[data-existing="${value}"]`).classList.add('selected');
   
   if (value === 'Yes') {
-    document.getElementById('clientMobileGroup').style.display = 'block';
+    document.getElementById('customerPhoneGroup').style.display = 'block';
   } else {
-    document.getElementById('clientMobileGroup').style.display = 'none';
+    document.getElementById('customerPhoneGroup').style.display = 'none';
   }
 }
 
 function proceedFromChargeables() {
   formData.chargeables = document.getElementById('chargeables').value.trim();
-  formData.clientMobile = document.getElementById('clientMobile').value.trim();
+  
+  // Get customer phone from job data OR manual input (fallback)
+  formData.customerPhone = formData.jobData?.CustomerPhone || 
+                           formData.jobData?.CallerPhone || 
+                           document.getElementById('customerPhone').value.trim() ||
+                           '';
+  
+  console.log('Customer phone being sent:', formData.customerPhone);
+  console.log('Full job data:', formData.jobData);
   
   document.getElementById('regoDisplay5').textContent = formData.rego;
   showStep(5);
@@ -894,7 +914,7 @@ async function submitJob() {
       type: formData.type,
       chargeables: formData.chargeables,
       existingClient: formData.existingClient,
-      clientMobile: formData.clientMobile,
+      customerPhone: formData.customerPhone,
       reimbursement: formData.reimbursement,
       textSupplier: formData.textSupplier,
       supplier: formData.supplier,
@@ -950,7 +970,7 @@ function startNew() {
     type: '',
     chargeables: '',
     existingClient: '',
-    clientMobile: '',
+    customerPhone: '',
     reimbursement: '',
     textSupplier: '',
     supplier: '',
@@ -981,7 +1001,7 @@ function startNew() {
   
   document.getElementById('selectedRegoDisplay').style.display = 'none';
   document.getElementById('typeSelection').style.display = 'none';
-  document.getElementById('clientMobileGroup').style.display = 'none';
+  document.getElementById('customerPhoneGroup').style.display = 'none';
   document.getElementById('servicesRenderedInput').style.display = 'none';
   document.getElementById('supplierOverageInput').style.display = 'none';
   
