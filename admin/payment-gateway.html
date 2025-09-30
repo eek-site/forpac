@@ -685,6 +685,18 @@ async function submitPaymentGateway() {
   showLoading();
   
   try {
+    // Extract customer data from job picker data
+    const customerPhone = formData.jobData?.CallerPhone || 
+                         formData.jobData?.CustomerPhone || 
+                         formData.jobData?.Phone || 
+                         '';
+    const customerEmail = formData.jobData?.Email || 
+                         formData.jobData?.CustomerEmail || 
+                         '';
+    const customerName = formData.jobData?.CustomerName || 
+                        (formData.jobData?.FirstName && formData.jobData?.LastName ? 
+                         `${formData.jobData.FirstName} ${formData.jobData.LastName}` : '');
+    
     await submitToFlow({
       action: 'SendPaymentGateway',
       jobRego: formData.jobRego,
@@ -693,9 +705,9 @@ async function submitPaymentGateway() {
       redirectOption: formData.redirectOption,
       amount: formData.amount,
       description: formData.description,
-      recipientPhone: formData.recipientPhone || formData.jobData?.CustomerPhone || '',
-      recipientEmail: formData.recipientEmail || formData.jobData?.Email || '',
-      recipientName: formData.recipientName || formData.jobData?.CustomerName || '',
+      recipientPhone: formData.recipientPhone || customerPhone,
+      recipientEmail: formData.recipientEmail || customerEmail,
+      recipientName: formData.recipientName || customerName,
       submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
       submittedAt: new Date().toISOString()
     });
