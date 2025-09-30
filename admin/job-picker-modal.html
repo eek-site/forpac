@@ -586,22 +586,56 @@ function parseJobDate(job) {
   return new Date(0);
 }
 
-// Format date for display
+// Format date for display in NZ timezone
 function formatJobDate(date) {
   if (!date || date.getTime() === 0) return 'No date';
   
+  // Convert both dates to NZ timezone for comparison
   const now = new Date();
-  const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+  const nzFormatter = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland' });
   
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
+  // Get NZ date components
+  const nzDateStr = date.toLocaleString('en-NZ', { timeZone: 'Pacific/Auckland' });
+  const nzNowStr = now.toLocaleString('en-NZ', { timeZone: 'Pacific/Auckland' });
   
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  const nzDate = new Date(nzDateStr);
+  const nzNow = new Date(nzNowStr);
+  
+  const diffDays = Math.floor((nzNow - nzDate) / (1000 * 60 * 60 * 24));
+  
+  const timeStr = date.toLocaleTimeString('en-NZ', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Pacific/Auckland'
   });
+  
+  if (diffDays === 0) {
+    return `Today at ${timeStr}`;
+  } else if (diffDays === 1) {
+    return `Yesterday at ${timeStr}`;
+  } else if (diffDays < 7) {
+    const dayName = date.toLocaleDateString('en-NZ', { 
+      weekday: 'long',
+      timeZone: 'Pacific/Auckland'
+    });
+    return `${dayName} at ${timeStr}`;
+  } else if (nzDate.getFullYear() === nzNow.getFullYear()) {
+    const dateStr = date.toLocaleDateString('en-NZ', { 
+      month: 'short', 
+      day: 'numeric',
+      timeZone: 'Pacific/Auckland'
+    });
+    return `${dateStr} at ${timeStr}`;
+  } else {
+    const dateStr = date.toLocaleDateString('en-NZ', { 
+      year: 'numeric',
+      month: 'short', 
+      day: 'numeric',
+      timeZone: 'Pacific/Auckland'
+    });
+    return `${dateStr} at ${timeStr}`;
+  }
 }
 
 // Apply column mapping to job data
@@ -1031,11 +1065,13 @@ function showJobPreview(job) {
   // CORE INFO
   const coreFields = [
     { label: 'ID', value: job.Id },
-    { label: 'Start Time', value: job.StartTime ? new Date(job.StartTime).toLocaleString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true 
+    { label: 'Start Time', value: job.StartTime ? new Date(job.StartTime).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
     }) : null },
-    { label: 'Completion Time', value: job.CompletionTime ? new Date(job.CompletionTime).toLocaleString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true 
+    { label: 'Completion Time', value: job.CompletionTime ? new Date(job.CompletionTime).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
     }) : null },
   ];
   
@@ -1147,14 +1183,23 @@ function showJobPreview(job) {
   
   // SCHEDULING INFO
   const schedulingFields = [
-    { label: 'Requested Date', value: job.RequestedDate ? new Date(job.RequestedDate).toLocaleString() : null },
+    { label: 'Requested Date', value: job.RequestedDate ? new Date(job.RequestedDate).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
     { label: 'Requested Time', value: job.RequestedTime },
     { label: 'Scheduled Date', value: job.ScheduledDate },
     { label: 'Scheduled Time', value: job.ScheduledTime },
     { label: 'Time Window', value: job.TimeWindow },
     { label: 'Estimated Duration', value: job.EstimatedDuration },
-    { label: 'Dispatch Time', value: job.DispatchTime ? new Date(job.DispatchTime).toLocaleString() : null },
-    { label: 'Arrival Time', value: job.ArrivalTime ? new Date(job.ArrivalTime).toLocaleString() : null },
+    { label: 'Dispatch Time', value: job.DispatchTime ? new Date(job.DispatchTime).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
+    { label: 'Arrival Time', value: job.ArrivalTime ? new Date(job.ArrivalTime).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
   ];
   
   const schedulingSection = buildSection('Scheduling', schedulingFields);
@@ -1175,7 +1220,10 @@ function showJobPreview(job) {
   // INVOICE INFO
   const invoiceFields = [
     { label: 'Invoice Number', value: job.InvoiceNumber || job.InvNbr },
-    { label: 'Invoice Date', value: job.InvoiceDate ? new Date(job.InvoiceDate).toLocaleString() : null },
+    { label: 'Invoice Date', value: job.InvoiceDate ? new Date(job.InvoiceDate).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
     { label: 'Net Income', value: job.NetIncome ? `$${job.NetIncome}` : null },
     { label: 'Bad Debt', value: job.BadDebt ? `$${job.BadDebt}` : null },
     { label: 'Close And Post', value: job.CloseAndPost },
@@ -1225,11 +1273,23 @@ function showJobPreview(job) {
   // SYSTEM INFO
   const systemFields = [
     { label: 'Brand', value: job.Brand },
-    { label: 'Created Date', value: job.CreatedDate ? new Date(job.CreatedDate).toLocaleString() : null },
-    { label: 'Last Updated', value: job.LastUpdated ? new Date(job.LastUpdated).toLocaleString() : null },
-    { label: 'Completed Date', value: job.CompletedDate ? new Date(job.CompletedDate).toLocaleString() : null },
+    { label: 'Created Date', value: job.CreatedDate ? new Date(job.CreatedDate).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
+    { label: 'Last Updated', value: job.LastUpdated ? new Date(job.LastUpdated).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
+    { label: 'Completed Date', value: job.CompletedDate ? new Date(job.CompletedDate).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
     { label: 'Synced To Forman', value: job.SyncedToForman },
-    { label: 'Last Sync Time', value: job.LastSyncTime ? new Date(job.LastSyncTime).toLocaleString() : null },
+    { label: 'Last Sync Time', value: job.LastSyncTime ? new Date(job.LastSyncTime).toLocaleString('en-NZ', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Pacific/Auckland'
+    }) : null },
     { label: 'Form Version', value: job.FormVersion },
     { label: 'Source', value: job.Source },
     { label: 'Output To', value: job.OutputTo },
