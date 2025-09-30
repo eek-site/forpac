@@ -1302,10 +1302,23 @@ function showJobPreview(job) {
   // Combine all sections
   previewHTML += sections.join('');
   
-  // Show preview
-  document.getElementById('jobsScreen').style.display = 'none';
-  document.getElementById('previewScreen').style.display = 'block';
-  document.getElementById('jobPreview').innerHTML = previewHTML;
+  // Show preview - use correct element IDs from job-picker-modal.html
+  const jobSelectionSection = document.getElementById('jobSelectionSection');
+  const jobPreviewSection = document.getElementById('jobPreviewSection');
+  const jobPreviewContent = document.getElementById('jobPreviewContent');
+  
+  if (jobSelectionSection && jobPreviewSection && jobPreviewContent) {
+    jobSelectionSection.style.display = 'none';
+    jobPreviewSection.style.display = 'block';
+    jobPreviewContent.innerHTML = previewHTML;
+  } else {
+    console.error('Job picker elements not found:', {
+      jobSelectionSection: !!jobSelectionSection,
+      jobPreviewSection: !!jobPreviewSection,
+      jobPreviewContent: !!jobPreviewContent
+    });
+    alert('Error: Job picker preview elements not found. Please check HTML structure.');
+  }
 }
 
 // Helper function to build a section
@@ -1333,15 +1346,24 @@ function buildSection(title, fields) {
 
 // Back to job list
 function backToJobList() {
-  document.getElementById('previewScreen').style.display = 'none';
-  document.getElementById('jobsScreen').style.display = 'block';
+  const jobSelectionSection = document.getElementById('jobSelectionSection');
+  const jobPreviewSection = document.getElementById('jobPreviewSection');
+  
+  if (jobSelectionSection && jobPreviewSection) {
+    jobPreviewSection.style.display = 'none';
+    jobSelectionSection.style.display = 'block';
+  }
   
   // Clear selection
   document.querySelectorAll('.job-item').forEach(item => {
     item.classList.remove('selected');
   });
   jobPickerState.selectedJob = null;
-  document.getElementById('selectBtn').disabled = true;
+  
+  const selectBtn = document.getElementById('selectBtn');
+  if (selectBtn) {
+    selectBtn.disabled = true;
+  }
 }
 
 // Confirm job selection and pass to parent
