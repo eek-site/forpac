@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Send Payment Gateway - FP Service Management</title>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
+
+.loading { position: fixed; inset: 0; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+.loading.authenticated { display: none; }
+.spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #1e3c72; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: #718096; font-size: 14px; }
+
+.page-container { display: none; min-height: 100vh; }
+.page-container.authenticated { display: block; }
+
+.header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.back-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.back-btn:hover { background: rgba(255,255,255,0.3); color: #fff; text-decoration: none; }
+.page-title { font-size: 20px; font-weight: 700; }
+.page-icon { font-size: 24px; }
+
+.main-content { padding: 24px; max-width: 800px; margin: 0 auto; }
+
+.content-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+.section-title { font-size: 1.4em; font-weight: 700; color: #1e3c72; margin-bottom: 8px; }
+.section-description { color: #64748b; margin-bottom: 24px; line-height: 1.5; }
+
+.form-step { display: none; }
+.form-step.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.form-group { margin-bottom: 24px; }
+.form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; font-size: 15px; }
+.form-label .required { color: #ef4444; margin-left: 4px; }
+.form-label .helper-text { display: block; font-weight: 400; font-size: 13px; color: #6b7280; margin-top: 4px; }
+.form-input { width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 14px; transition: border-color 0.2s; }
+.form-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
+.form-input.error { border-color: #ef4444; }
+.error-message { color: #ef4444; font-size: 13px; margin-top: 6px; display: none; }
+.error-message.show { display: block; }
+
+.info-display { background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+.info-display .info-label { font-weight: 600; color: #1e40af; margin-bottom: 8px; }
+.info-display .info-value { color: #1e293b; font-size: 1.1em; }
+
+.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.option-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.option-card:hover { border-color: #1e3c72; background: #f0f4ff; }
+.option-card.selected { border-color: #1e3c72; background: #dbeafe; color: #1e3c72; font-weight: 600; }
+.option-card .option-icon { font-size: 24px; margin-bottom: 8px; }
+.option-card .option-label { font-size: 14px; font-weight: 500; }
+
+.btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: #1e3c72; color: #fff; }
+.btn-primary:hover { background: #1a3260; }
+.btn-primary:disabled { background: #d1d5db; cursor: not-allowed; }
+.btn-secondary { background: #6b7280; color: #fff; }
+.btn-secondary:hover { background: #5b6370; }
+.btn-success { background: #10b981; color: #fff; }
+.btn-success:hover { background: #059669; }
+
+.button-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+.alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; border: 1px solid; }
+.alert-success { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.alert-error { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.alert-info { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.loading-overlay.show { display: flex; }
+.loading-card { background: #fff; padding: 30px; border-radius: 8px; text-align: center; }
+
+.completion-message { text-align: center; padding: 40px 20px; }
+.completion-icon { font-size: 64px; margin-bottom: 20px; }
+.completion-title { font-size: 1.8em; font-weight: 700; color: #1e3c72; margin-bottom: 12px; }
+.completion-text { color: #64748b; font-size: 1.1em; line-height: 1.6; }
+
+.job-picker-btn { background: #1e3c72; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: background 0.2s; width: 100%; justify-content: center; }
+.job-picker-btn:hover { background: #1a3260; }
+
+@media (max-width: 768px) {
+  .header { padding: 12px 16px; }
+  .page-title { font-size: 18px; }
+  .main-content { padding: 16px; }
+  .content-card { padding: 20px; }
+  .options-grid { grid-template-columns: 1fr; }
+  .button-group { flex-direction: column; }
+  .button-group .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="loading-text">Verifying access...</div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner"></div>
+        <div style="margin-top: 15px;">Processing...</div>
+    </div>
+</div>
+
+<!-- Hidden iframe for job picker -->
+<iframe id="jobPickerFrame" src="job-picker-modal.html" style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; border: none; z-index: 10001;"></iframe>
+
+<div class="page-container" id="pageContainer">
+    <div class="header">
+        <div class="header-left">
+            <a href="command-menu.html" class="back-btn">← Back to Menu</a>
+            <div class="page-icon">💳</div>
+            <div class="page-title">Send Payment Gateway</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-card">
+            <!-- Step 1: Select Job Registration -->
+            <div class="form-step active" data-step="1">
+                <div class="section-title">Select Job Registration</div>
+                <div class="section-description">Choose a job from the list or enter a registration manually</div>
+                
+                <div class="form-group">
+                    <button class="job-picker-btn" onclick="openJobPicker()">
+                        <span>📋</span>
+                        <span>Open Job Picker</span>
+                    </button>
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0; color: #9ca3af; font-weight: 600;">OR</div>
+                
+                <div class="form-group">
+                    <label for="manualRego" class="form-label">
+                        Enter Registration Manually
+                    </label>
+                    <input 
+                        type="text" 
+                        id="manualRego" 
+                        class="form-input" 
+                        placeholder="Type registration number..."
+                        onkeypress="handleManualRegoKeypress(event)"
+                    >
+                    <button class="btn btn-primary" onclick="selectManualRego()" style="margin-top: 12px; width: 100%; justify-content: center;">
+                        Continue with This Registration
+                    </button>
+                </div>
+                
+                <div id="selectedRegoDisplay" style="display: none;">
+                    <div class="info-display">
+                        <div class="info-label">Selected Registration:</div>
+                        <div class="info-value" id="selectedRegoValue"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="proceedToPaymentMethod()" style="width: 100%; justify-content: center;">
+                        Continue →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Payment Method -->
+            <div class="form-step" data-step="2">
+                <div class="section-title">Select Payment Method</div>
+                <div class="section-description">Choose how the customer will pay</div>
+                
+                <div class="info-display">
+                    <div class="info-label">Job Registration:</div>
+                    <div class="info-value" id="regoDisplay2"></div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="options-grid">
+                        <div class="option-card" data-method="1" onclick="selectPaymentMethod(1)">
+                            <div class="option-icon">💳</div>
+                            <div class="option-label">Credit Card (Stripe)</div>
+                        </div>
+                        <div class="option-card" data-method="2" onclick="selectPaymentMethod(2)">
+                            <div class="option-icon">🏦</div>
+                            <div class="option-label">Bank Transfer</div>
+                        </div>
+                        <div class="option-card" data-method="3" onclick="selectPaymentMethod(3)">
+                            <div class="option-icon">✍️</div>
+                            <div class="option-label">Credit Card (Stripe) Manual (Ad-Hoc)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToStep1()">← Back</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Redirect Selection (only for method 1) -->
+            <div class="form-step" data-step="3">
+                <div class="section-title">Select Redirect After Payment</div>
+                <div class="section-description">Where should the customer be redirected after payment?</div>
+                
+                <div class="info-display">
+                    <div class="info-label">Job Registration:</div>
+                    <div class="info-value" id="regoDisplay3"></div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="options-grid">
+                        <div class="option-card" data-redirect="1" onclick="selectRedirect(1)">
+                            <div class="option-icon">🆕</div>
+                            <div class="option-label">New Job (www.eek.nz/job)</div>
+                        </div>
+                        <div class="option-card" data-redirect="2" onclick="selectRedirect(2)">
+                            <div class="option-icon">✅</div>
+                            <div class="option-label">Progress Payment (www.eek.nz/thanks)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToStep2()">← Back</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Amount and Description -->
+            <div class="form-step" data-step="4">
+                <div class="section-title">Payment Details</div>
+                <div class="section-description">Enter the amount and service description</div>
+                
+                <div class="info-display">
+                    <div class="info-label">Job Registration:</div>
+                    <div class="info-value" id="regoDisplay4"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amountDue" class="form-label">
+                        Amount Due <span class="required">*</span>
+                        <span class="helper-text">Enter the payment amount (e.g., 49.99)</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        id="amountDue" 
+                        class="form-input" 
+                        placeholder="49.99"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                    <div class="error-message" id="amountError">Please enter a valid amount</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="serviceDescription" class="form-label">
+                        Service Description <span class="required">*</span>
+                        <span class="helper-text">Briefly describe the service</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="serviceDescription" 
+                        class="form-input" 
+                        placeholder="e.g., Roadside assistance - flat battery"
+                        required
+                    >
+                    <div class="error-message" id="descriptionError">Please enter a service description</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToPreviousStep()">← Back</button>
+                    <button class="btn btn-primary" onclick="validateAmountAndDescription()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Recipient Details (only for manual rego) -->
+            <div class="form-step" data-step="5">
+                <div class="section-title">Recipient Details</div>
+                <div class="section-description">Who should receive the payment link?</div>
+                
+                <div class="info-display">
+                    <div class="info-label">Job Registration:</div>
+                    <div class="info-value" id="regoDisplay5"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientPhone" class="form-label">
+                        Phone Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="recipientPhone" 
+                        class="form-input" 
+                        placeholder="Enter phone number"
+                        required
+                    >
+                    <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientEmail" class="form-label">
+                        Email Address <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="recipientEmail" 
+                        class="form-input" 
+                        placeholder="email@example.com"
+                        required
+                    >
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientName" class="form-label">
+                        Recipient Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="recipientName" 
+                        class="form-input" 
+                        placeholder="Enter recipient name"
+                        required
+                    >
+                    <div class="error-message" id="nameError">Please enter a recipient name</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToStep4()">← Back</button>
+                    <button class="btn btn-success" onclick="submitPaymentGateway()">Send Payment Link</button>
+                </div>
+            </div>
+
+            <!-- Completion Step -->
+            <div class="form-step" data-step="complete">
+                <div class="completion-message">
+                    <div class="completion-icon">✅</div>
+                    <div class="completion-title">Payment Link Sent Successfully</div>
+                    <div class="completion-text">
+                        The payment gateway link has been generated and sent to the customer.
+                    </div>
+                    <button class="btn btn-primary" onclick="startNew()" style="margin-top: 24px;">
+                        Send Another Payment Link
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let msalInstance = null;
+let currentStep = 1;
+let formData = {
+    jobRego: '',
+    isManualRego: false,
+    jobData: null,
+    paymentMethod: null,
+    redirectOption: null,
+    amount: '',
+    description: '',
+    recipientPhone: '',
+    recipientEmail: '',
+    recipientName: ''
+};
+
+const msalConfig = {
+  auth: {
+    clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+    authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+    redirectUri: window.location.origin + '/admin'
+  },
+  cache: {
+    cacheLocation: 'sessionStorage',
+    storeAuthStateInCookie: true
+  }
+};
+
+async function initAuth(){
+  try{
+    if(!window.msal || !window.msal.PublicClientApplication){
+      console.error('MSAL failed to load.');
+      return false;
+    }
+
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    const redirectResponse = await msalInstance.handleRedirectPromise();
+    if (redirectResponse && redirectResponse.account){
+      msalInstance.setActiveAccount(redirectResponse.account);
+    }
+
+    const active = msalInstance.getActiveAccount();
+    const accounts = msalInstance.getAllAccounts();
+    const account = active || accounts[0];
+
+    if (account){
+      msalInstance.setActiveAccount(account);
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e){
+    console.error('Auth init error:', e);
+    return false;
+  }
+}
+
+function showPage(){
+  document.getElementById('loadingScreen').classList.add('authenticated');
+  document.getElementById('pageContainer').classList.add('authenticated');
+}
+
+function showLoading(){
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading(){
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+function showAlert(message, type = 'info'){
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type}`;
+  alertDiv.innerHTML = message;
+  const contentCard = document.querySelector('.content-card');
+  contentCard.insertBefore(alertDiv, contentCard.firstChild);
+  setTimeout(() => alertDiv.remove(), 5000);
+}
+
+function showStep(stepId) {
+  document.querySelectorAll('.form-step').forEach(step => {
+    step.classList.remove('active');
+  });
+  
+  const targetStep = document.querySelector(`.form-step[data-step="${stepId}"]`);
+  if (targetStep) {
+    targetStep.classList.add('active');
+    currentStep = stepId;
+  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showError(fieldName) {
+  const input = document.getElementById(fieldName);
+  const error = document.getElementById(fieldName + 'Error');
+  if (input) input.classList.add('error');
+  if (error) error.classList.add('show');
+}
+
+function hideError(fieldName) {
+  const input = document.getElementById(fieldName);
+  const error = document.getElementById(fieldName + 'Error');
+  if (input) input.classList.remove('error');
+  if (error) error.classList.remove('show');
+}
+
+// Job Picker Integration
+function openJobPicker() {
+  const iframe = document.getElementById('jobPickerFrame');
+  iframe.style.display = 'block';
+  iframe.contentWindow.postMessage({ type: 'OPEN_PICKER', options: {} }, '*');
+}
+
+function closeJobPicker() {
+  const iframe = document.getElementById('jobPickerFrame');
+  iframe.style.display = 'none';
+}
+
+window.addEventListener('message', function(event) {
+  if (event.data.type === 'JOB_SELECTED') {
+    formData.jobRego = event.data.rego;
+    formData.isManualRego = false;
+    formData.jobData = event.data.job;
+    
+    document.getElementById('selectedRegoValue').textContent = event.data.rego;
+    document.getElementById('selectedRegoDisplay').style.display = 'block';
+    
+    closeJobPicker();
+  } else if (event.data.type === 'JOB_PICKER_CLOSED') {
+    closeJobPicker();
+  }
+});
+
+function handleManualRegoKeypress(event) {
+  if (event.key === 'Enter') {
+    selectManualRego();
+  }
+}
+
+function selectManualRego() {
+  const rego = document.getElementById('manualRego').value.trim();
+  
+  if (!rego) {
+    alert('Please enter a registration number');
+    return;
+  }
+  
+  formData.jobRego = rego;
+  formData.isManualRego = true;
+  formData.jobData = null;
+  
+  document.getElementById('selectedRegoValue').textContent = rego;
+  document.getElementById('selectedRegoDisplay').style.display = 'block';
+}
+
+function proceedToPaymentMethod() {
+  if (!formData.jobRego) {
+    alert('Please select or enter a job registration');
+    return;
+  }
+  
+  document.getElementById('regoDisplay2').textContent = formData.jobRego;
+  showStep(2);
+}
+
+function backToStep1() {
+  showStep(1);
+}
+
+function selectPaymentMethod(method) {
+  formData.paymentMethod = method;
+  
+  document.querySelectorAll('[data-method]').forEach(card => {
+    card.classList.remove('selected');
+  });
+  document.querySelector(`[data-method="${method}"]`).classList.add('selected');
+  
+  setTimeout(() => {
+    if (method === 1) {
+      // Credit Card (Stripe) - show redirect options
+      document.getElementById('regoDisplay3').textContent = formData.jobRego;
+      showStep(3);
+    } else {
+      // Bank Transfer or Manual - go directly to amount/description
+      document.getElementById('regoDisplay4').textContent = formData.jobRego;
+      showStep(4);
+    }
+  }, 300);
+}
+
+function backToStep2() {
+  showStep(2);
+}
+
+function selectRedirect(option) {
+  formData.redirectOption = option;
+  
+  document.querySelectorAll('[data-redirect]').forEach(card => {
+    card.classList.remove('selected');
+  });
+  document.querySelector(`[data-redirect="${option}"]`).classList.add('selected');
+  
+  setTimeout(() => {
+    document.getElementById('regoDisplay4').textContent = formData.jobRego;
+    showStep(4);
+  }, 300);
+}
+
+function backToPreviousStep() {
+  if (formData.paymentMethod === 1) {
+    showStep(3);
+  } else {
+    showStep(2);
+  }
+}
+
+function validateAmountAndDescription() {
+  const amount = document.getElementById('amountDue').value.trim();
+  const description = document.getElementById('serviceDescription').value.trim();
+  
+  let isValid = true;
+  
+  if (!amount || parseFloat(amount) <= 0) {
+    showError('amount');
+    isValid = false;
+  } else {
+    hideError('amount');
+  }
+  
+  if (!description) {
+    showError('description');
+    isValid = false;
+  } else {
+    hideError('description');
+  }
+  
+  if (isValid) {
+    formData.amount = amount;
+    formData.description = description;
+    
+    // If manual rego, show recipient details
+    if (formData.isManualRego) {
+      document.getElementById('regoDisplay5').textContent = formData.jobRego;
+      showStep(5);
+    } else {
+      // If from job picker, submit directly
+      submitPaymentGateway();
+    }
+  }
+}
+
+function backToStep4() {
+  showStep(4);
+}
+
+async function submitPaymentGateway() {
+  // Validate recipient details if manual rego
+  if (formData.isManualRego) {
+    const phone = document.getElementById('recipientPhone').value.trim();
+    const email = document.getElementById('recipientEmail').value.trim();
+    const name = document.getElementById('recipientName').value.trim();
+    
+    let isValid = true;
+    
+    if (!phone || !/^\d{7,}$/.test(phone.replace(/[\s\-()]/g, ''))) {
+      showError('phone');
+      isValid = false;
+    } else {
+      hideError('phone');
+    }
+    
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('email');
+      isValid = false;
+    } else {
+      hideError('email');
+    }
+    
+    if (!name) {
+      showError('name');
+      isValid = false;
+    } else {
+      hideError('name');
+    }
+    
+    if (!isValid) return;
+    
+    formData.recipientPhone = phone;
+    formData.recipientEmail = email;
+    formData.recipientName = name;
+  }
+  
+  showLoading();
+  
+  try {
+    await submitToFlow({
+      action: 'SendPaymentGateway',
+      jobRego: formData.jobRego,
+      isManualRego: formData.isManualRego,
+      paymentMethod: formData.paymentMethod,
+      redirectOption: formData.redirectOption,
+      amount: formData.amount,
+      description: formData.description,
+      recipientPhone: formData.recipientPhone || formData.jobData?.CustomerPhone || '',
+      recipientEmail: formData.recipientEmail || formData.jobData?.Email || '',
+      recipientName: formData.recipientName || formData.jobData?.CustomerName || '',
+      submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+      submittedAt: new Date().toISOString()
+    });
+    
+    hideLoading();
+    showStep('complete');
+  } catch (error) {
+    hideLoading();
+    showAlert('Failed to send payment gateway: ' + error.message, 'error');
+  }
+}
+
+async function submitToFlow(data) {
+  const flowEndpoint = 'https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_ok7gvPEZKmPw9q2jiKY9Msqofd65YeMtuGfSjEqxJ4';
+  
+  const response = await fetch(flowEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      commandNumber: 3,
+      formType: 'PaymentGateway',
+      data: data
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Flow failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+function startNew() {
+  formData = {
+    jobRego: '',
+    isManualRego: false,
+    jobData: null,
+    paymentMethod: null,
+    redirectOption: null,
+    amount: '',
+    description: '',
+    recipientPhone: '',
+    recipientEmail: '',
+    recipientName: ''
+  };
+  
+  document.querySelectorAll('.form-input').forEach(input => {
+    input.value = '';
+    input.classList.remove('error');
+  });
+  
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  document.getElementById('selectedRegoDisplay').style.display = 'none';
+  
+  showStep(1);
+}
+
+window.addEventListener('DOMContentLoaded', async function(){
+  const authenticated = await initAuth();
+  if(authenticated){
+    showPage();
+  } else {
+    window.location.href = '/admin';
+  }
+});
+</script>
+
+</body>
+</html>
