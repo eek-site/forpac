@@ -259,6 +259,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                     <div class="info-value" id="regoDisplay3"></div>
                 </div>
                 
+                <div class="info-display" id="phoneDisplay3" style="display: none;">
+                    <div class="info-label">Customer Phone:</div>
+                    <div class="info-value" id="phoneValue3"></div>
+                </div>
+                
                 <div class="form-group">
                     <label for="reimbursement" class="form-label">
                         Reimbursement
@@ -290,6 +295,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                     <div class="info-value" id="regoDisplay3b"></div>
                 </div>
                 
+                <div class="info-display" id="phoneDisplay3b" style="display: none;">
+                    <div class="info-label">Customer Phone:</div>
+                    <div class="info-value" id="phoneValue3b"></div>
+                </div>
+                
                 <div class="form-group">
                     <label class="form-label">Text Supplier? <span class="required">*</span></label>
                     <div class="options-grid">
@@ -313,6 +323,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 <div class="info-display">
                     <div class="info-label">Job Registration:</div>
                     <div class="info-value" id="regoDisplay4"></div>
+                </div>
+                
+                <div class="info-display" id="phoneDisplay4" style="display: none;">
+                    <div class="info-label">Customer Phone:</div>
+                    <div class="info-value" id="phoneValue4"></div>
                 </div>
                 
                 <div class="form-group">
@@ -387,6 +402,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
                 <div class="info-display">
                     <div class="info-label">Job Registration:</div>
                     <div class="info-value" id="regoDisplay5"></div>
+                </div>
+                
+                <div class="info-display" id="phoneDisplay5" style="display: none;">
+                    <div class="info-label">Customer Phone:</div>
+                    <div class="info-value" id="phoneValue5"></div>
                 </div>
                 
                 <div class="form-group">
@@ -667,6 +687,11 @@ function handleJobSelection(data) {
 function selectType(type) {
   formData.type = type;
   
+  // Capture customer phone from job data immediately when type is selected
+  if (formData.jobData) {
+    formData.customerPhone = formData.jobData.CustomerPhone || formData.jobData.CallerPhone || '';
+  }
+  
   document.querySelectorAll('[data-type]').forEach(card => {
     card.classList.remove('selected');
   });
@@ -677,23 +702,41 @@ function selectType(type) {
       document.getElementById('regoDisplay2').textContent = formData.rego;
       
       // Pre-fill customer phone from job data
-      if (formData.jobData) {
-        const customerPhone = formData.jobData.CustomerPhone || formData.jobData.CallerPhone || '';
-        if (customerPhone) {
-          document.getElementById('customerPhone').value = customerPhone;
-          console.log('Pre-filled customer phone:', customerPhone);
-        }
+      if (formData.customerPhone) {
+        document.getElementById('customerPhone').value = formData.customerPhone;
+        console.log('Pre-filled customer phone:', formData.customerPhone);
       }
       
       showStep(2);
     } else if (type === 'Deposit' || type === 'Reimbursement' || type === 'Refund') {
       document.getElementById('regoDisplay3').textContent = formData.rego;
+      
+      // Show customer phone if available
+      if (formData.customerPhone) {
+        document.getElementById('phoneValue3').textContent = formData.customerPhone;
+        document.getElementById('phoneDisplay3').style.display = 'block';
+      }
+      
       showStep(3);
     } else if (type === 'Supplier') {
       document.getElementById('regoDisplay3b').textContent = formData.rego;
+      
+      // Show customer phone if available
+      if (formData.customerPhone) {
+        document.getElementById('phoneValue3b').textContent = formData.customerPhone;
+        document.getElementById('phoneDisplay3b').style.display = 'block';
+      }
+      
       showStep('3b');
     } else if (type === 'Close Job' || type === 'DNC') {
       document.getElementById('regoDisplay5').textContent = formData.rego;
+      
+      // Show customer phone if available
+      if (formData.customerPhone) {
+        document.getElementById('phoneValue5').textContent = formData.customerPhone;
+        document.getElementById('phoneDisplay5').style.display = 'block';
+      }
+      
       showStep(5);
     }
   }, 300);
@@ -731,6 +774,13 @@ function proceedFromChargeables() {
   console.log('Full job data:', formData.jobData);
   
   document.getElementById('regoDisplay5').textContent = formData.rego;
+  
+  // Show customer phone if available
+  if (formData.customerPhone) {
+    document.getElementById('phoneValue5').textContent = formData.customerPhone;
+    document.getElementById('phoneDisplay5').style.display = 'block';
+  }
+  
   showStep(5);
 }
 
@@ -738,6 +788,13 @@ function proceedFromReimbursements() {
   formData.reimbursement = document.getElementById('reimbursement').value.trim();
   
   document.getElementById('regoDisplay5').textContent = formData.rego;
+  
+  // Show customer phone if available
+  if (formData.customerPhone) {
+    document.getElementById('phoneValue5').textContent = formData.customerPhone;
+    document.getElementById('phoneDisplay5').style.display = 'block';
+  }
+  
   showStep(5);
 }
 
@@ -751,6 +808,13 @@ function selectTextSupplier(value) {
   
   setTimeout(() => {
     document.getElementById('regoDisplay4').textContent = formData.rego;
+    
+    // Show customer phone if available
+    if (formData.customerPhone) {
+      document.getElementById('phoneValue4').textContent = formData.customerPhone;
+      document.getElementById('phoneDisplay4').style.display = 'block';
+    }
+    
     showStep(4);
   }, 300);
 }
@@ -767,6 +831,13 @@ function proceedFromBillables() {
   formData.bank = document.getElementById('bank').value.trim();
   
   document.getElementById('regoDisplay5').textContent = formData.rego;
+  
+  // Show customer phone if available
+  if (formData.customerPhone) {
+    document.getElementById('phoneValue5').textContent = formData.customerPhone;
+    document.getElementById('phoneDisplay5').style.display = 'block';
+  }
+  
   showStep(5);
 }
 
