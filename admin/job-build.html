@@ -480,15 +480,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
             <!-- Completion Step -->
             <div class="form-step" data-step="complete">
-                <div class="completion-message">
+                <div class="completion-message" id="completionMessage">
                     <div class="completion-icon">✅</div>
                     <div class="completion-title">Job Build Complete</div>
                     <div class="completion-text">
                         The job has been updated successfully and all details have been recorded.
                     </div>
-                    <button class="btn btn-primary" onclick="startNew()" style="margin-top: 24px;">
-                        Build Another Job
-                    </button>
+                    <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="updateSameJob()">
+                            🔄 Update Same Job
+                        </button>
+                        <button class="btn btn-secondary" onclick="startNew()">
+                            📋 Build Different Job
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -933,7 +938,7 @@ async function submitJob() {
     await submitToFlow(submissionData);
     
     hideLoading();
-    showStep('complete');
+    showCompletionScreen();
   } catch (error) {
     console.error('Submission error:', error);
     hideLoading();
@@ -961,6 +966,81 @@ async function submitToFlow(data) {
   }
   
   return response.json();
+}
+
+function showCompletionScreen() {
+  const completionMessage = document.getElementById('completionMessage');
+  completionMessage.innerHTML = `
+    <div class="completion-icon">✅</div>
+    <div class="completion-title">Job Build Complete</div>
+    <div class="completion-text">
+        Job <strong>${formData.rego}</strong> has been updated successfully and all details have been recorded.
+    </div>
+    <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="updateSameJob()">
+            🔄 Update ${formData.rego}
+        </button>
+        <button class="btn btn-secondary" onclick="startNew()">
+            📋 Build Different Job
+        </button>
+    </div>
+  `;
+  showStep('complete');
+}
+
+function updateSameJob() {
+  // Keep the rego and job data, but reset everything else
+  const currentRego = formData.rego;
+  const currentJobData = formData.jobData;
+  
+  formData = {
+    rego: currentRego,
+    jobData: currentJobData,
+    type: '',
+    chargeables: '',
+    existingClient: '',
+    customerPhone: '',
+    reimbursement: '',
+    textSupplier: '',
+    supplier: '',
+    textJobMobile: '',
+    emailJobSupplier: '',
+    costings: '',
+    bank: '',
+    jobNotes: [],
+    paid: '',
+    closeAndPost: ''
+  };
+  
+  // Clear all inputs
+  document.querySelectorAll('.form-input').forEach(input => {
+    input.value = '';
+  });
+  
+  // Clear all selections
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  document.querySelectorAll('.checkbox-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+  });
+  
+  // Keep the rego display visible and show type selection
+  document.getElementById('selectedRegoValue').textContent = currentRego;
+  document.getElementById('selectedRegoDisplay').style.display = 'block';
+  document.getElementById('typeSelection').style.display = 'block';
+  
+  // Hide optional fields
+  document.getElementById('customerPhoneGroup').style.display = 'none';
+  document.getElementById('servicesRenderedInput').style.display = 'none';
+  document.getElementById('supplierOverageInput').style.display = 'none';
+  
+  showStep(1);
 }
 
 function startNew() {
