@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Job Picker - FP Service Management</title>
-<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<!-- MSAL will be inherited from parent page -->
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
@@ -439,24 +439,32 @@ function detectIframe() {
   jobPickerState.isInIframe = window.self !== window.top;
 }
 
-// Initialize MSAL
+// Initialize - request data from parent instead of handling auth directly
 async function initJobPickerAuth() {
-  if (jobPickerState.msalInstance) return true;
-  
   try {
-    if (!window.msal || !window.msal.PublicClientApplication) {
-      throw new Error('MSAL library not loaded');
+    // Request jobs data from parent page
+    if (window.parent && window.parent !== window) {
+      console.log('Requesting jobs data from parent...');
+      window.parent.postMessage({
+        type: 'REQUEST_JOBS_DATA'
+      }, '*');
+      return true;
     }
+    
+    // If not in iframe, try local auth
+    if (window.msal && window.msal.PublicClientApplication) {
+      jobPickerState.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
+      await jobPickerState.msalInstance.initialize();
 
-    jobPickerState.msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
-    await jobPickerState.msalInstance.initialize();
+      const accounts = jobPickerState.msalInstance.getAllAccounts();
+      if (!accounts.length) throw new Error('No authenticated account');
 
-    const accounts = jobPickerState.msalInstance.getAllAccounts();
-    if (!accounts.length) throw new Error('No authenticated account');
-
-    return true;
+      return true;
+    }
+    
+    throw new Error('Not in iframe and MSAL not available');
   } catch (error) {
-    console.error('Job picker auth failed:', error);
+    console.error('Job picker init failed:', error);
     return false;
   }
 }
@@ -1464,8 +1472,43 @@ function showJobPickerError(message) {
 window.addEventListener('message', function(event) {
   if (event.data.type === 'OPEN_PICKER') {
     openJobPicker(event.data.options || {});
+  } else if (event.data.type === 'JOBS_DATA_RESPONSE') {
+    // Handle jobs data from parent
+    handleJobsDataFromParent(event.data.jobs);
   }
 });
+
+// Handle jobs data received from parent
+function handleJobsDataFromParent(jobs) {
+  console.log('Received jobs data from parent:', jobs.length);
+  
+  // Process jobs similar to fetchJobsFromSharePoint
+  const allJobsWithStatus = jobs.filter(job => {
+    const rego = job.Rego || job.Registration || job['Registration Number'];
+    return rego && String(rego).trim();
+  }).map(job => {
+    const completionTime = job.CompletionTime;
+    const isOpen = !completionTime || String(completionTime).trim() === '';
+    const invoiceStr = String(job.InvoiceIdentifier || '').trim();
+    
+    return {
+      ...job,
+      parsedDate: parseJobDate(job),
+      isOpen: isOpen,
+      invoiceId: invoiceStr || 'N/A',
+      completionTime: String(completionTime || '').trim() || 'Not completed'
+    };
+  });
+  
+  console.log(`Total jobs loaded: ${allJobsWithStatus.length}`);
+  console.log(`Open jobs: ${allJobsWithStatus.filter(j => j.isOpen).length}`);
+  console.log(`Closed jobs: ${allJobsWithStatus.filter(j => !j.isOpen).length}`);
+  
+  jobPickerState.allJobs = allJobsWithStatus;
+  applyJobFilters();
+  jobPickerState.isLoading = false;
+  updateJobsDisplay();
+}
 
 // Modal click outside
 document.addEventListener('click', (event) => {

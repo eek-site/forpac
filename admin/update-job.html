@@ -172,6 +172,10 @@
         }
 
         msalInstance.setActiveAccount(accounts[0]);
+        
+        // Make MSAL instance available to iframes
+        window.msalInstance = msalInstance;
+        
         return true;
       } catch (e) {
         console.error('Auth init error:', e);
@@ -216,8 +220,84 @@
         handleJobSelected(event.data.job);
       } else if (event.data.type === 'JOB_PICKER_CLOSED') {
         closeJobPicker();
+      } else if (event.data.type === 'REQUEST_JOBS_DATA') {
+        // Handle request for jobs data from iframe
+        fetchJobsDataForPicker();
       }
     });
+
+    // Fetch jobs data for the picker iframe
+    async function fetchJobsDataForPicker() {
+      try {
+        showAlert('Loading jobs data...', 'info');
+        
+        // Use the same SharePoint fetching logic as other pages
+        const SPO_HOST = 'roadandrescue.sharepoint.com';
+        const SPO_SITE_PATH = '/sites/rar';
+        const SPO_LIST_TITLE = 'Forman Pacific Consolidated';
+        
+        const token = await getGraphToken();
+        
+        // Get site
+        const siteUrl = `https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:${SPO_SITE_PATH}`;
+        const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
+        const site = await siteResponse.json();
+        
+        // Get list
+        const listNameOData = SPO_LIST_TITLE.replace(/'/g, "''");
+        const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
+        const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
+        const listsData = await listsResponse.json();
+        const listId = listsData.value[0].id;
+        
+        // Get items
+        let allItems = [];
+        let nextLink = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listId}/items?$expand=fields&$top=999`;
+        
+        while (nextLink) {
+          const response = await fetch(nextLink, { headers: { Authorization: `Bearer ${token}` }});
+          const data = await response.json();
+          
+          if (data.value) {
+            allItems = allItems.concat(data.value);
+          }
+          
+          nextLink = data['@odata.nextLink'] || null;
+        }
+        
+        const jobs = allItems.map(item => item.fields);
+        
+        // Send jobs data to iframe
+        const iframe = document.getElementById('jobPickerFrame');
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({
+            type: 'JOBS_DATA_RESPONSE',
+            jobs: jobs
+          }, '*');
+        }
+        
+        showAlert('Jobs data loaded successfully', 'success');
+      } catch (error) {
+        console.error('Failed to fetch jobs data:', error);
+        showAlert('Failed to load jobs data: ' + error.message, 'error');
+      }
+    }
+
+    // Get Graph API token
+    async function getGraphToken() {
+      const account = msalInstance.getActiveAccount() || msalInstance.getAllAccounts()[0];
+      if (!account) throw new Error('No signed-in account');
+
+      const request = { scopes: GRAPH_SCOPES, account };
+      try {
+        const { accessToken } = await msalInstance.acquireTokenSilent(request);
+        return accessToken;
+      } catch (err) {
+        console.warn('Silent token failed; attempting interactive', err);
+        const resp = await msalInstance.acquireTokenPopup({ scopes: GRAPH_SCOPES });
+        return resp?.accessToken || '';
+      }
+    }
 
     function displayJobDetails(job) {
       const container = document.getElementById('jobInfo');
