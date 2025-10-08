@@ -106,7 +106,7 @@
     body.touch-device .mobile-menu-toggle{display:block;}
     .mobile-nav-overlay.active{display:block;}
 
-    /* Small Screen Overrides */
+    /* Mobile-First Responsive Design */
     @media (max-width: 768px) {
       .after-hours-banner p{font-size:0.8em;line-height:1.4;}
       .after-hours-banner h3{font-size:1.1em;}
@@ -114,10 +114,66 @@
       .logo{width:36px;height:36px;font-size:18px;}
       .company-name{font-size:1.2em;}
       .tagline{display:none;}
+      
+      /* Hero section mobile improvements */
+      .hero{padding:20px 15px;margin:20px auto;border-radius:16px;}
+      .hero-inner{gap:24px;}
+      .hero-left h1{font-size:2rem;margin:8px 0 12px;}
+      .subtitle{font-size:1.1rem;line-height:1.5;}
+      .cta-row{flex-direction:column;gap:12px;margin:18px 0 6px;}
+      .btn-primary,.btn-secondary{width:100%;justify-content:center;padding:14px 18px;font-size:16px;}
+      .kpis{flex-direction:column;gap:12px;margin:16px 0 0;}
+      .kpis li{min-width:auto;text-align:center;}
+      .trustbar{flex-direction:column;gap:8px;text-align:center;}
+      .trustbar ul{justify-content:center;}
+      
+      /* Services section mobile */
+      .services-section{padding:0 15px;margin:30px auto;}
+      .services-grid{grid-template-columns:1fr;gap:20px;}
+      .service-card{padding:20px;}
+      
+      /* Stats section mobile */
+      .stats-section{padding:40px 15px;margin:30px 0;}
+      .stats-container{grid-template-columns:repeat(2,1fr);gap:30px;}
+      .stat-item h3{font-size:2.5em;}
+      
+      /* Resources section mobile */
+      .resources-section{padding:40px 15px;margin:30px auto;border-radius:16px;}
+      .resources-section h2{font-size:1.8em;margin-bottom:30px;}
+      .resources-grid{grid-template-columns:1fr;gap:15px;}
+      .resource-card{padding:20px;}
+      
+      /* Footer mobile */
+      .footer{padding:30px 15px 15px;margin-top:40px;}
+      .footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:20px;}
+      .footer-section{text-align:center;}
+      
+      /* Show sticky FAB on mobile */
+      .sticky-fab{display:block;}
     }
+    
     @media (max-width: 480px) {
       .company-name{font-size:1.1em;}
       .logo-section{gap:10px;}
+      .header-content{padding:10px 12px;}
+      
+      /* Extra small mobile adjustments */
+      .hero{padding:15px 12px;margin:15px auto;}
+      .hero-left h1{font-size:1.8rem;}
+      .subtitle{font-size:1rem;}
+      .btn-primary,.btn-secondary{padding:16px 18px;font-size:16px;}
+      .service-card{padding:15px;}
+      .stats-container{grid-template-columns:1fr;gap:20px;}
+      .stat-item h3{font-size:2em;}
+      .resources-section{padding:30px 12px;}
+      .footer{padding:25px 12px 12px;}
+    }
+    
+    /* Touch device optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .btn-primary,.btn-secondary,.phone-button{min-height:44px;}
+      .nav-link,.mobile-nav-links a{min-height:44px;display:flex;align-items:center;}
+      .mobile-menu-toggle{min-height:44px;min-width:44px;}
     }
 
     /* Hero */
