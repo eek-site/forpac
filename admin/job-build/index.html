@@ -502,7 +502,7 @@
     // Configuration
     const SPO_HOST = 'roadandrescue.sharepoint.com';
     const SPO_SITE_PATH = '/sites/rar';
-    const SPO_LIST_TITLE = 'BookAJobMaster';
+    const SPO_LIST_TITLE = 'Forman Pacific Consolidated';
 
     const MSAL_CONFIG = {
       auth: {
@@ -954,7 +954,7 @@
 
       const result = await response.json();
 
-      // Log to JobBuildNotes activity log
+      // Log to Job Build activity log
       await logActivity(site.id, token, {
         JobIDRego: currentClient === 'eek' ? data.Rego : data.InvoiceIdentifier,
         TypeText: `${data.Type} Job Created`,
@@ -970,9 +970,9 @@
 
     async function logActivity(siteId, token, activityData) {
       try {
-        // Find JobBuildNotes list
+        // Find Job Build list
         const activityLists = await fetchJson(
-          `https://graph.microsoft.com/v1.0/sites/${siteId}/lists?$filter=displayName eq 'JobBuildNotes'`,
+          `https://graph.microsoft.com/v1.0/sites/${siteId}/lists?$filter=displayName eq 'Job Build'`,
           token
         );
 

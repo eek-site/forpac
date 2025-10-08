@@ -272,8 +272,10 @@ const FP_DATA_SCHEMA = {
 // ===== FIELD MAPPING UTILITIES =====
 const FP_FIELD_MAPPINGS = {
   // Map SharePoint field names to standard field names
+  // Updated for new list names: "Forman Pacific Consolidated" and "Job Build"
   sharepoint: {
     jobs: {
+      // Forman Pacific Consolidated list fields
       'ID': 'id',
       'Title': 'title',
       'Status': 'status',
@@ -295,6 +297,7 @@ const FP_FIELD_MAPPINGS = {
       'Notes': 'notes'
     },
     activities: {
+      // Job Build list fields
       'ID': 'id',
       'JobID': 'jobId',
       'JobReference': 'jobId',

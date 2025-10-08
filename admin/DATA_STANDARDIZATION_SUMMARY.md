@@ -19,6 +19,7 @@ This document summarizes the data standardization implementation across the Form
 ## Data Schema Structure
 
 ### Jobs Schema (`FP_DATA.SCHEMA.jobs`)
+**Source**: Forman Pacific Consolidated SharePoint List
 - **id**: Job ID (number, required)
 - **title**: Job title (string, required)
 - **status**: Job status (choice: Open, In Progress, Completed, Cancelled, Blocked)
@@ -40,6 +41,7 @@ This document summarizes the data standardization implementation across the Form
 - **notes**: Additional notes (text, optional)
 
 ### Activities Schema (`FP_DATA.SCHEMA.activities`)
+**Source**: Job Build SharePoint List
 - **id**: Activity ID (number, required)
 - **jobId**: Associated job ID (number, required)
 - **type**: Activity type (choice: Update, Call, Email, Assignment, Follow-up, Onsite, Resolution)
