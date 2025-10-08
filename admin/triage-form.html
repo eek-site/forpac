@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Triage Form - FP Service Management</title>
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
+<!-- Standardized Data Schema -->
+<script src="/assets/js/fp-data-schema.js"></script>
+
+<!-- Standardized Admin Styles -->
+<link rel="stylesheet" href="/assets/css/fp-admin-styles.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
@@ -452,18 +458,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script>
 let msalInstance = null;
 let currentStep = 1;
-let formData = {
-    emergencyType: '',
-    callerName: '',
-    mobileNumber: '',
-    connectionType: '',
-    vehicleRego: '',
-    emailAddress: '',
-    contactNumber: '',
-    consent: '',
-    dncPhone: '',
-    dncReason: ''
-};
+// Initialize form data using standardized schema
+let formData = FP_DATA.TRANSFORMERS.applyDefaults({}, FP_DATA.SCHEMA.triage);
 
 const msalConfig = {
   auth: {
@@ -570,10 +566,20 @@ function validateAndNext() {
   const name = document.getElementById('callerName').value.trim();
   const mobile = document.getElementById('mobileNumber').value.trim();
   
+  // Update form data for validation
+  formData.callerName = name;
+  formData.mobileNumber = mobile;
+  
+  // Use standardized validation
+  const nameValidation = FP_DATA.VALIDATION.validateField('callerName', name, FP_DATA.SCHEMA.triage);
+  const mobileValidation = FP_DATA.VALIDATION.validateField('mobileNumber', mobile, FP_DATA.SCHEMA.triage);
+  
   let isValid = true;
   
-  if (!name) {
+  // Validate caller name
+  if (!nameValidation.valid) {
     document.getElementById('callerName').classList.add('error');
+    document.getElementById('callerNameError').textContent = nameValidation.message;
     document.getElementById('callerNameError').classList.add('show');
     isValid = false;
   } else {
@@ -581,8 +587,10 @@ function validateAndNext() {
     document.getElementById('callerNameError').classList.remove('show');
   }
   
-  if (!mobile || !/^\d{7,}$/.test(mobile.replace(/[\s\-()]/g, ''))) {
+  // Validate mobile number
+  if (!mobileValidation.valid) {
     document.getElementById('mobileNumber').classList.add('error');
+    document.getElementById('mobileNumberError').textContent = mobileValidation.message;
     document.getElementById('mobileNumberError').classList.add('show');
     isValid = false;
   } else {
@@ -591,8 +599,6 @@ function validateAndNext() {
   }
   
   if (isValid) {
-    formData.callerName = name;
-    formData.mobileNumber = mobile;
     showStep(3);
   }
 }
@@ -607,13 +613,14 @@ async function confirmAndComplete() {
   showLoading();
   
   try {
+    // Apply defaults and ensure all required fields are present
+    const submissionData = FP_DATA.TRANSFORMERS.applyDefaults(formData, FP_DATA.SCHEMA.triage);
+    submissionData.submittedBy = msalInstance.getActiveAccount()?.username || 'Unknown';
+    submissionData.submittedAt = new Date().toISOString();
+    
     await submitToFlow({
       action: 'TriageBooking',
-      emergencyType: formData.emergencyType || '',
-      callerName: formData.callerName || '',
-      mobileNumber: formData.mobileNumber || '',
-      submittedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
-      submittedAt: new Date().toISOString()
+      ...submissionData
     });
     
     hideLoading();

@@ -12,6 +12,12 @@
 
   <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
+  
+  <!-- Standardized Data Schema -->
+  <script src="/assets/js/fp-data-schema.js"></script>
+  
+  <!-- Standardized Admin Styles -->
+  <link rel="stylesheet" href="/assets/css/fp-admin-styles.css">
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -398,12 +404,20 @@
       try{
         showToast('Loading data from SharePoint...', 'info');
         const rows = await fetchSharePointRows();
-        state.allJobsData = rows;
-        state.filteredData = [...rows];
+        
+        // Transform SharePoint data to standardized format
+        const transformedRows = rows.map(item => {
+          const transformed = FP_DATA.TRANSFORMERS.fromSharePoint(item, 'jobs');
+          const withDefaults = FP_DATA.TRANSFORMERS.applyDefaults(transformed, FP_DATA.SCHEMA.jobs);
+          return { ...withDefaults, ...item }; // Keep original fields for compatibility
+        });
+        
+        state.allJobsData = transformedRows;
+        state.filteredData = [...transformedRows];
         generateTableHeaders();
         updateStatistics();
         renderTable();
-        showToast(`Loaded ${rows.length} rows.`, 'success');
+        showToast(`Loaded ${transformedRows.length} rows.`, 'success');
       }catch(err){
         console.error('Failed to load SharePoint data', err);
         const msg = /403/.test(String(err)) ? 'Access denied. Ask admin to grant "Sites.Read.All".' : 'Failed to load SharePoint data.';
@@ -452,11 +466,27 @@
           const td = document.createElement('td');
           const val = rec[k];
 
+          // Use standardized formatting based on field type
           if (/status/i.test(k)){
-            const v = String(val ?? '').toLowerCase() || '-';
-            td.innerHTML = `<span class="status-badge status-${v}">${val ?? '-'}</span>`;
+            td.innerHTML = FP_DATA.FORMATTERS.statusBadge(val || 'Unknown');
+          } else if (/priority/i.test(k)){
+            td.innerHTML = FP_DATA.FORMATTERS.statusBadge(val || 'Unknown', 'priority');
           } else if (/price|amount|total|cost|value/i.test(k) && !isNaN(Number(val))){
-            td.innerHTML = `<strong>$${Number(val).toLocaleString()}</strong>`;
+            td.innerHTML = `<span class="fp-currency">${FP_DATA.FORMATTERS.currency(val)}</span>`;
+          } else if (/date|time/i.test(k) && val){
+            td.innerHTML = `<span class="fp-datetime">${FP_DATA.FORMATTERS.datetime(val)}</span>`;
+          } else if (/phone/i.test(k) && val){
+            td.innerHTML = `<span class="fp-phone">${FP_DATA.FORMATTERS.phone(val)}</span>`;
+          } else if (/email/i.test(k) && val){
+            td.innerHTML = `<a href="mailto:${val}" class="fp-email">${val}</a>`;
+          } else if (/id/i.test(k) && val){
+            td.innerHTML = `<span class="fp-job-id">${val}</span>`;
+          } else if (/rego|registration/i.test(k) && val){
+            td.innerHTML = `<span class="fp-vehicle-rego">${val}</span>`;
+          } else if (/location/i.test(k) && val){
+            td.innerHTML = `<span class="fp-location">${val}</span>`;
+          } else if (/user|by/i.test(k) && val){
+            td.innerHTML = `<span class="fp-user">${val}</span>`;
           } else {
             td.textContent = (val ?? '').toString();
           }
@@ -618,13 +648,31 @@
         label.textContent = humanizeHeader(k);
         const value = document.createElement('div');
         value.className='detail-value';
+        const val = record[k];
+        
+        // Use standardized formatting based on field type
         if (/status/i.test(k)){
-          const v = String(record[k]??'').toLowerCase();
-          value.innerHTML = `<span class="status-badge status-${v}">${record[k]??'-'}</span>`;
-        }else if (/price|amount|total|cost|value/i.test(k) && !isNaN(Number(record[k]))){
-          value.innerHTML = `<strong>$${Number(record[k]).toLocaleString()}</strong>`;
-        }else{
-          value.textContent = record[k] ?? '-';
+          value.innerHTML = FP_DATA.FORMATTERS.statusBadge(val || 'Unknown');
+        } else if (/priority/i.test(k)){
+          value.innerHTML = FP_DATA.FORMATTERS.statusBadge(val || 'Unknown', 'priority');
+        } else if (/price|amount|total|cost|value/i.test(k) && !isNaN(Number(val))){
+          value.innerHTML = `<span class="fp-currency">${FP_DATA.FORMATTERS.currency(val)}</span>`;
+        } else if (/date|time/i.test(k) && val){
+          value.innerHTML = `<span class="fp-datetime">${FP_DATA.FORMATTERS.datetime(val)}</span>`;
+        } else if (/phone/i.test(k) && val){
+          value.innerHTML = `<span class="fp-phone">${FP_DATA.FORMATTERS.phone(val)}</span>`;
+        } else if (/email/i.test(k) && val){
+          value.innerHTML = `<a href="mailto:${val}" class="fp-email">${val}</a>`;
+        } else if (/id/i.test(k) && val){
+          value.innerHTML = `<span class="fp-job-id">${val}</span>`;
+        } else if (/rego|registration/i.test(k) && val){
+          value.innerHTML = `<span class="fp-vehicle-rego">${val}</span>`;
+        } else if (/location/i.test(k) && val){
+          value.innerHTML = `<span class="fp-location">${val}</span>`;
+        } else if (/user|by/i.test(k) && val){
+          value.innerHTML = `<span class="fp-user">${val}</span>`;
+        } else {
+          value.textContent = val ?? '-';
         }
         details.appendChild(label); details.appendChild(value);
       });

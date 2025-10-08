@@ -11,6 +11,12 @@
 
   <!-- Command Menu -->
   <script src="/assets/js/fp-menu-loader.js"></script>
+  
+  <!-- Standardized Data Schema -->
+  <script src="/assets/js/fp-data-schema.js"></script>
+  
+  <!-- Standardized Admin Styles -->
+  <link rel="stylesheet" href="/assets/css/fp-admin-styles.css">
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -215,56 +221,7 @@
             <a href="/admin/jobs-master" class="view-all">View All →</a>
           </div>
           <ul class="job-list" id="activeJobsList">
-            <li class="job-item urgent insurance">
-              <div class="job-info">
-                <h3>Water Damage - Commercial Property</h3>
-                <p>📍 Auckland CBD - Tower Insurance</p>
-              </div>
-              <div class="job-status">
-                <span class="status-badge status-in-progress">In Progress</span>
-                <span class="response-time">Response: 28 min</span>
-              </div>
-            </li>
-            <li class="job-item insurance">
-              <div class="job-info">
-                <h3>Vehicle Breakdown - Mechanical</h3>
-                <p>📍 Wellington - AA Insurance</p>
-              </div>
-              <div class="job-status">
-                <span class="status-badge status-assigned">Assigned</span>
-                <span class="response-time">ETA: 15 min</span>
-              </div>
-            </li>
-            <li class="job-item corporate">
-              <div class="job-info">
-                <h3>HVAC Emergency - Office Building</h3>
-                <p>📍 Christchurch - Corporate Direct</p>
-              </div>
-              <div class="job-status">
-                <span class="status-badge status-pending">Pending</span>
-                <span class="response-time">Queue: #3</span>
-              </div>
-            </li>
-            <li class="job-item insurance">
-              <div class="job-info">
-                <h3>Tree Removal - Storm Damage</h3>
-                <p>📍 Hamilton - State Insurance</p>
-              </div>
-              <div class="job-status">
-                <span class="status-badge status-complete">Complete</span>
-                <span class="response-time">Resolved: 45 min</span>
-              </div>
-            </li>
-            <li class="job-item corporate">
-              <div class="job-info">
-                <h3>Electrical Fault - Retail Store</h3>
-                <p>📍 Tauranga - Corporate Client</p>
-              </div>
-              <div class="job-status">
-                <span class="status-badge status-assigned">Assigned</span>
-                <span class="response-time">ETA: 20 min</span>
-              </div>
-            </li>
+            <!-- Jobs will be populated dynamically using standardized data -->
           </ul>
         </div>
 
@@ -321,6 +278,85 @@
     // Keep msalInstance in outer scope for logout()
     let msalInstance = null;
     let statsTimer = null;
+    
+    // Standardized sample data using FP_DATA schema
+    const sampleJobs = [
+      {
+        id: 1001,
+        title: "Water Damage - Commercial Property",
+        status: "In Progress",
+        priority: "High",
+        customer: "Tower Insurance",
+        customerPhone: "(09) 123-4567",
+        location: "Auckland CBD",
+        vehicleRego: "ABC123",
+        jobType: "Mechanic",
+        createdDate: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+        createdBy: "admin@formanpacific.com",
+        cost: 450.00,
+        description: "Water damage assessment and repair for commercial property"
+      },
+      {
+        id: 1002,
+        title: "Vehicle Breakdown - Mechanical",
+        status: "Open",
+        priority: "Medium",
+        customer: "AA Insurance",
+        customerPhone: "(04) 234-5678",
+        location: "Wellington",
+        vehicleRego: "XYZ789",
+        jobType: "Mechanic",
+        createdDate: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        createdBy: "admin@formanpacific.com",
+        cost: 320.00,
+        description: "Vehicle breakdown requiring mechanical repair"
+      },
+      {
+        id: 1003,
+        title: "HVAC Emergency - Office Building",
+        status: "Open",
+        priority: "Medium",
+        customer: "Corporate Direct",
+        customerPhone: "(03) 345-6789",
+        location: "Christchurch",
+        vehicleRego: "",
+        jobType: "Non Emergency",
+        createdDate: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+        createdBy: "admin@formanpacific.com",
+        cost: 280.00,
+        description: "HVAC system emergency repair"
+      },
+      {
+        id: 1004,
+        title: "Tree Removal - Storm Damage",
+        status: "Completed",
+        priority: "High",
+        customer: "State Insurance",
+        customerPhone: "(07) 456-7890",
+        location: "Hamilton",
+        vehicleRego: "",
+        jobType: "Non Emergency",
+        createdDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        createdBy: "admin@formanpacific.com",
+        cost: 650.00,
+        description: "Tree removal due to storm damage"
+      },
+      {
+        id: 1005,
+        title: "Electrical Fault - Retail Store",
+        status: "Open",
+        priority: "Medium",
+        customer: "Corporate Client",
+        customerPhone: "(07) 567-8901",
+        location: "Tauranga",
+        vehicleRego: "",
+        jobType: "Non Emergency",
+        createdDate: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+        createdBy: "admin@formanpacific.com",
+        cost: 380.00,
+        description: "Electrical fault repair in retail store"
+      }
+    ];
 
     const msalConfig = {
       auth: {
@@ -351,9 +387,170 @@
       document.getElementById('loadingScreen').classList.add('authenticated');
       document.getElementById('dashboardContainer').classList.add('authenticated');
 
+      // Populate dashboard with standardized data
+      populateActiveJobs();
+      updateStatistics();
+
       if (!statsTimer){
         statsTimer = setInterval(updateStats, 10000);
       }
+    }
+    
+    // Populate active jobs using standardized data
+    function populateActiveJobs() {
+      const jobsList = document.getElementById('activeJobsList');
+      if (!jobsList) return;
+      
+      jobsList.innerHTML = '';
+      
+      // Filter to show only active jobs (not completed)
+      const activeJobs = sampleJobs.filter(job => job.status !== 'Completed');
+      
+      activeJobs.forEach(job => {
+        const jobItem = createJobListItem(job);
+        jobsList.appendChild(jobItem);
+      });
+    }
+    
+    // Create a job list item using standardized data
+    function createJobListItem(job) {
+      const li = document.createElement('li');
+      
+      // Determine CSS classes based on priority and status
+      const priorityClass = job.priority.toLowerCase().replace(' ', '-');
+      const statusClass = job.status.toLowerCase().replace(' ', '-');
+      
+      li.className = `job-item ${priorityClass} ${statusClass}`;
+      
+      // Calculate response time
+      const createdDate = new Date(job.createdDate);
+      const now = new Date();
+      const diffMinutes = Math.floor((now - createdDate) / (1000 * 60));
+      const responseTime = diffMinutes < 60 ? `${diffMinutes} min` : `${Math.floor(diffMinutes / 60)}h ${diffMinutes % 60}m`;
+      
+      // Format location with icon
+      const locationText = job.location ? `📍 ${job.location}` : '';
+      
+      // Format cost
+      const costText = job.cost ? FP_DATA.FORMATTERS.currency(job.cost) : '';
+      
+      // Create job info
+      const jobInfo = document.createElement('div');
+      jobInfo.className = 'job-info';
+      jobInfo.innerHTML = `
+        <h3>${job.title}</h3>
+        <p>${locationText} - ${job.customer}</p>
+        ${job.vehicleRego ? `<p class="fp-vehicle-rego">${job.vehicleRego}</p>` : ''}
+        ${costText ? `<p class="fp-currency">${costText}</p>` : ''}
+      `;
+      
+      // Create job status
+      const jobStatus = document.createElement('div');
+      jobStatus.className = 'job-status';
+      
+      // Use standardized status badge
+      const statusBadge = FP_DATA.FORMATTERS.statusBadge(job.status);
+      const priorityBadge = job.priority ? FP_DATA.FORMATTERS.statusBadge(job.priority, 'priority') : '';
+      
+      jobStatus.innerHTML = `
+        ${statusBadge}
+        ${priorityBadge}
+        <span class="response-time">Response: ${responseTime}</span>
+      `;
+      
+      li.appendChild(jobInfo);
+      li.appendChild(jobStatus);
+      
+      // Add click handler
+      li.addEventListener('click', () => {
+        showJobDetails(job);
+      });
+      
+      return li;
+    }
+    
+    // Show job details modal
+    function showJobDetails(job) {
+      // Create a simple modal for job details
+      const modal = document.createElement('div');
+      modal.className = 'job-details-modal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      `;
+      
+      const modalContent = document.createElement('div');
+      modalContent.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      `;
+      
+      modalContent.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Job Details</h2>
+          <button onclick="this.closest('.job-details-modal').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+        </div>
+        <div class="job-details-content">
+          <h3>${job.title}</h3>
+          <p><strong>Job ID:</strong> <span class="fp-job-id">${job.id}</span></p>
+          <p><strong>Status:</strong> ${FP_DATA.FORMATTERS.statusBadge(job.status)}</p>
+          <p><strong>Priority:</strong> ${FP_DATA.FORMATTERS.statusBadge(job.priority, 'priority')}</p>
+          <p><strong>Customer:</strong> ${job.customer}</p>
+          <p><strong>Phone:</strong> <span class="fp-phone">${job.customerPhone}</span></p>
+          <p><strong>Location:</strong> <span class="fp-location">${job.location}</span></p>
+          ${job.vehicleRego ? `<p><strong>Vehicle:</strong> <span class="fp-vehicle-rego">${job.vehicleRego}</span></p>` : ''}
+          <p><strong>Job Type:</strong> ${job.jobType}</p>
+          <p><strong>Cost:</strong> <span class="fp-currency">${FP_DATA.FORMATTERS.currency(job.cost)}</span></p>
+          <p><strong>Created:</strong> <span class="fp-datetime">${FP_DATA.FORMATTERS.datetime(job.createdDate)}</span></p>
+          <p><strong>Created By:</strong> <span class="fp-user">${job.createdBy}</span></p>
+          ${job.description ? `<p><strong>Description:</strong> ${job.description}</p>` : ''}
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+          <button onclick="this.closest('.job-details-modal').remove()" style="padding: 10px 20px; background: #1e3c72; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+        </div>
+      `;
+      
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+      
+      // Close on background click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      });
+    }
+    
+    // Update statistics using standardized data
+    function updateStatistics() {
+      const emergencyJobs = sampleJobs.filter(job => job.priority === 'Emergency' || job.priority === 'High').length;
+      const totalJobs = sampleJobs.length;
+      const completedJobs = sampleJobs.filter(job => job.status === 'Completed').length;
+      const totalCost = sampleJobs.reduce((sum, job) => sum + (job.cost || 0), 0);
+      
+      // Update the stat cards
+      const emergencyEl = document.getElementById('emergencyJobs');
+      const claimsEl = document.getElementById('claimsProcessing');
+      const suppliersEl = document.getElementById('activeSuppliers');
+      const responseEl = document.getElementById('avgResponseTime');
+      
+      if (emergencyEl) emergencyEl.textContent = emergencyJobs;
+      if (claimsEl) claimsEl.textContent = totalJobs;
+      if (suppliersEl) suppliersEl.textContent = '523'; // Keep existing supplier count
+      if (responseEl) responseEl.textContent = '32m'; // Keep existing response time
     }
 
     function showUnauthorized(){
