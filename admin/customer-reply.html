@@ -95,11 +95,11 @@
         <div id="alertContainer"></div>
         
         <div class="form-group">
-          <label class="form-label" for="vehicleRego">Vehicle Registration *</label>
-          <input type="text" id="vehicleRego" class="form-input" placeholder="Enter vehicle registration" required>
+          <label class="form-label">Select Job Registration</label>
+          <p style="color: #64748b; margin-bottom: 16px;">Click the button below to select a job from the available jobs list.</p>
         </div>
 
-        <button class="btn-submit" onclick="loadJobDetails()">Load Job Details</button>
+        <button class="btn-submit" onclick="openJobPicker()">Select Job Registration</button>
       </div>
 
       <div id="jobDetails" class="job-details">
@@ -117,6 +117,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Job Picker Modal -->
+  <iframe id="jobPickerFrame" src="/admin/job-picker-modal.html" style="display: none; position: fixed; inset: 0; z-index: 10000; border: none; background: rgba(0,0,0,0.6);"></iframe>
 
   <script>
     let msalInstance = null;
@@ -173,70 +176,67 @@
       setTimeout(() => alert.remove(), 5000);
     }
 
-    async function loadJobDetails() {
-      const rego = document.getElementById('vehicleRego').value.trim();
-      if (!rego) {
-        showAlert('Please enter a vehicle registration', 'error');
-        return;
-      }
-
-      try {
-        showAlert('Loading job details...', 'info');
-        
-        // Simulate job loading - replace with actual SharePoint lookup
-        const mockJob = {
-          id: 1001,
-          title: "Vehicle Service",
-          status: "In Progress",
-          priority: "Medium",
-          customer: "John Doe",
-          customerPhone: "(09) 123-4567",
-          customerEmail: "john.doe@email.com",
-          location: "Auckland CBD",
-          vehicleRego: rego,
-          jobType: "Mechanic",
-          supplier: "Auckland Auto Services",
-          createdDate: new Date().toISOString(),
-          cost: 450.00,
-          description: "Regular vehicle service"
-        };
-
-        currentJob = mockJob;
-        displayJobDetails(mockJob);
-        document.getElementById('jobDetails').classList.add('show');
-        
-        showAlert('Job details loaded successfully', 'success');
-      } catch (error) {
-        showAlert('Failed to load job details: ' + error.message, 'error');
-      }
+    function openJobPicker() {
+      const iframe = document.getElementById('jobPickerFrame');
+      iframe.style.display = 'block';
+      iframe.contentWindow.postMessage({
+        type: 'OPEN_PICKER',
+        options: { filterPPI: false }
+      }, '*');
     }
+
+    function closeJobPicker() {
+      const iframe = document.getElementById('jobPickerFrame');
+      iframe.style.display = 'none';
+    }
+
+    function handleJobSelected(jobData) {
+      currentJob = jobData;
+      displayJobDetails(jobData);
+      document.getElementById('jobDetails').classList.add('show');
+      showAlert('Job details loaded successfully', 'success');
+      closeJobPicker();
+    }
+
+    // Listen for messages from job picker
+    window.addEventListener('message', function(event) {
+      if (event.data.type === 'JOB_SELECTED') {
+        handleJobSelected(event.data.job);
+      } else if (event.data.type === 'JOB_PICKER_CLOSED') {
+        closeJobPicker();
+      }
+    });
 
     function displayJobDetails(job) {
       const container = document.getElementById('jobInfo');
       container.innerHTML = `
         <div class="detail-item">
           <div class="detail-label">Job ID</div>
-          <div class="detail-value fp-job-id">${job.id}</div>
+          <div class="detail-value fp-job-id">${job.Id || 'N/A'}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Registration</div>
+          <div class="detail-value fp-vehicle-rego">${job.Rego || 'N/A'}</div>
         </div>
         <div class="detail-item">
           <div class="detail-label">Customer</div>
-          <div class="detail-value fp-user">${job.customer}</div>
+          <div class="detail-value fp-user">${job.CustomerName || 'N/A'}</div>
         </div>
         <div class="detail-item">
           <div class="detail-label">Phone</div>
-          <div class="detail-value fp-phone">${job.customerPhone}</div>
+          <div class="detail-value fp-phone">${job.CallerPhone || job.CustomerPhone || 'N/A'}</div>
         </div>
         <div class="detail-item">
           <div class="detail-label">Email</div>
-          <div class="detail-value fp-email">${job.customerEmail}</div>
+          <div class="detail-value fp-email">${job.Email || 'N/A'}</div>
         </div>
         <div class="detail-item">
-          <div class="detail-label">Vehicle</div>
-          <div class="detail-value fp-vehicle-rego">${job.vehicleRego}</div>
+          <div class="detail-label">Service Type</div>
+          <div class="detail-value">${job.ServiceType || 'N/A'}</div>
         </div>
         <div class="detail-item">
           <div class="detail-label">Status</div>
-          <div class="detail-value">${FP_DATA.FORMATTERS.statusBadge(job.status)}</div>
+          <div class="detail-value">${job.JobStatus || job.Status || 'N/A'}</div>
         </div>
       `;
     }
@@ -262,11 +262,11 @@
           commandNumber: 7,
           formType: 'CustomerReply',
           data: {
-            jobId: currentJob.id,
-            vehicleRego: currentJob.vehicleRego,
-            customerName: currentJob.customer,
-            customerPhone: currentJob.customerPhone,
-            customerEmail: currentJob.customerEmail,
+            jobId: currentJob.Id,
+            vehicleRego: currentJob.Rego,
+            customerName: currentJob.CustomerName,
+            customerPhone: currentJob.CallerPhone || currentJob.CustomerPhone,
+            customerEmail: currentJob.Email,
             replyMessage: replyMessage,
             sentBy: msalInstance.getActiveAccount()?.username || 'Unknown',
             sentAt: new Date().toISOString()
