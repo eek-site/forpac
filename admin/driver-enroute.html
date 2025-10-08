@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver En Route | FormanPacific Service Management</title>
+  <meta name="description" content="Update driver status to en route">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- MSAL -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+  
+  <!-- Standardized Data Schema -->
+  <script src="/assets/js/fp-data-schema.js"></script>
+  
+  <!-- Standardized Admin Styles -->
+  <link rel="stylesheet" href="/assets/css/fp-admin-styles.css">
+  
+  <!-- Command Menu -->
+  <script src="/assets/js/fp-menu-loader.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
+
+    .loading { position: fixed; inset: 0; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+    .loading.authenticated { display: none; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #1e3c72; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #718096; font-size: 14px; }
+
+    .page-container { display: none; min-height: 100vh; }
+    .page-container.authenticated { display: block; }
+
+    .header { background: #1e3c72; color: white; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 24px; font-weight: bold; }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+    .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card-title { font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #1f2937; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; }
+    .form-input { width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; }
+    .form-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1); }
+
+    .job-details { display: none; }
+    .job-details.show { display: block; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    .detail-item { padding: 15px; background: #f9fafb; border-radius: 8px; }
+    .detail-label { font-weight: 600; color: #374151; margin-bottom: 5px; }
+    .detail-value { color: #6b7280; }
+
+    .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .alert-success { background: #d1fae5; border: 1px solid #10b981; color: #065f46; }
+    .alert-error { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; }
+    .alert-info { background: #dbeafe; border: 1px solid #3b82f6; color: #1e40af; }
+
+    .btn-submit { background: #1e3c72; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    .btn-submit:hover { background: #152a52; }
+    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-en-route { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading...</div>
+  </div>
+
+  <!-- Main Page -->
+  <div id="pageContainer" class="page-container">
+    <div class="header">
+      <div class="header-content">
+        <div class="logo">FP</div>
+        <h1>Driver En Route</h1>
+        <div class="user-info">
+          <span id="userName">Loading...</span>
+          <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="card">
+        <h2 class="card-title">Update Driver Status to En Route</h2>
+        
+        <div id="alertContainer"></div>
+        
+        <div class="form-group">
+          <label class="form-label" for="vehicleRego">Vehicle Registration *</label>
+          <input type="text" id="vehicleRego" class="form-input" placeholder="Enter vehicle registration" required>
+        </div>
+
+        <button class="btn-submit" onclick="loadJobDetails()">Load Job Details</button>
+      </div>
+
+      <div id="jobDetails" class="job-details">
+        <div class="card">
+          <h2 class="card-title">Job Information</h2>
+          <div id="jobInfo" class="detail-grid"></div>
+          
+          <div class="form-group">
+            <label class="form-label" for="driverName">Driver Name *</label>
+            <input type="text" id="driverName" class="form-input" placeholder="Enter driver name" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="estimatedArrival">Estimated Arrival Time</label>
+            <input type="datetime-local" id="estimatedArrival" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="enRouteNotes">En Route Notes</label>
+            <textarea id="enRouteNotes" class="form-input" rows="3" placeholder="Enter any notes about the journey..."></textarea>
+          </div>
+
+          <button class="btn-submit" onclick="updateDriverStatus()">Mark Driver En Route</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let msalInstance = null;
+    let currentJob = null;
+
+    const msalConfig = {
+      auth: {
+        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+        redirectUri: window.location.origin + '/admin'
+      },
+      cache: { cacheLocation: 'sessionStorage' }
+    };
+
+    const GRAPH_SCOPES = ['https://graph.microsoft.com/Sites.Read.All'];
+
+    async function initAuth() {
+      try {
+        if (!window.msal || !msal.PublicClientApplication) {
+          console.error('MSAL failed to load.');
+          return false;
+        }
+
+        msalInstance = new msal.PublicClientApplication(msalConfig);
+        if (msalInstance.initialize) {
+          await msalInstance.initialize();
+        }
+
+        const redirectResponse = await msalInstance.handleRedirectPromise();
+        if (redirectResponse?.account) {
+          msalInstance.setActiveAccount(redirectResponse.account);
+        }
+
+        const accounts = msalInstance.getAllAccounts();
+        if (!accounts.length) {
+          await msalInstance.loginRedirect({ scopes: GRAPH_SCOPES });
+          return false;
+        }
+
+        msalInstance.setActiveAccount(accounts[0]);
+        return true;
+      } catch (e) {
+        console.error('Auth init error:', e);
+        return false;
+      }
+    }
+
+    function showAlert(message, type = 'info') {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    async function loadJobDetails() {
+      const rego = document.getElementById('vehicleRego').value.trim();
+      if (!rego) {
+        showAlert('Please enter a vehicle registration', 'error');
+        return;
+      }
+
+      try {
+        showAlert('Loading job details...', 'info');
+        
+        // Simulate job loading - replace with actual SharePoint lookup
+        const mockJob = {
+          id: 1001,
+          title: "Vehicle Service",
+          status: "Assigned",
+          priority: "Medium",
+          customer: "John Doe",
+          customerPhone: "(09) 123-4567",
+          location: "Auckland CBD",
+          vehicleRego: rego,
+          jobType: "Mechanic",
+          supplier: "Auckland Auto Services",
+          supplierPhone: "(09) 555-0123",
+          createdDate: new Date().toISOString(),
+          cost: 450.00,
+          description: "Regular vehicle service"
+        };
+
+        currentJob = mockJob;
+        displayJobDetails(mockJob);
+        document.getElementById('jobDetails').classList.add('show');
+        
+        showAlert('Job details loaded successfully', 'success');
+      } catch (error) {
+        showAlert('Failed to load job details: ' + error.message, 'error');
+      }
+    }
+
+    function displayJobDetails(job) {
+      const container = document.getElementById('jobInfo');
+      container.innerHTML = `
+        <div class="detail-item">
+          <div class="detail-label">Job ID</div>
+          <div class="detail-value fp-job-id">${job.id}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Title</div>
+          <div class="detail-value">${job.title}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Current Status</div>
+          <div class="detail-value">${FP_DATA.FORMATTERS.statusBadge(job.status)}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Customer</div>
+          <div class="detail-value fp-user">${job.customer}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Location</div>
+          <div class="detail-value fp-location">${job.location}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Supplier</div>
+          <div class="detail-value fp-user">${job.supplier}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Supplier Phone</div>
+          <div class="detail-value fp-phone">${job.supplierPhone}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Vehicle</div>
+          <div class="detail-value fp-vehicle-rego">${job.vehicleRego}</div>
+        </div>
+      `;
+    }
+
+    async function updateDriverStatus() {
+      const driverName = document.getElementById('driverName').value.trim();
+      const estimatedArrival = document.getElementById('estimatedArrival').value;
+      const enRouteNotes = document.getElementById('enRouteNotes').value.trim();
+
+      if (!driverName) {
+        showAlert('Please enter driver name', 'error');
+        return;
+      }
+
+      if (!currentJob) {
+        showAlert('No job loaded', 'error');
+        return;
+      }
+
+      try {
+        showAlert('Updating driver status...', 'info');
+
+        // Prepare data packet for Power Automate
+        const statusData = {
+          commandNumber: 13,
+          formType: 'DriverEnRoute',
+          data: {
+            jobId: currentJob.id,
+            vehicleRego: currentJob.vehicleRego,
+            driverName: driverName,
+            estimatedArrival: estimatedArrival || null,
+            enRouteNotes: enRouteNotes,
+            previousStatus: currentJob.status,
+            newStatus: 'En Route',
+            updatedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+            updatedAt: new Date().toISOString()
+          }
+        };
+
+        // Send to Power Automate
+        const response = await fetch('https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_ok7gvPEZKmPw9q2jiKY9Msqofd65YeMtuGfSjEqxJ4', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(statusData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Update failed: ${response.status}`);
+        }
+
+        showAlert('Driver status updated to En Route!', 'success');
+        
+        // Reset form
+        document.getElementById('driverName').value = '';
+        document.getElementById('estimatedArrival').value = '';
+        document.getElementById('enRouteNotes').value = '';
+        document.getElementById('jobDetails').classList.remove('show');
+        
+      } catch (error) {
+        showAlert('Failed to update driver status: ' + error.message, 'error');
+      }
+    }
+
+    function logout() {
+      if (msalInstance) {
+        msalInstance.logoutRedirect();
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', async function() {
+      const authenticated = await initAuth();
+      if (authenticated) {
+        document.getElementById('loadingScreen').classList.add('authenticated');
+        document.getElementById('pageContainer').classList.add('authenticated');
+        document.getElementById('userName').textContent = msalInstance.getActiveAccount()?.name || 'User';
+      } else {
+        window.location.href = '/admin';
+      }
+    });
+  </script>
+</body>
+</html>

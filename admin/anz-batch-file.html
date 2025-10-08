@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate ANZ Batch File | FormanPacific Service Management</title>
+  <meta name="description" content="Generate ANZ batch file for payments">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- MSAL -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+  
+  <!-- Standardized Data Schema -->
+  <script src="/assets/js/fp-data-schema.js"></script>
+  
+  <!-- Standardized Admin Styles -->
+  <link rel="stylesheet" href="/assets/css/fp-admin-styles.css">
+  
+  <!-- Command Menu -->
+  <script src="/assets/js/fp-menu-loader.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; min-height: 100vh; }
+
+    .loading { position: fixed; inset: 0; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+    .loading.authenticated { display: none; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #1e3c72; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #718096; font-size: 14px; }
+
+    .page-container { display: none; min-height: 100vh; }
+    .page-container.authenticated { display: block; }
+
+    .header { background: #1e3c72; color: white; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 24px; font-weight: bold; }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+    .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card-title { font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #1f2937; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; }
+    .form-input { width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; }
+    .form-input:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1); }
+
+    .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .alert-success { background: #d1fae5; border: 1px solid #10b981; color: #065f46; }
+    .alert-error { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; }
+    .alert-info { background: #dbeafe; border: 1px solid #3b82f6; color: #1e40af; }
+
+    .btn-submit { background: #1e3c72; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    .btn-submit:hover { background: #152a52; }
+    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading...</div>
+  </div>
+
+  <!-- Main Page -->
+  <div id="pageContainer" class="page-container">
+    <div class="header">
+      <div class="header-content">
+        <div class="logo">FP</div>
+        <h1>Generate ANZ Batch File</h1>
+        <div class="user-info">
+          <span id="userName">Loading...</span>
+          <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="card">
+        <h2 class="card-title">Generate ANZ Batch File</h2>
+        
+        <div id="alertContainer"></div>
+        
+        <div class="form-group">
+          <label class="form-label" for="batchDate">Batch Date *</label>
+          <input type="date" id="batchDate" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="batchDescription">Batch Description</label>
+          <input type="text" id="batchDescription" class="form-input" placeholder="Enter batch description...">
+        </div>
+
+        <button class="btn-submit" onclick="generateBatchFile()">Generate Batch File</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let msalInstance = null;
+
+    const msalConfig = {
+      auth: {
+        clientId: 'd67be044-6aaa-4d01-ada2-da0cc50d2034',
+        authority: 'https://login.microsoftonline.com/61ffc6bc-d9ce-458b-8120-d32187c3770d',
+        redirectUri: window.location.origin + '/admin'
+      },
+      cache: { cacheLocation: 'sessionStorage' }
+    };
+
+    const GRAPH_SCOPES = ['https://graph.microsoft.com/Sites.Read.All'];
+
+    async function initAuth() {
+      try {
+        if (!window.msal || !msal.PublicClientApplication) {
+          console.error('MSAL failed to load.');
+          return false;
+        }
+
+        msalInstance = new msal.PublicClientApplication(msalConfig);
+        if (msalInstance.initialize) {
+          await msalInstance.initialize();
+        }
+
+        const redirectResponse = await msalInstance.handleRedirectPromise();
+        if (redirectResponse?.account) {
+          msalInstance.setActiveAccount(redirectResponse.account);
+        }
+
+        const accounts = msalInstance.getAllAccounts();
+        if (!accounts.length) {
+          await msalInstance.loginRedirect({ scopes: GRAPH_SCOPES });
+          return false;
+        }
+
+        msalInstance.setActiveAccount(accounts[0]);
+        return true;
+      } catch (e) {
+        console.error('Auth init error:', e);
+        return false;
+      }
+    }
+
+    function showAlert(message, type = 'info') {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    async function generateBatchFile() {
+      const batchDate = document.getElementById('batchDate').value;
+      const batchDescription = document.getElementById('batchDescription').value.trim();
+
+      if (!batchDate) {
+        showAlert('Please select a batch date', 'error');
+        return;
+      }
+
+      try {
+        showAlert('Generating ANZ batch file...', 'info');
+
+        // Prepare data packet for Power Automate
+        const batchData = {
+          commandNumber: 21,
+          formType: 'GenerateANZBatchFile',
+          data: {
+            batchDate: batchDate,
+            batchDescription: batchDescription || 'ANZ Batch File',
+            generatedBy: msalInstance.getActiveAccount()?.username || 'Unknown',
+            generatedAt: new Date().toISOString()
+          }
+        };
+
+        // Send to Power Automate
+        const response = await fetch('https://default61ffc6bcd9ce458b8120d32187c377.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e1adbceb52c94e07b923228a8c05d29d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_ok7gvPEZKmPw9q2jiKY9Msqofd65YeMtuGfSjEqxJ4', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(batchData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Generation failed: ${response.status}`);
+        }
+
+        showAlert('ANZ batch file generated successfully!', 'success');
+        
+        // Reset form
+        document.getElementById('batchDate').value = '';
+        document.getElementById('batchDescription').value = '';
+        
+      } catch (error) {
+        showAlert('Failed to generate ANZ batch file: ' + error.message, 'error');
+      }
+    }
+
+    function logout() {
+      if (msalInstance) {
+        msalInstance.logoutRedirect();
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', async function() {
+      const authenticated = await initAuth();
+      if (authenticated) {
+        document.getElementById('loadingScreen').classList.add('authenticated');
+        document.getElementById('pageContainer').classList.add('authenticated');
+        document.getElementById('userName').textContent = msalInstance.getActiveAccount()?.name || 'User';
+        
+        // Set default date to today
+        document.getElementById('batchDate').value = new Date().toISOString().split('T')[0];
+      } else {
+        window.location.href = '/admin';
+      }
+    });
+  </script>
+</body>
+</html>
