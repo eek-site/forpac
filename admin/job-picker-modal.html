@@ -1424,16 +1424,15 @@ async function openJobPicker(options = {}) {
   // Clear filters
   clearAllFilters();
   
+  const modal = document.getElementById('jobPickerModal');
+  modal.classList.add('active');
+  
+  // Request jobs data from parent instead of trying to fetch directly
   const authOk = await initJobPickerAuth();
   if (!authOk) {
     alert('Authentication failed. Please sign in again.');
     return;
   }
-  
-  const modal = document.getElementById('jobPickerModal');
-  modal.classList.add('active');
-  
-  await fetchJobsFromSharePoint();
 }
 
 // Close job picker

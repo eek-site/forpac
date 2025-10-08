@@ -236,18 +236,31 @@
         const SPO_SITE_PATH = '/sites/rar';
         const SPO_LIST_TITLE = 'Forman Pacific Consolidated';
         
+        console.log('Getting Graph token...');
         const token = await getGraphToken();
+        console.log('Token obtained, fetching site...');
         
         // Get site
         const siteUrl = `https://graph.microsoft.com/v1.0/sites/${SPO_HOST}:${SPO_SITE_PATH}`;
         const siteResponse = await fetch(siteUrl, { headers: { Authorization: `Bearer ${token}` }});
         const site = await siteResponse.json();
         
+        console.log('Site response:', site);
+        
+        if (!site.id) {
+          throw new Error('Failed to get site ID from SharePoint. Response: ' + JSON.stringify(site));
+        }
+        
         // Get list
         const listNameOData = SPO_LIST_TITLE.replace(/'/g, "''");
         const listsUrl = `https://graph.microsoft.com/v1.0/sites/${site.id}/lists?$filter=displayName eq '${listNameOData}'`;
         const listsResponse = await fetch(listsUrl, { headers: { Authorization: `Bearer ${token}` }});
         const listsData = await listsResponse.json();
+        
+        if (!listsData.value || listsData.value.length === 0) {
+          throw new Error(`List '${SPO_LIST_TITLE}' not found`);
+        }
+        
         const listId = listsData.value[0].id;
         
         // Get items
