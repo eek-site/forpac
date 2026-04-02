@@ -1,0 +1,6 @@
+# https://www.formanpacific.com/
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://www.formanpacific.com/sitemap.xml
